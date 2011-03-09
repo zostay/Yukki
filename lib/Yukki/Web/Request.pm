@@ -25,7 +25,7 @@ has request => (
         secure body input session session_options logger cookies query_parameters
         body_parameters parameters content raw_body uri base user headers uploads
         content_encoding content_length content_type header referer user_agent param
-        upload new_response
+        upload 
     ) ],
 );
 
@@ -40,21 +40,6 @@ has path_parameters => (
     required    => 1,
     default     => sub { +{} },
 );
-
-for my $message_type (qw( errors warnings info )) {
-    has $message_type => (
-        is          => 'ro',
-        isa         => 'ArrayRef[Str]',
-        required    => 1,
-        default     => sub { [] },
-        traits      => [ 'Array' ],
-        handles     => {
-            "list_$message_type" => 'elements',
-            "add_$message_type"  => 'push',
-            "has_$message_type"  => 'count',
-        },
-    );
-}
 
 1;
 

@@ -98,10 +98,10 @@ sub node_constructors {
 }
 
 sub replace_nodes {
-    my ($self, $replacement, $request, @nodes) = @_;
+    my ($self, $replacement, $context, @nodes) = @_;
 
     NODE: for my $node (@nodes) {
-        $replacement = $replacement->($request, $node) if ref $replacement eq 'CODE';
+        $replacement = $replacement->($context, $node) if ref $replacement eq 'CODE';
 
         next NODE unless defined $replacement;
 
@@ -120,9 +120,9 @@ sub replace_nodes {
 }
 
 sub render {
-    my ($self, $template, $req, $actions, $in_wrapper, $to_string) = validated_list(\@_,
+    my ($self, $template, $ctx, $actions, $in_wrapper, $to_string) = validated_list(\@_,
         template   => { isa => 'Str', coerce => 1 },
-        request    => { isa => 'Yukki::Web::Request' },
+        context    => { isa => 'Yukki::Web::Context' },
         actions    => { isa => 'HashRef', default => {} },
         in_wrapper => { isa => 'Bool', default => 0 },
         to_string  => { isa => 'Bool', default => 1 },
@@ -135,7 +135,7 @@ sub render {
 
     while (my ($path, $replacement) = each %$actions) {
         my @nodes = $self->select_nodes($document, $path);
-        $self->replace_nodes($replacement, $req, @nodes);
+        $self->replace_nodes($replacement, $ctx, @nodes);
     }
 
     if ($in_wrapper) {
@@ -143,23 +143,31 @@ sub render {
             in_wrapper => 0,
             to_string  => $to_string,
             template   => 'shell.html',
-            request    => $req,
+            context    => $ctx,
             actions    => {
                 '#messages'  => sub {
                     $self->render(
                         in_wrapper => 0,
                         to_string  => 0,
                         template   => 'messages.html',
-                        request    => $req,
+                        context    => $ctx,
                         actions    => {
-                            '.navigation' => sub { [ $req->navigation    ] },
-                            '.error'      => sub { [ $req->list_errors   ] },
-                            '.warning'    => sub { [ $req->list_warnings ] },
-                            '.info'       => sub { [ $req->list_info     ] },
+                            '.main-title' => sub {
+                                if ($ctx->response->has_page_title) {
+                                   return $ctx->response->page_title . ' - Yukki';
+                               }
+                               else {
+                                   return 'Yukki';
+                               }
+                           },
+                            '.navigation' => [ $ctx->response->navigation ],
+                            '.error'      => [ $ctx->list_errors          ],
+                            '.warning'    => [ $ctx->list_warnings        ],
+                            '.info'       => [ $ctx->list_info            ],
                         },
                     );
                 },
-                '#content' => sub { $document->root },
+                '#content' => $document->root,
             },
         );
     }

@@ -7,61 +7,55 @@ extends 'Yukki::Web::Controller';
 use HTTP::Throwable::Factory qw( http_throw );
 
 sub fire {
-    my ($self, $req) = @_;
+    my ($self, $ctx) = @_;
 
     my $res;
-    given ($req->path_parameters->{action}) {
-        when ('page')   { $res = $self->show_login_page($req) }
-        when ('submit') { $res = $self->check_login_submission($req) }
-        when ('exit')   { $res = $self->logout($req) }
+    given ($ctx->request->path_parameters->{action}) {
+        when ('page')   { $self->show_login_page($ctx) }
+        when ('submit') { $self->check_login_submission($ctx) }
+        when ('exit')   { $self->logout($ctx) }
         default         { http_throw('NotFound') }
     }
-
-    return $res->finalize;
 }
 
 sub show_login_page {
-    my ($self, $req) = @_;
+    my ($self, $ctx) = @_;
 
-    my $res = $req->new_response(200);
-    $res->content_type('text/html');
-    $res->body( $self->view('Login')->page($req) );
-
-    return $res;
+    $ctx->response->body( $self->view('Login')->page($ctx) );
 }
 
 sub check_login_submission {
-    my ($self, $req) = @_;
+    my ($self, $ctx) = @_;
+    
+    my $login_name = $ctx->request->body_parameters->{login_name};
+    my $password   = $ctx->request->body_parameters->{password};
 
-    my $user = $self->model('User')->find(login_name => $req->body_parameters->{login_name});
+    my $user = $self->model('User')->find(login_name => $login_name);
 
-    $req->add_errors('no such user or you typed your password incorrectly') unless $user;
+    $ctx->add_errors('no such user or you typed your password incorrectly') unless $user;
 
-    if ($user and $user->{password} ne $req->body_parameters->{password}) {
-        $req->add_errors('no such user or you typed your password incorrectly');
+    if ($user and $user->{password} ne $password) {
+        $ctx->add_errors('no such user or you typed your password incorrectly');
     }
 
-    if ($req->has_errors) {
-        return $self->show_login_page($req);
+    if ($ctx->has_errors) {
+        $self->show_login_page($ctx);
+        return;
     }
 
     else {
-        $req->session->{user} = $user;
+        $ctx->request->session->{user} = $user;
 
-        my $res = $req->new_response;
-        $res->redirect('/page/view/main');
-        return $res;
+        $ctx->response->redirect('/page/view/main');
+        return;
     }
 }
 
 sub logout {
-    my ($self, $req) = @_;
+    my ($self, $ctx) = @_;
 
-    $req->session->expire;
-
-    my $res = $req->new_response;
-    $res->redirect('/login');
-    return $res;
+    $ctx->request->session->expire;
+    $ctx->response->redirect('/login');
 }
 
 1;

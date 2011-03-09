@@ -7,15 +7,14 @@ extends 'Yukki::Web::Controller';
 use HTTP::Throwable::Factory qw( http_throw );
 
 sub fire {
-    my ($self, $req) = @_;
+    my ($self, $ctx) = @_;
 
     # TODO Check access...
     warn "TODO CHECK ACCESS\n";
 
-    my $response;
-    given ($req->path_parameters->{action}) {
-        when ('view') { $response = $self->view_page($req) }
-        when ('edit') { $response = $self->edit_page($req) }
+    given ($ctx->request->path_parameters->{action}) {
+        when ('view') { $self->view_page($ctx) }
+        when ('edit') { $self->edit_page($ctx) }
         default {
             http_throw('InternalServerError', { 
                 show_stack_trace => 0,
@@ -23,61 +22,55 @@ sub fire {
             });
         }
     }
-
-    return $response->finalize;
 }
 
 sub view_page {
-    my ($self, $req) = @_;
+    my ($self, $ctx) = @_;
 
-    my $repository = $req->path_parameters->{repository};
-    my $page       = $req->path_parameters->{page};
+    my $repository = $ctx->request->path_parameters->{repository};
+    my $page       = $ctx->request->path_parameters->{page};
 
     my $content = $self->model('Page')->load($repository, $page);
 
     my $body;
     if (not defined $content) {
-        $body = $self->view('Page')->blank($req, { repository => $repository, page => $page });
+        $body = $self->view('Page')->blank($ctx, { repository => $repository, page => $page });
     }
 
     else {
-        $body = $self->view('Page')->view($req, { content => $content });
+        $body = $self->view('Page')->view($ctx, { content => $content });
     }
 
-    my $res = $req->new_response(200);
-    $res->content_type('text/html');
-    $res->body($body);
-
-    return $res;
+    $ctx->response->body($body);
 }
 
 sub edit_page {
-    my ($self, $req) = @_;
+    my ($self, $ctx) = @_;
 
-    my $repository = $req->path_parameters->{repository};
-    my $page       = $req->path_parameters->{page};
+    my $repository = $ctx->request->path_parameters->{repository};
+    my $page       = $ctx->request->path_parameters->{page};
 
-    if ($req->method eq 'POST') {
-        my $new_content = $req->parameters->{yukkitext};
-        my $comment     = $req->parameters->{comment};
+    if ($ctx->request->method eq 'POST') {
+        my $new_content = $ctx->request->parameters->{yukkitext};
+        my $comment     = $ctx->request->parameters->{comment};
 
         $self->model('Page')->save($repository, $page, {
             content => $new_content,
             comment => $comment,
         });
 
-        my $response = $req->new_response;
-        $response->redirect(join '/', '/page/view', $repository, $page);
-        return $response;
+        $ctx->response->redirect(join '/', '/page/view', $repository, $page);
+        return;
     }
 
     my $content = $self->model('Page')->load($repository, $page);
 
-    my $res = $req->new_response(200);
-    $res->content_type('text/html');
-    $res->body( $self->view('Page')->edit($req, { page => $page, content => $content }) );
-
-    return $res;
+    $ctx->response->body( 
+        $self->view('Page')->edit($ctx, { 
+            page    => $page, 
+            content => $content 
+        }) 
+    );
 }
 
 1;

@@ -4,7 +4,7 @@ use Moose;
 extends qw( Yukki );
 
 use Yukki::Error;
-use Yukki::Web::Request;
+use Yukki::Web::Context;
 use Yukki::Web::Router;
 
 use HTTP::Throwable::Factory qw( http_throw http_exception );
@@ -51,16 +51,18 @@ sub dispatch {
 
     my $response;
     try {
-        my $req = Yukki::Web::Request->new(env => $env);
-        my $match = $self->router->match($req->path);
+        my $ctx = Yukki::Web::Context->new(env => $env);
+
+        my $match = $self->router->match($ctx->request->path);
 
         http_throw('NotFound') unless $match;
 
-        $req->path_parameters($match->mapping);
+        $ctx->request->path_parameters($match->mapping);
 
         my $controller = $match->target;
 
-        $response = $controller->fire($req);
+        $controller->fire($ctx);
+        $response = $ctx->response->finalize;
     }
 
     catch {
