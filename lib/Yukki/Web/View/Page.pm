@@ -19,3 +19,18 @@ sub view {
         },
     );
 }
+
+sub edit {
+    my ($self, $req, $params) = @_;
+
+    return $self->render(
+        in_wrapper => 1,
+        template   => 'page/edit.html',
+        request    => $req,
+        actions    => {
+            '#yukkitext' => sub { $params->{content} },
+        },
+    );
+}
+
+1;

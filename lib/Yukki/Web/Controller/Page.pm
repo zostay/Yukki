@@ -4,7 +4,6 @@ use Moose;
 
 extends 'Yukki::Web::Controller';
 
-use Git::Repository;
 use HTTP::Throwable::Factory qw( http_throw );
 
 sub fire {
@@ -16,6 +15,7 @@ sub fire {
     my $response;
     given ($req->path_parameters->{action}) {
         when ('view') { $response = $self->view_page($req) }
+        when ('edit') { $response = $self->edit_page($req) }
         default {
             http_throw('InternalServerError', { 
                 show_stack_trace => 0,
@@ -31,30 +31,46 @@ sub view_page {
     my ($self, $req) = @_;
 
     my $repository = $req->path_parameters->{repository};
-    my $page       = join '.', $req->path_parameters->{page}, 'mkd';
+    my $page       = $req->path_parameters->{page};
 
-    my $repo_settings = $self->app->settings->{repositories}{$repository};
-    http_throw('NotFound') if not defined $repo_settings;
+    my $content = $self->model('Page')->load($repository, $page);
 
-    my $repo_dir = $self->locate('repository_path', $repo_settings->{repository});
-    my $git = Git::Repository->new( git_dir => $repo_dir );
-
-    my $object_id;
-    my @files = $git->run('ls-tree', 'refs/heads/master', $page);
-    FILE: for my $line (@files) {
-        my ($mode, $type, $id, $name) = split /\s+/, $line;
-
-        if ($name eq $page) {
-            $object_id = $id;
-            last FILE;
-        }
-    }
-
-    my $content = $git->run('show', $object_id);
+    http_throw('NotFound') if not defined $content;
 
     my $res = $req->new_response(200);
     $res->content_type('text/html');
     $res->body( $self->view('Page')->view($req, { content => $content }) );
+
+    return $res;
+}
+
+sub edit_page {
+    my ($self, $req) = @_;
+
+    my $repository = $req->path_parameters->{repository};
+    my $page       = $req->path_parameters->{page};
+
+    if ($req->method eq 'POST') {
+        my $new_content = $req->parameters->{yukkitext};
+        my $comment     = $req->parameters->{comment};
+
+        $self->model('Page')->save($repository, $page, {
+            content => $new_content,
+            comment => $comment,
+        });
+
+        my $response = $req->new_response;
+        $response->redirect(join '/', '/page/view', $repository, $page);
+        return $response;
+    }
+
+    my $content = $self->model('Page')->load($repository, $page);
+
+    http_throw('NotFound') if not defined $content;
+
+    my $res = $req->new_response(200);
+    $res->content_type('text/html');
+    $res->body( $self->view('Page')->edit($req, { content => $content }) );
 
     return $res;
 }
