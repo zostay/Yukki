@@ -5,6 +5,22 @@ extends 'Yukki::Web::View';
 
 use Text::MultiMarkdown qw( markdown );
 
+sub blank {
+    my ($self, $req, $vars) = @_;
+
+    my $link = "/page/edit/$vars->{repository}/$vars->{page}";
+
+    return $self->render(
+        in_wrapper => 1,
+        template   => 'page/blank.html',
+        request    => $req,
+        actions    => {
+            '#yukkiname'   => sub { $vars->{page} },
+            '#create-page' => sub { { href => $link } },
+        },
+    );
+}
+
 sub view {
     my ($self, $req, $params) = @_;
 
@@ -28,6 +44,7 @@ sub edit {
         template   => 'page/edit.html',
         request    => $req,
         actions    => {
+            '#yukkiname' => sub { $params->{page} },
             '#yukkitext' => sub { $params->{content} },
         },
     );

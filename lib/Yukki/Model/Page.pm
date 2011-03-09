@@ -92,6 +92,8 @@ sub load {
         }
     }
 
+    return unless defined $object_id;
+
     return $git->run('show', $object_id);
 }
 

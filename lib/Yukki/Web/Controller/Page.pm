@@ -35,11 +35,18 @@ sub view_page {
 
     my $content = $self->model('Page')->load($repository, $page);
 
-    http_throw('NotFound') if not defined $content;
+    my $body;
+    if (not defined $content) {
+        $body = $self->view('Page')->blank($req, { repository => $repository, page => $page });
+    }
+
+    else {
+        $body = $self->view('Page')->view($req, { content => $content });
+    }
 
     my $res = $req->new_response(200);
     $res->content_type('text/html');
-    $res->body( $self->view('Page')->view($req, { content => $content }) );
+    $res->body($body);
 
     return $res;
 }
@@ -66,11 +73,9 @@ sub edit_page {
 
     my $content = $self->model('Page')->load($repository, $page);
 
-    http_throw('NotFound') if not defined $content;
-
     my $res = $req->new_response(200);
     $res->content_type('text/html');
-    $res->body( $self->view('Page')->edit($req, { content => $content }) );
+    $res->body( $self->view('Page')->edit($req, { page => $page, content => $content }) );
 
     return $res;
 }
