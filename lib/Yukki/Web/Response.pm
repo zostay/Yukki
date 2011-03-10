@@ -30,6 +30,12 @@ has navigation => (
     isa         => 'ArrayRef',
     required    => 1,
     default     => sub { [] },
+    traits      => [ 'Array' ],
+    handles     => {
+        navigation_menu      => 'elements',
+        add_navigation_item  => 'push',
+        add_navigation_items => 'push',
+    },
 );
 
 1;

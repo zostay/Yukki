@@ -26,6 +26,11 @@ sub view {
 
     my $markdown = '<div>' . markdown($params->{content}) . '</div>';
 
+    $ctx->response->add_navigation_item({
+        label => 'Edit',
+        href  => join('/', '/page/edit', $params->{repository}, $params->{page}),
+    });
+
     return $self->render(
         in_wrapper => 1,
         template   => 'page/view.html',
@@ -38,6 +43,11 @@ sub view {
 
 sub edit {
     my ($self, $ctx, $params) = @_;
+
+    $ctx->response->add_navigation_item({
+        label => 'View',
+        href  => join('/', '/page/view', $params->{repository}, $params->{page}),
+    });
 
     return $self->render(
         in_wrapper => 1,

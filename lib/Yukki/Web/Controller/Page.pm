@@ -38,7 +38,11 @@ sub view_page {
     }
 
     else {
-        $body = $self->view('Page')->view($ctx, { content => $content });
+        $body = $self->view('Page')->view($ctx, { 
+            repository => $repository,
+            page       => $page, 
+            content    => $content,
+        });
     }
 
     $ctx->response->body($body);
@@ -67,8 +71,9 @@ sub edit_page {
 
     $ctx->response->body( 
         $self->view('Page')->edit($ctx, { 
-            page    => $page, 
-            content => $content 
+            repository => $repository,
+            page       => $page, 
+            content    => $content 
         }) 
     );
 }

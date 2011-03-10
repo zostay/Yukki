@@ -57,6 +57,10 @@ sub node_constructors {
             });
         }
 
+        when (ref $_ eq 'CODE') {
+            @nodes = ($_);
+        }
+
         when (blessed $_ and $_->isa('XML::Twig::Elt')) { 
             @nodes = (sub { 
                 my $node = shift;
@@ -86,7 +90,7 @@ sub node_constructors {
 
         # Flattening is necessary and intentional
         when (reftype $_ eq 'ARRAY') {
-            @nodes = map { $self->construct_node($_) } @$node_like;
+            @nodes = map { $self->node_constructors($_) } @$node_like;
         }
 
         default {
@@ -101,6 +105,8 @@ sub replace_nodes {
     my ($self, $replacement, $context, @nodes) = @_;
 
     NODE: for my $node (@nodes) {
+        warn $node->sprint;
+        my $replacement = $replacement;
         $replacement = $replacement->($context, $node) if ref $replacement eq 'CODE';
 
         next NODE unless defined $replacement;
@@ -139,6 +145,16 @@ sub render {
     }
 
     if ($in_wrapper) {
+        my $nav = sub {
+            my $nav = $_;
+            sub {
+                my $node = shift;
+                my $a = $node->first_descendant('a');
+                $a->set_att(href => $nav->{href});
+                $a->set_text($nav->{label});
+            };
+        };
+
         return $self->render(
             in_wrapper => 0,
             to_string  => $to_string,
@@ -152,21 +168,21 @@ sub render {
                         template   => 'messages.html',
                         context    => $ctx,
                         actions    => {
-                            '.main-title' => sub {
-                                if ($ctx->response->has_page_title) {
-                                   return $ctx->response->page_title . ' - Yukki';
-                               }
-                               else {
-                                   return 'Yukki';
-                               }
-                           },
-                            '.navigation' => [ $ctx->response->navigation ],
-                            '.error'      => [ $ctx->list_errors          ],
-                            '.warning'    => [ $ctx->list_warnings        ],
-                            '.info'       => [ $ctx->list_info            ],
+                            '.error'      => [ $ctx->list_errors   ],
+                            '.warning'    => [ $ctx->list_warnings ],
+                            '.info'       => [ $ctx->list_info     ],
                         },
                     );
                 },
+                '.main-title' => sub {
+                    if ($ctx->response->has_page_title) {
+                        return $ctx->response->page_title . ' - Yukki';
+                    }
+                    else {
+                        return 'Yukki';
+                    }
+                },
+                '.navigation' => [ map { $nav->() } $ctx->response->navigation_menu ],
                 '#content' => $document->root,
             },
         );
