@@ -28,7 +28,7 @@ sub view_page {
     my ($self, $ctx) = @_;
 
     my $repository = $ctx->request->path_parameters->{repository};
-    my $page       = $ctx->request->path_parameters->{page};
+    my $page       = join '/', @{ $ctx->request->path_parameters->{page} };
 
     my $content = $self->model('Page')->load($repository, $page);
 
@@ -52,7 +52,7 @@ sub edit_page {
     my ($self, $ctx) = @_;
 
     my $repository = $ctx->request->path_parameters->{repository};
-    my $page       = $ctx->request->path_parameters->{page};
+    my $page       = join '/', @{ $ctx->request->path_parameters->{page} };
 
     if ($ctx->request->method eq 'POST') {
         my $new_content = $ctx->request->parameters->{yukkitext};

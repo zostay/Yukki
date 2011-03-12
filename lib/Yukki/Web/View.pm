@@ -106,7 +106,6 @@ sub replace_nodes {
     my ($self, $replacement, $context, @nodes) = @_;
 
     NODE: for my $node (@nodes) {
-        warn $node->sprint;
         my $replacement = $replacement;
         $replacement = $replacement->($context, $node) if ref $replacement eq 'CODE';
 

@@ -3,11 +3,21 @@ use Moose;
 
 extends 'Path::Router';
 
+use Yukki::Web::Router::Route;
+
+use Moose::Util::TypeConstraints qw( subtype where );
+use List::MoreUtils qw( all );
+
 =head1 NAME
 
 Yukki::Web::Router - send requests to the correct controllers, yo
 
 =cut
+
+# Add support for slurpy variables, inline off because I haven't written the match
+# generator function yet.
+has '+route_class' => ( default => 'Yukki::Web::Router::Route' );
+has '+inline'      => ( default => 0 );
 
 has app => (
     is          => 'ro',
@@ -37,7 +47,7 @@ sub BUILD {
         target => $self->controller('Login'),
     ));
 
-    $self->add_route('page/:action/:repository/?:page' => (
+    $self->add_route('page/:action/:repository/*:page' => (
         defaults => {
             action     => 'view',
             repository => 'main',
@@ -46,7 +56,9 @@ sub BUILD {
         validations => {
             action     => qr/^(?:view|edit)$/,
             repository => qr/^[a-z0-9]+$/i,
-            page       => qr/^[a-z0-9]+(?:\.[a-z0-9]+)*$/i,
+            page       => subtype('ArrayRef[Str]' => where {
+                all { /^[a-z0-9]+(?:\.[a-z0-9]+)*$/ } @$_
+            }),
         },
         target => $self->controller('Page'),
     ));
