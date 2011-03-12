@@ -203,6 +203,8 @@ sub yukkilink {
     my $link       = $params->{link};
     my $label      = $params->{label} // $link;
 
+    ($repository, $link) = split /:/, 2 if $link =~ /:/;
+
     $label =~ s/^\s*//; $label =~ s/\s*$//;
     return qq{<a href="/page/view/$repository/$link">$label</a>};
 }
@@ -210,11 +212,29 @@ sub yukkilink {
 sub yukkitext {
     my ($self, $params) = @_;
 
-    my $yukkitext = $params->{yukkitext};
+    my $repository = $params->{repository};
+    my $yukkitext  = $params->{yukkitext};
 
-    $yukkitext =~ s{ \[\[ \s* ([\w/.]*) \s* (?: \| ([^\]]*) )? \]\] }{ 
-        $self->yukkilink({ %$params, link => $1, label => $2 });
-    }xe;
+    $yukkitext =~ s{ 
+        \[\[ \s*                # [[ to start it
+
+            (?: ([\w]+) : )?    # repository: is optional
+            ([\w/.]+) \s*       # link/to/page is mandatory
+
+            (?: \|              # | to split link from label
+                ([^\]]+)        # a pretty label (needs trimming)
+            )?                  # is optional
+
+        \]\]                    # ]] to end
+    }{ 
+        $self->yukkilink({ 
+            %$params, 
+            
+            repository => $1 // $repository, 
+            link       => $2, 
+            label      => $3,
+        });
+    }xeg;
 
     return '<div>' . markdown($yukkitext) . '</div>';
 }
