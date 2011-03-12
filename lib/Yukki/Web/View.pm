@@ -5,6 +5,7 @@ use Moose;
 use MooseX::Params::Validate;
 use Path::Class;
 use Scalar::Util qw( blessed reftype );
+use Text::MultiMarkdown qw( markdown );
 use XML::Twig;
 
 has app => (
@@ -193,6 +194,29 @@ sub render {
     else {
         return $document->root;
     }
+}
+
+sub yukkilink {
+    my ($self, $params) = @_;
+
+    my $repository = $params->{repository};
+    my $link       = $params->{link};
+    my $label      = $params->{label} // $link;
+
+    $label =~ s/^\s*//; $label =~ s/\s*$//;
+    return qq{<a href="/page/view/$repository/$link">$label</a>};
+}
+
+sub yukkitext {
+    my ($self, $params) = @_;
+
+    my $yukkitext = $params->{yukkitext};
+
+    $yukkitext =~ s{ \[\[ \s* ([\w/.]*) \s* (?: \| ([^\]]*) )? \]\] }{ 
+        $self->yukkilink({ %$params, link => $1, label => $2 });
+    }xe;
+
+    return '<div>' . markdown($yukkitext) . '</div>';
 }
 
 1;

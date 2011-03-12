@@ -3,8 +3,6 @@ use Moose;
 
 extends 'Yukki::Web::View';
 
-use Text::MultiMarkdown qw( markdown );
-
 sub blank {
     my ($self, $ctx, $vars) = @_;
 
@@ -24,7 +22,11 @@ sub blank {
 sub view {
     my ($self, $ctx, $params) = @_;
 
-    my $markdown = '<div>' . markdown($params->{content}) . '</div>';
+    my $html = $self->yukkitext({
+        page       => $params->{page},
+        repository => $params->{repository},
+        yukkitext  => $params->{content},
+    });
 
     $ctx->response->add_navigation_item({
         label => 'Edit',
@@ -36,7 +38,7 @@ sub view {
         template   => 'page/view.html',
         context    => $ctx,
         actions    => {
-            '#yukkitext' => sub { \$markdown },
+            '#yukkitext' => sub { \$html },
         },
     );
 }
