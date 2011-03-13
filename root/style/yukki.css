@@ -1,0 +1,11 @@
+* { margin: 0; padding: 0; color: #333; font-family: Optima }
+li { margin-left: 2em; }
+
+#masthead { padding: 2em 1em; background: #ddf }
+#masthead .main-title { color: #339 }
+#navigation .navigation, #bottom-navigation .navigation { margin: 0; list-style: none; float: left }
+
+#main { padding: 1em; }
+
+textarea#yukkitext { width: 100%; height: 20em; }
+input#comment { width: 80em; }

@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 
+use Plack::App::File;
 use Plack::Builder;
 use YAML qw( LoadFile );
 
@@ -20,7 +21,12 @@ my $app = sub {
 };
 
 builder {
-    enable 'Session';
+    mount "/style"  => Plack::App::File->new( root => $server->locate_dir('static_path', 'style') );
+    mount "/script" => Plack::App::File->new( root => $server->locate_dir('static_path', 'script') );
 
-    $app;
+    mount "/"       => builder { 
+        enable 'Session';
+
+        $app;
+    };
 };
