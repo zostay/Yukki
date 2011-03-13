@@ -6,6 +6,7 @@ requires qw(
     view
     controller
     locate
+    locate_dir
 );
 
 1;

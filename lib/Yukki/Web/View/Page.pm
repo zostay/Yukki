@@ -57,7 +57,7 @@ sub edit {
         context    => $ctx,
         actions    => {
             '#yukkiname' => sub { $params->{page} },
-            '#yukkitext' => sub { $params->{content} },
+            '#yukkitext' => sub { $params->{content} || '' },
         },
     );
 }

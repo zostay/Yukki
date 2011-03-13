@@ -24,23 +24,39 @@ sub fire {
     }
 }
 
+sub lookup_page {
+    my ($self, $repo_name, $page) = @_;
+
+    my $repository = $self->model('Repository', { name => $repo_name });
+
+    my $final_part = shift @$page;
+    my $filetype;
+    if ($final_part =~ s/\.(?<filetype>[a-z0-9]+)$//) {
+        $filetype = $+{filetype};
+    }
+
+    my $path = join '/', @$page, $final_part;
+    return $repository->page({ path => $path, filetype => $filetype });
+}
+
 sub view_page {
     my ($self, $ctx) = @_;
 
-    my $repository = $ctx->request->path_parameters->{repository};
-    my $page       = join '/', @{ $ctx->request->path_parameters->{page} };
+    my $repo_name  = $ctx->request->path_parameters->{repository};
+    my $path       = $ctx->request->path_parameters->{page};
 
-    my $content = $self->model('Page')->load($repository, $page);
+    my $page    = $self->lookup_page($repo_name, $path);
+    my $content = $page->fetch;
 
     my $body;
     if (not defined $content) {
-        $body = $self->view('Page')->blank($ctx, { repository => $repository, page => $page });
+        $body = $self->view('Page')->blank($ctx, { repository => $repo_name, page => $page->path });
     }
 
     else {
         $body = $self->view('Page')->view($ctx, { 
-            repository => $repository,
-            page       => $page, 
+            repository => $repo_name,
+            page       => $page->path, 
             content    => $content,
         });
     }
@@ -51,28 +67,30 @@ sub view_page {
 sub edit_page {
     my ($self, $ctx) = @_;
 
-    my $repository = $ctx->request->path_parameters->{repository};
-    my $page       = join '/', @{ $ctx->request->path_parameters->{page} };
+    my $repo_name = $ctx->request->path_parameters->{repository};
+    my $path      = $ctx->request->path_parameters->{page};
+
+    my $page = $self->lookup_page($repo_name, $path);
 
     if ($ctx->request->method eq 'POST') {
         my $new_content = $ctx->request->parameters->{yukkitext};
         my $comment     = $ctx->request->parameters->{comment};
 
-        $self->model('Page')->save($repository, $page, {
+        $page->store({ 
             content => $new_content,
             comment => $comment,
         });
 
-        $ctx->response->redirect(join '/', '/page/view', $repository, $page);
+        $ctx->response->redirect(join '/', '/page/view', $repo_name, $page->path);
         return;
     }
 
-    my $content = $self->model('Page')->load($repository, $page);
+    my $content = $page->fetch;
 
     $ctx->response->body( 
         $self->view('Page')->edit($ctx, { 
-            repository => $repository,
-            page       => $page, 
+            repository => $repo_name,
+            page       => $page->path, 
             content    => $content 
         }) 
     );

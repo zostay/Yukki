@@ -51,7 +51,7 @@ sub BUILD {
         defaults => {
             action     => 'view',
             repository => 'main',
-            page       => 'home',
+            page       => [ 'home' ],
         },
         validations => {
             action     => qr/^(?:view|edit)$/,

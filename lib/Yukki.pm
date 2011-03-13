@@ -33,22 +33,36 @@ sub view { die 'not implemented here' }
 sub controller { die 'not implemented here' }
 
 sub model {
-    my ($self, $name) = @_;
+    my ($self, $name, $params) = @_;
     my $class_name = join '::', 'Yukki::Model', $name;
     Class::MOP::load_class($class_name);
-    return $class_name->new(app => $self);
+    return $class_name->new(app => $self, %{ $params // {} });
+}
+
+sub _locate {
+    my ($self, $type, $base, @extra_path) = @_;
+
+    my $path_class = $type eq 'file' ? 'Path::Class::File'
+                   : $type eq 'dir'  ? 'Path::Class::Dir'
+                   : Yukki::Error->throw("unkonwn location type $type");
+
+    my $base_path = $self->settings->{$base};
+    if ($base_path !~ m{^/}) {
+        return $path_class->new($self->settings->{root}, $base_path, @extra_path);
+    }
+    else {
+        return $path_class->new($base_path, @extra_path);
+    }
 }
 
 sub locate {
     my ($self, $base, @extra_path) = @_;
+    $self->_locate(file => $base, @extra_path);
+}
 
-    my $base_path = $self->settings->{$base};
-    if ($base_path !~ m{^/}) {
-        return file($self->settings->{root}, $base_path, @extra_path);
-    }
-    else {
-        return file($base_path, @extra_path);
-    }
+sub locate_dir {
+    my ($self, $base, @extra_path) = @_;
+    $self->_locate(dir => $base, @extra_path);
 }
 
 with qw( Yukki::Role::App );
