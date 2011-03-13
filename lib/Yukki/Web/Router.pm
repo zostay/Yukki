@@ -55,9 +55,9 @@ sub BUILD {
         },
         validations => {
             action     => qr/^(?:view|edit)$/,
-            repository => qr/^[a-z0-9]+$/i,
+            repository => qr/^[_a-z0-9]+$/i,
             page       => subtype('ArrayRef[Str]' => where {
-                all { /^[a-z0-9]+(?:\.[a-z0-9]+)*$/ } @$_
+                all { /^[_a-z0-9-]+(?:\.[_a-z0-9-]+)*$/i } @$_
             }),
         },
         target => $self->controller('Page'),

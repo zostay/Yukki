@@ -29,7 +29,7 @@ sub lookup_page {
 
     my $repository = $self->model('Repository', { name => $repo_name });
 
-    my $final_part = shift @$page;
+    my $final_part = pop @$page;
     my $filetype;
     if ($final_part =~ s/\.(?<filetype>[a-z0-9]+)$//) {
         $filetype = $+{filetype};
@@ -56,7 +56,7 @@ sub view_page {
     else {
         $body = $self->view('Page')->view($ctx, { 
             repository => $repo_name,
-            page       => $page->path, 
+            page       => $page->full_path, 
             content    => $content,
         });
     }
@@ -81,7 +81,7 @@ sub edit_page {
             comment => $comment,
         });
 
-        $ctx->response->redirect(join '/', '/page/view', $repo_name, $page->path);
+        $ctx->response->redirect(join '/', '/page/edit', $repo_name, $page->full_path);
         return;
     }
 
@@ -90,7 +90,7 @@ sub edit_page {
     $ctx->response->body( 
         $self->view('Page')->edit($ctx, { 
             repository => $repo_name,
-            page       => $page->path, 
+            page       => $page->full_path, 
             content    => $content 
         }) 
     );
