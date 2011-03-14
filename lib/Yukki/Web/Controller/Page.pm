@@ -51,7 +51,10 @@ sub view_page {
 
     my $body;
     if (not defined $content) {
-        $body = $self->view('Page')->blank($ctx, { repository => $repo_name, page => $page->path });
+        $body = $self->view('Page')->blank($ctx, { 
+            repository => $repo_name, 
+            page       => $page->full_path,
+        });
     }
 
     else {

@@ -19,4 +19,4 @@ textarea#yukkitext { width: 100%; height: 20em; }
 input#comment { width: 100%; }
 
 .pane { width: 48% }
-div#preview-yukkitext { border: 1px inset; padding: 5px; height: 30em; overflow: auto; float: right; }
+div#preview-yukkitext { border: 1px inset; padding: 5px; height: 28em; overflow: auto; float: right; }

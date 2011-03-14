@@ -5,7 +5,7 @@ use Moose;
 use MooseX::Params::Validate;
 use Path::Class;
 use Scalar::Util qw( blessed reftype );
-use Text::MultiMarkdown qw( markdown );
+use Text::MultiMarkdown;
 use XML::Twig;
 
 has app => (
@@ -15,6 +15,22 @@ has app => (
     weak_ref    => 1,
     handles     => 'Yukki::Role::App',
 );
+
+has markdown => (
+    is          => 'ro',
+    isa         => 'Text::MultiMarkdown',
+    required    => 1,
+    lazy_build  => 1,
+    handles     => {
+        'format_markdown' => 'markdown',
+    },
+);
+
+sub _build_markdown {
+    Text::MultiMarkdown->new(
+        markdown_in_html_blocks => 1,
+    );
+}
 
 sub select_nodes {
     my ($self, $document, $path) = @_;
@@ -218,7 +234,7 @@ sub yukkitext {
         \[\[ \s*                # [[ to start it
 
             (?: ([\w]+) : )?    # repository: is optional
-            ([\w/.]+) \s*       # link/to/page is mandatory
+            ([\w/.\-]+) \s*     # link/to/page is mandatory
 
             (?: \|              # | to split link from label
                 ([^\]]+)        # a pretty label (needs trimming)
@@ -235,7 +251,7 @@ sub yukkitext {
         });
     }xeg;
 
-    return '<div>' . markdown($yukkitext) . '</div>';
+    return '<div>' . $self->format_markdown($yukkitext) . '</div>';
 }
 
 1;
