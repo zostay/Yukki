@@ -13,8 +13,9 @@ sub fire {
     warn "TODO CHECK ACCESS\n";
 
     given ($ctx->request->path_parameters->{action}) {
-        when ('view') { $self->view_page($ctx) }
-        when ('edit') { $self->edit_page($ctx) }
+        when ('view')    { $self->view_page($ctx) }
+        when ('edit')    { $self->edit_page($ctx) }
+        when ('preview') { $self->preview_page($ctx) }
         default {
             http_throw('InternalServerError', { 
                 show_stack_trace => 0,
@@ -93,6 +94,25 @@ sub edit_page {
             page       => $page->full_path, 
             content    => $content 
         }) 
+    );
+}
+
+sub preview_page {
+    my ($self, $ctx) = @_;
+
+    my $repo_name = $ctx->request->path_parameters->{repository};
+    my $path      = $ctx->request->path_parameters->{page};
+
+    my $page = $self->lookup_page($repo_name, $path);
+
+    my $content = $ctx->request->body_parameters->{yukkitext};
+
+    $ctx->response->body(
+        $self->view('Page')->preview($ctx, { 
+            repository => $repo_name,
+            path       => $page->full_path,
+            content    => $content,
+        })
     );
 }
 

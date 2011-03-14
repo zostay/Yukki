@@ -51,15 +51,34 @@ sub edit {
         href  => join('/', '/page/view', $params->{repository}, $params->{page}),
     });
 
+    my $html = $self->yukkitext({
+        page       => $params->{page},
+        repository => $params->{repository},
+        yukkitext  => $params->{content},
+    });
+
     return $self->render(
         in_wrapper => 1,
         template   => 'page/edit.html',
         context    => $ctx,
         actions    => {
-            '#yukkiname' => sub { $params->{page} },
-            '#yukkitext' => sub { $params->{content} || '' },
+            '#yukkiname'    => sub { $params->{page} },
+            '#yukkitext'    => sub { $params->{content} || '' },
+            '#preview-yukkitext' => sub { \$html },
         },
     );
+}
+
+sub preview {
+    my ($self, $ctx, $params) = @_;
+
+    my $html = $self->yukkitext({
+        page       => $params->{page},
+        repository => $params->{repository},
+        yukkitext  => $params->{content},
+    });
+
+    return $html;
 }
 
 1;

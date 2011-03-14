@@ -54,7 +54,7 @@ sub BUILD {
             page       => [ 'home' ],
         },
         validations => {
-            action     => qr/^(?:view|edit)$/,
+            action     => qr/^(?:view|edit|preview)$/,
             repository => qr/^[_a-z0-9]+$/i,
             page       => subtype('ArrayRef[Str]' => where {
                 all { /^[_a-z0-9-]+(?:\.[_a-z0-9-]+)*$/i } @$_
