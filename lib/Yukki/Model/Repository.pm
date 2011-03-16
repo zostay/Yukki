@@ -129,6 +129,12 @@ sub make_blob {
         { input => $content });
 }
 
+sub make_blob_from_file {
+    my ($self, $name, $filename) = @_;
+
+    return $self->git->run('hash-object', '-t', 'blob', '-w', '--path', $name, $filename);
+}
+
 sub find_root {
     my ($self) = @_;
 
@@ -177,6 +183,37 @@ sub find_path {
 sub show {
     my ($self, $object_id) = @_;
     return $self->git->run('show', $object_id);
+}
+
+sub fetch_size {
+    my ($self, $path) = @_;
+
+    my @files = $self->git->run('ls-tree', '-l', $self->branch, $path);
+    FILE: for my $line (@files) {
+        my ($mode, $type, $id, $size, $name) = split /\s+/, $line;
+        return $size if $name eq $path;
+    }
+
+    return;
+}
+
+sub list_pages {
+    my ($self, $path) = @_;
+    my @pages;
+
+    my @files = $self->git->run('ls-tree', $self->branch, $path . '/');
+    FILE: for my $line (@files) {
+        my ($mode, $type, $id, $name) = split /\s+/, $line;
+
+        my $filetype;
+        if ($name =~ s/\.(?<filetype>[a-z0-9]+)$//) {
+            $filetype = $+{filetype};
+        }
+
+        push @pages, $self->page({ path => $name, filetype => $filetype });
+    }
+
+    return @pages;
 }
 
 sub page {

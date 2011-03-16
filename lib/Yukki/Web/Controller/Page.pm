@@ -16,11 +16,9 @@ sub fire {
         when ('view')    { $self->view_page($ctx) }
         when ('edit')    { $self->edit_page($ctx) }
         when ('preview') { $self->preview_page($ctx) }
+        when ('attach')  { $self->upload_attachment($ctx) }
         default {
-            http_throw('InternalServerError', { 
-                show_stack_trace => 0,
-                message          => 'Not yet implemented.',
-            });
+            http_throw('NotFound');
         }
     }
 }
@@ -91,11 +89,14 @@ sub edit_page {
 
     my $content = $page->fetch;
 
+    my @attachments = $page->list_pages($page->path);
+
     $ctx->response->body( 
         $self->view('Page')->edit($ctx, { 
-            repository => $repo_name,
-            page       => $page->full_path, 
-            content    => $content 
+            repository  => $repo_name,
+            page        => $page->full_path, 
+            content     => $content,
+            attachments => \@attachments,
         }) 
     );
 }
@@ -117,6 +118,23 @@ sub preview_page {
             content    => $content,
         })
     );
+}
+
+sub upload_attachment {
+    my ($self, $ctx) = @_;
+
+    my $repo_name = $ctx->request->path_parameters->{repository};
+    my $path      = delete $ctx->request->path_parameters->{page};
+
+    my $page = $self->lookup_page($repo_name, $path);
+
+    my @file = split m{/}, $page->path;
+    push @file, $ctx->request->uploads->{file}->filename;
+
+    $ctx->request->path_parameters->{action} = 'upload';
+    $ctx->request->path_parameters->{file}   = \@file;
+
+    $self->controller('Attachment')->fire($ctx);
 }
 
 1;

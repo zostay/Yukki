@@ -9,8 +9,17 @@
     <label for="coment">Comment:</label>
     <input id="comment" name="comment" type="text"/>
 
-    <div class="submit">
-        <input type="submit" id="submit" name="submit" value="Save"/>
+    <div id="attachments" class="attachments">
+        <div id="attachments-list" class="attachment-list empty">No files attached.</div>
+        <div id="attachments-dropzone" class="attachment-dropzone">Drop files here for upload.</div>
+        <div class="button-group">
+            <button id="attachments-picker" class="attachment-picker">Choose Files...</button>
+            <button id="attachments-start" class="attachment-start">Upload Now</button>
+        </div>
+    </div>
+
+    <div class="button-group">
+        <button type="submit" id="submit" name="submit">Save</button>
     </div>
 </form>
 </div>

@@ -21,8 +21,9 @@ my $app = sub {
 };
 
 builder {
-    mount "/style"  => Plack::App::File->new( root => $server->locate_dir('static_path', 'style') );
-    mount "/script" => Plack::App::File->new( root => $server->locate_dir('static_path', 'script') );
+    mount "/style"    => Plack::App::File->new( root => $server->locate_dir('static_path', 'style') );
+    mount "/script"   => Plack::App::File->new( root => $server->locate_dir('static_path', 'script') );
+    mount "/template" => Plack::App::File->new( root => $server->locate_dir('static_path', 'template') );
 
     mount "/"       => builder { 
         enable 'Session';

@@ -30,6 +30,13 @@ has app => (
 sub BUILD {
     my $self = shift;
 
+    $self->add_route('' => (
+        defaults => {
+            redirect => 'page/view/main',
+        },
+        target => $self->controller('Redirect'),
+    ));
+
     $self->add_route('login/?:action' => (
         defaults => {
             action => 'page',
@@ -54,13 +61,29 @@ sub BUILD {
             page       => [ 'home.yukki' ],
         },
         validations => {
-            action     => qr/^(?:view|edit|preview)$/,
+            action     => qr/^(?:view|edit|preview|attach)$/,
             repository => qr/^[_a-z0-9]+$/i,
             page       => subtype('ArrayRef[Str]' => where {
                 all { /^[_a-z0-9-]+(?:\.[_a-z0-9-]+)*$/i } @$_
             }),
         },
         target => $self->controller('Page'),
+    ));
+
+    $self->add_route('page/:action/:repository/+:file' => (
+        defaults => {
+            action     => 'download',
+            repository => 'main',
+            file       => [ 'untitled.txt' ],
+        },
+        validations => {
+            action     => qr/^(?:view|upload|download)$/,
+            repository => qr/^[_a-z0-9]+$/i,
+            page       => subtype('ArrayRef[Str]' => where {
+                all { /^[_a-z0-9-]+(?:\.[_a-z0-9-]+)*$/i } @$_
+            }),
+        },
+        target => $self->controller('Attachment'),
     ));
 }
 

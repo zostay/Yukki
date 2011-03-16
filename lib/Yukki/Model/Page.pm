@@ -4,6 +4,8 @@ use Moose;
 
 extends 'Yukki::Model';
 
+use Number::Bytes::Human qw( format_bytes );
+
 has path => (
     is         => 'ro',
     isa        => 'Str',
@@ -22,9 +24,11 @@ has repository => (
     isa        => 'Yukki::Model::Repository',
     required   => 1,
     handles    => [ qw( 
-        make_blob find_root branch 
+        make_blob make_blob_from_file
+        find_root branch 
         show make_tree commit_tree 
         update_root find_path 
+        list_pages fetch_size
     ) ],
 );
 
@@ -40,6 +44,23 @@ sub full_path {
     return $full_path;
 }
 
+sub file_name {
+    my $self = shift;
+    my $full_path = $self->full_path;
+    my ($file_name) = $full_path =~ m{([^/]+)$};
+    return $file_name;
+}
+
+sub file_size {
+    my $self = shift;
+    return $self->fetch_size($self->full_path);
+}
+
+sub formatted_file_size {
+    my $self = shift;
+    return format_bytes($self->file_size);
+}
+
 sub store {
     my ($self, $params) = @_;
     my $path = $self->full_path;
@@ -47,7 +68,13 @@ sub store {
     my (@parts) = split m{/}, $path;
     my $blob_name = $parts[-1];
 
-    my $object_id = $self->make_blob($blob_name, $params->{content});
+    my $object_id;
+    if ($params->{content}) {
+        $object_id = $self->make_blob($blob_name, $params->{content});
+    }
+    elsif ($params->{filename}) {
+        $object_id = $self->make_blob_from_file($blob_name, $params->{filename});
+    }
     Yukki::Error->throw("unable to create blob for $path") unless $object_id;
 
     my $old_tree_id = $self->find_root;

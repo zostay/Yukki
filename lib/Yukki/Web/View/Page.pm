@@ -65,6 +65,30 @@ sub edit {
             '#yukkiname'    => sub { $params->{page} },
             '#yukkitext'    => sub { $params->{content} || '' },
             '#preview-yukkitext' => sub { \$html },
+            '#attachments-list'  => sub {
+                if (@{ $params->{attachments} }) {
+                    $self->render(
+                        in_wrapper => 0,
+                        to_string  => 0,
+                        template   => 'page/attachments.html',
+                        context    => $ctx,
+                        actions    => {
+                            'tbody' => [ map {
+                                $self->render(
+                                    in_wrapper => 0,
+                                    to_string  => 0,
+                                    template   => 'page/attachment_row.html',
+                                    context    => $ctx,
+                                    actions    => {
+                                        '.filename' => $_->file_name,
+                                        '.size'     => $_->formatted_file_size,
+                                    },
+                                );
+                            } @{ $params->{attachments} } ],
+                        },
+                    );
+                }
+            },
         },
     );
 }
