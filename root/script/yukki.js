@@ -60,7 +60,7 @@ $(document).ready(function() {
             'silverlight_xap_url' : '/script/lib/plupload/plupload.silverlight.xap'
         });
 
-        $(this).click(function(e) {
+        $this.find('.attachment-start').click(function(e) {
             uploader.start();
             e.preventDefault();
         });
