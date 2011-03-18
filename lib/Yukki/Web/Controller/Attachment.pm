@@ -39,11 +39,27 @@ sub lookup_file {
 }
 
 sub download_file {
-    http_throw('InternalServerError', { show_stack_trace => 0, message => 'Not yet implemented.' });
+    my ($self, $ctx) = @_;
+
+    my $repo_name = $ctx->request->path_parameters->{repository};
+    my $path      = $ctx->request->path_parameters->{file};
+
+    my $file      = $self->lookup_file($repo_name, $path);
+
+    $ctx->response->content_type('application/octet');
+    $ctx->response->body([ scalar $file->fetch ]);
 }
 
 sub view_file {
-    http_throw('InternalServerError', { show_stack_trace => 0, message => 'Not yet implemented.' });
+    my ($self, $ctx) = @_;
+
+    my $repo_name = $ctx->request->path_parameters->{repository};
+    my $path      = $ctx->request->path_parameters->{file};
+
+    my $file      = $self->lookup_file($repo_name, $path);
+
+    $ctx->response->content_type($file->media_type);
+    $ctx->response->body([ scalar $file->fetch ]);
 }
 
 sub upload_file {

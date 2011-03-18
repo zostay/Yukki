@@ -70,7 +70,7 @@ sub BUILD {
         target => $self->controller('Page'),
     ));
 
-    $self->add_route('page/:action/:repository/+:file' => (
+    $self->add_route('attachment/:action/:repository/+:file' => (
         defaults => {
             action     => 'download',
             repository => 'main',
