@@ -1,10 +1,11 @@
-package Yukki::Model::Page;
+package Yukki::Model::File;
 use 5.12.1;
 use Moose;
 
 extends 'Yukki::Model';
 
 use Number::Bytes::Human qw( format_bytes );
+use LWP::MediaTypes qw( guess_media_type );
 
 has path => (
     is         => 'ro',
@@ -23,13 +24,20 @@ has repository => (
     is         => 'ro',
     isa        => 'Yukki::Model::Repository',
     required   => 1,
-    handles    => [ qw( 
-        make_blob make_blob_from_file
-        find_root branch 
-        show make_tree commit_tree 
-        update_root find_path 
-        list_pages fetch_size
-    ) ],
+    handles    => {
+        'make_blob'           => 'make_blob',
+        'make_blob_from_file' => 'make_blog_from_file',
+        'find_root'           => 'find_root',
+        'branch '             => 'branch',
+        'show'                => 'show',
+        'make_tree'           => 'make_tree',
+        'commit_tree'         => 'commit_tree',
+        'update_root'         => 'update_root',
+        'find_path'           => 'find_path',
+        'list_files'          => 'list_files',
+        'fetch_size'          => 'fetch_size',
+        'repository_name'     => 'name',
+    },
 );
 
 sub full_path {
@@ -51,6 +59,11 @@ sub file_name {
     return $file_name;
 }
 
+sub object_id {
+    my $self = shift;
+    return $self->find_path($self->full_path);
+}
+
 sub file_size {
     my $self = shift;
     return $self->fetch_size($self->full_path);
@@ -59,6 +72,11 @@ sub file_size {
 sub formatted_file_size {
     my $self = shift;
     return format_bytes($self->file_size);
+}
+
+sub media_type {
+    my $self = shift;
+    return guess_media_type($self->full_path);
 }
 
 sub store {
@@ -95,14 +113,14 @@ sub store {
 sub exists {
     my $self = shift;
 
-    my $path = join('.', $self->path, $self->filetype);
+    my $path = $self->full_path;
     return $self->find_path($path);
 }
 
 sub fetch {
     my $self = shift;
 
-    my $path = join('.', $self->path, $self->filetype);
+    my $path = $self->full_path;
     my $object_id = $self->find_path($path);
 
     return unless defined $object_id;

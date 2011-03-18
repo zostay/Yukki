@@ -70,22 +70,28 @@ $(document).ready(function() {
         uploader.init();
 
         uploader.bind('FilesAdded', function(up, files) {
-            $.each(files, function(i, file) {
-                fetch_template('page/attachments.html', function(attachments_template) {
-                    if ($file_list.is('.empty')) {
-                        $file_list.removeClass('empty').empty().append(attachments_template);
-                    }
+            fetch_template('page/attachments.html', function(attachments_template) {
+                var was_empty = false;
+                if ($file_list.is('.empty')) {
+                    $file_list.removeClass('empty').empty().append(attachments_template);
+                    was_empty = true;
+                }
 
-                    fetch_template('page/attachment_row.html', function(attachment_row_template) {
-                        var new_row = $(attachment_row_template).attr('id', file.id);
-                            new_row.find('.filename').text(file.name);
-                            new_row.find('.size').text(plupload.formatSize(file.size));
-                            new_row.find('.action').html('<div class="progress"></div>');
-                        $file_list.find('tbody').append(new_row);
+                $.each(files, function(i, file) {
+                    var new_row = $file_list.find('.attachment-table .file:first').clone();
+                        new_row.attr('id', file.id);
+                        new_row.find('.filename').text(file.name);
+                        new_row.find('.size').text(plupload.formatSize(file.size));
+                        new_row.find('.action').html('<div class="progress"></div>');
+                    $file_list.find('tbody').append(new_row);
 
-                        $file_list.find('#' + file.id + ' .progress').progressbar({ 'value': 0 });
-                    });
+                    $file_list.find('#' + file.id + ' .progress').progressbar({ 'value': 0 });
                 });
+
+                if (was_empty) {
+                    console.log('was_empty');
+                    $file_list.find('.attachment-table .file:first').remove();
+                }
             });
 
             up.refresh();

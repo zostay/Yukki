@@ -5,8 +5,8 @@ extends 'Yukki::Web::View';
 
 sub page {
     my ($self, $ctx) = @_;
-    return $self->render(
-        in_wrapper => 1,
+
+    return $self->render_page(
         template   => 'login/page.html', 
         context    => $ctx,
     );

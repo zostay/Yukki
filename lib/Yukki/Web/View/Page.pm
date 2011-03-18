@@ -8,13 +8,12 @@ sub blank {
 
     my $link = "/page/edit/$vars->{repository}/$vars->{page}";
 
-    return $self->render(
-        in_wrapper => 1,
-        template   => 'page/blank.html',
-        context    => $ctx,
-        actions    => {
-            '#yukkiname'   => sub { $vars->{page} },
-            '#create-page' => sub { { href => $link } },
+    return $self->render_page(
+        template => 'page/blank.html',
+        context  => $ctx,
+        vars     => {
+            '#yukkiname'        => $vars->{page},
+            '#create-page@href' => $link,
         },
     );
 }
@@ -33,12 +32,11 @@ sub view {
         href  => join('/', '/page/edit', $params->{repository}, $params->{page}),
     });
 
-    return $self->render(
-        in_wrapper => 1,
-        template   => 'page/view.html',
-        context    => $ctx,
-        actions    => {
-            '#yukkitext' => sub { \$html },
+    return $self->render_page(
+        template => 'page/view.html',
+        context  => $ctx,
+        vars     => {
+            '#yukkitext' => \$html,
         },
     );
 }
@@ -57,40 +55,62 @@ sub edit {
         yukkitext  => $params->{content},
     });
 
-    return $self->render(
-        in_wrapper => 1,
-        template   => 'page/edit.html',
-        context    => $ctx,
-        actions    => {
-            '#yukkiname'    => sub { $params->{page} },
-            '#yukkitext'    => sub { $params->{content} || '' },
-            '#preview-yukkitext' => sub { \$html },
-            '#attachments-list'  => sub {
-                if (@{ $params->{attachments} }) {
-                    $self->render(
-                        in_wrapper => 0,
-                        to_string  => 0,
-                        template   => 'page/attachments.html',
-                        context    => $ctx,
-                        actions    => {
-                            'tbody' => [ map {
-                                $self->render(
-                                    in_wrapper => 0,
-                                    to_string  => 0,
-                                    template   => 'page/attachment_row.html',
-                                    context    => $ctx,
-                                    actions    => {
-                                        '.filename' => $_->file_name,
-                                        '.size'     => $_->formatted_file_size,
-                                    },
-                                );
-                            } @{ $params->{attachments} } ],
-                        },
-                    );
-                }
-            },
+    my %attachments;
+    if (@{ $params->{attachments} }) {
+        %attachments = (
+            '#attachments-list@class' => 'attachment-list',
+            '#attachments-list'       => $self->attachments($params->{attachments}),
+        );
+    }
+
+    return $self->render_page(
+        template => 'page/edit.html',
+        context  => $ctx,
+        vars     => {
+            '#yukkiname'              => $params->{page},
+            '#yukkitext'              => $params->{content} // '',
+            '#preview-yukkitext'      => \$html,
+            %attachments,
         },
     );
+}
+
+sub attachments {
+    my ($self, $attachments) = @_;
+
+    return $self->render(
+        template   => 'page/attachments.html',
+        vars       => {
+            '.file' => [ map { +{
+                './@id'     => $_->object_id,
+                '.filename' => $_->file_name,
+                '.size'     => $_->formatted_file_size,
+                '.action'   => $self->attachment_links($_),
+            } } @$attachments ],
+        },
+    );
+}
+
+sub attachment_links {
+    my ($self, $attachment) = @_;
+
+    my @links;
+
+    push @links, { 
+        label => 'View',
+        href  => join('/', '/attachment', 'view', 
+                 $attachment->repository_name, 
+                 $attachment->full_path),
+    } if $attachment->media_type ne 'application/octet';
+
+    push @links, {
+        label => 'Download',
+        href  => join('/', '/attachment', 'download',
+                 $attachment->repository_name,
+                 $attachment->full_path),
+    };
+
+    return $self->render_links(links => \@links);
 }
 
 sub preview {

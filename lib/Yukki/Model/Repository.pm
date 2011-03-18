@@ -3,10 +3,9 @@ use Moose;
 
 extends 'Yukki::Model';
 
-use Yukki::Model::Page;
+use Yukki::Model::File;
 
 use Git::Repository;
-use Path::Class;
 use MooseX::Types::Path::Class;
 
 has name => (
@@ -87,9 +86,9 @@ sub make_tree {
     if (defined $base) {
         my @old_tree = $git->run('ls-tree', $base);
         for my $line (@old_tree) {
-            my ($old_mode, $old_type, $old_object_id, $old_page) = split /\s+/, $line;
+            my ($old_mode, $old_type, $old_object_id, $old_file) = split /\s+/, $line;
 
-            if ($old_page eq $name) {
+            if ($old_file eq $name) {
                 $overwrite++;
 
                 Yukki::Error->throw("cannot replace $old_type $name with $type")
@@ -197,12 +196,12 @@ sub fetch_size {
     return;
 }
 
-sub list_pages {
+sub list_files {
     my ($self, $path) = @_;
-    my @pages;
+    my @files;
 
-    my @files = $self->git->run('ls-tree', $self->branch, $path . '/');
-    FILE: for my $line (@files) {
+    my @tree_files = $self->git->run('ls-tree', $self->branch, $path . '/');
+    FILE: for my $line (@tree_files) {
         my ($mode, $type, $id, $name) = split /\s+/, $line;
 
         my $filetype;
@@ -210,16 +209,16 @@ sub list_pages {
             $filetype = $+{filetype};
         }
 
-        push @pages, $self->page({ path => $name, filetype => $filetype });
+        push @files, $self->file({ path => $name, filetype => $filetype });
     }
 
-    return @pages;
+    return @files;
 }
 
-sub page {
+sub file {
     my ($self, $params) = @_;
 
-    Yukki::Model::Page->new(
+    Yukki::Model::File->new(
         %$params,
         app        => $self->app,
         repository => $self,

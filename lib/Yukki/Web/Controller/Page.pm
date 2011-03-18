@@ -35,7 +35,7 @@ sub lookup_page {
     }
 
     my $path = join '/', @$page, $final_part;
-    return $repository->page({ path => $path, filetype => $filetype });
+    return $repository->file({ path => $path, filetype => $filetype });
 }
 
 sub view_page {
@@ -89,7 +89,7 @@ sub edit_page {
 
     my $content = $page->fetch;
 
-    my @attachments = $page->list_pages($page->path);
+    my @attachments = grep { $_->filetype ne 'yukki' } $page->list_files($page->path);
 
     $ctx->response->body( 
         $self->view('Page')->edit($ctx, { 

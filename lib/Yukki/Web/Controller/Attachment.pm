@@ -35,7 +35,7 @@ sub lookup_file {
     }
 
     my $path = join '/', @$file, $final_part;
-    return $repository->page({ path => $path, filetype => $filetype });
+    return $repository->file({ path => $path, filetype => $filetype });
 }
 
 sub download_file {
