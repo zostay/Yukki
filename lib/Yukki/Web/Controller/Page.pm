@@ -114,7 +114,7 @@ sub preview_page {
     $ctx->response->body(
         $self->view('Page')->preview($ctx, { 
             repository => $repo_name,
-            path       => $page->full_path,
+            page       => $page->full_path,
             content    => $content,
         })
     );
