@@ -59,6 +59,22 @@ sub dispatch {
 
         $ctx->request->path_parameters($match->mapping);
 
+        if ($ctx->session->{user}) {
+            $ctx->response->add_navigation_item({
+                label => 'Sign out',
+                href  => '/login/exit',
+                sort  => 100,
+            });
+        }
+        
+        else {
+            $ctx->response->add_navigation_item({
+                label => 'Sign in',
+                href  => '/login',
+                sort  => 100,
+            });
+        }
+
         my $controller = $match->target;
 
         $controller->fire($ctx);

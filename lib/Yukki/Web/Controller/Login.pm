@@ -44,7 +44,7 @@ sub check_login_submission {
     }
 
     else {
-        $ctx->request->session->{user} = $user;
+        $ctx->session->{user} = $user;
 
         $ctx->response->redirect('/page/view/main');
         return;
@@ -54,7 +54,7 @@ sub check_login_submission {
 sub logout {
     my ($self, $ctx) = @_;
 
-    $ctx->request->session->expire;
+    $ctx->session->expire;
     $ctx->response->redirect('/login');
 }
 

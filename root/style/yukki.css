@@ -14,7 +14,7 @@ td { padding: 3px }
 
 #masthead { padding: 2em 1em; background: #ddf; }
 #masthead .main-title { color: #339; }
-#navigation .navigation, #bottom-navigation .navigation { margin: 0; list-style: none; float: left }
+#navigation .navigation, #bottom-navigation .navigation { margin: 0 3px; list-style: none; float: left }
 
 #bottom-navigation { padding: 2em 1em; background: #ddf; }
 

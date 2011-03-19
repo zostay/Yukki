@@ -27,12 +27,12 @@ has page_title => (
 
 has navigation => (
     is          => 'rw',
-    isa         => 'ArrayRef',
+    isa         => 'ArrayRef[HashRef]',
     required    => 1,
     default     => sub { [] },
     traits      => [ 'Array' ],
     handles     => {
-        navigation_menu      => 'elements',
+        navigation_menu      => [ sort => sub { ($_[0]->{sort}//50) <=> ($_[1]->{sort}//50) } ],
         add_navigation_item  => 'push',
         add_navigation_items => 'push',
     },
