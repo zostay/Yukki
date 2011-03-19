@@ -81,7 +81,10 @@ sub render_page {
         vars       => {
             '#messages'   => $messages,
             '.main-title' => $main_title,
-            '.navigation' => [ map { 
+            '#navigation .navigation' => [ map { 
+                { 'a' => $_->{label}, 'a@href' => $_->{href} },
+            } $ctx->response->navigation_menu ],
+            '#bottom-navigation .navigation' => [ map { 
                 { 'a' => $_->{label}, 'a@href' => $_->{href} },
             } $ctx->response->navigation_menu ],
             '#content'    => $self->render(template => $template, vars => $vars),
