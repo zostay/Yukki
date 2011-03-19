@@ -26,7 +26,7 @@ has repository => (
     required   => 1,
     handles    => {
         'make_blob'           => 'make_blob',
-        'make_blob_from_file' => 'make_blog_from_file',
+        'make_blob_from_file' => 'make_blob_from_file',
         'find_root'           => 'find_root',
         'branch '             => 'branch',
         'show'                => 'show',
@@ -57,6 +57,13 @@ sub file_name {
     my $full_path = $self->full_path;
     my ($file_name) = $full_path =~ m{([^/]+)$};
     return $file_name;
+}
+
+sub file_id {
+    my $self = shift;
+    my $file_id = $self->file_name;
+    $file_id =~ tr/a-zA-Z0-9:-_/_/c;
+    return $file_id;
 }
 
 sub object_id {

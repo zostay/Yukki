@@ -82,7 +82,7 @@ sub attachments {
         template   => 'page/attachments.html',
         vars       => {
             '.file' => [ map { +{
-                './@id'     => $_->object_id,
+                './@id'     => $_->file_id,
                 '.filename' => $_->file_name,
                 '.size'     => $_->formatted_file_size,
                 '.action'   => $self->attachment_links($_),

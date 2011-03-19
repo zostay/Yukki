@@ -69,6 +69,10 @@ $(document).ready(function() {
 
         uploader.init();
 
+        function file_id(file) {
+            return file.name.replace(/[^a-zA-Z0-9:\-_]/g, '_');
+        }
+
         uploader.bind('FilesAdded', function(up, files) {
             fetch_template('page/attachments.html', function(attachments_template) {
                 var was_empty = false;
@@ -78,18 +82,26 @@ $(document).ready(function() {
                 }
 
                 $.each(files, function(i, file) {
-                    var new_row = $file_list.find('.attachment-table .file:first').clone();
-                        new_row.attr('id', file.id);
-                        new_row.find('.filename').text(file.name);
-                        new_row.find('.size').text(plupload.formatSize(file.size));
-                        new_row.find('.action').html('<div class="progress"></div>');
-                    $file_list.find('tbody').append(new_row);
+                    var new_row = $file_list.find('.attachment-table #' + file_id(file));
+                    var cloned = false;
+                    if (!new_row) {
+                        new_row = $file_list.find('.attachment-table .file:first').clone();
+                        cloned = true;
+                    }
 
-                    $file_list.find('#' + file.id + ' .progress').progressbar({ 'value': 0 });
+                    new_row.attr('id', file_id(file));
+                    new_row.find('.filename').text(file.name);
+                    new_row.find('.size').text(plupload.formatSize(file.size));
+                    new_row.find('.action').html('<div class="progress"></div>');
+
+                    if (cloned) {
+                        $file_list.find('tbody').append(new_row);
+                    }
+
+                    $file_list.find('#' + file_id(file) + ' .progress').progressbar({ 'value': 0 });
                 });
 
                 if (was_empty) {
-                    console.log('was_empty');
                     $file_list.find('.attachment-table .file:first').remove();
                 }
             });
@@ -98,22 +110,20 @@ $(document).ready(function() {
         });
 
         uploader.bind('UploadProgress', function(up, file) {
-            $('#' + file.id + ' .progress').progressbar({ 'value': file.percent });
+            $('#' + file_id(file) + ' .progress').progressbar({ 'value': file.percent });
         });
 
         uploader.bind('FileUploaded', function(up, file, res) {
-            console.log(res.response);
             var json = eval('('+res.response+')');
-            console.log(json);
 
-            $('#' + file.id + ' .action').empty().append('<ul class="action-links"></ul>');
+            $('#' + file_id(file) + ' .action').empty().append('<ul class="action-links"></ul>');
             if (json.viewable) {
-                $('#' + file.id + ' .action-links').append(
+                $('#' + file_id(file) + ' .action-links').append(
                     '<li><a href="/attachment/view/' + json.repository_path + '">View</a></li>'
                 );
             }
 
-            $('#' + file.id + ' .action-links').append(
+            $('#' + file_id(file) + ' .action-links').append(
                 '<li><a href="/attachment/download/' + json.repository_path + '">Download</a></li>'
             );
         });

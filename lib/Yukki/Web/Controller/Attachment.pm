@@ -80,7 +80,7 @@ sub upload_file {
     $ctx->response->body(
         encode_json({
             viewable        => 1,
-            repository_path => $file->full_path,
+            repository_path => join('/', $repo_name, $file->full_path),
         })
     );
 }
