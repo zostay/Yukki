@@ -4,6 +4,7 @@ use Moose;
 
 extends 'Yukki::Model';
 
+use Digest::SHA1 qw( sha1_hex );
 use Number::Bytes::Human qw( format_bytes );
 use LWP::MediaTypes qw( guess_media_type );
 
@@ -61,9 +62,7 @@ sub file_name {
 
 sub file_id {
     my $self = shift;
-    my $file_id = $self->file_name;
-    $file_id =~ tr/a-zA-Z0-9:-_/_/c;
-    return $file_id;
+    return sha1_hex($self->file_name);
 }
 
 sub object_id {

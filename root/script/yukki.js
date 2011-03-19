@@ -49,6 +49,7 @@ $(document).ready(function() {
         var $picker    = $this.find('.attachment-picker');
         var $file_list = $this.find('.attachment-list');
         var $drop_zone = $this.find('.attachment-dropzone');
+        var $starter   = $this.find('.attachment-start');
 
         var uploader = new plupload.Uploader({
             'runtimes'            : 'gears,html5,flash,silverlight,html4',
@@ -60,7 +61,7 @@ $(document).ready(function() {
             'silverlight_xap_url' : '/script/lib/plupload/plupload.silverlight.xap'
         });
 
-        $this.find('.attachment-start').click(function(e) {
+        $starter.click(function(e) {
             uploader.start();
             e.preventDefault();
         });
@@ -69,8 +70,14 @@ $(document).ready(function() {
 
         uploader.init();
 
+        var file_id_memo = {};
         function file_id(file) {
-            return file.name.replace(/[^a-zA-Z0-9:\-_]/g, '_');
+            if (file_id_memo[file.name]) {
+                return file_id_memo[file.name];
+            }
+            else {
+                return file_id_memo[file.name] = Sha1.hash(file.name);
+            }
         }
 
         uploader.bind('FilesAdded', function(up, files) {
@@ -104,9 +111,10 @@ $(document).ready(function() {
                 if (was_empty) {
                     $file_list.find('.attachment-table .file:first').remove();
                 }
-            });
 
-            up.refresh();
+                up.refresh();
+                $starter.show();
+            });
         });
 
         uploader.bind('UploadProgress', function(up, file) {
@@ -116,21 +124,24 @@ $(document).ready(function() {
         uploader.bind('FileUploaded', function(up, file, res) {
             var json = eval('('+res.response+')');
 
-            $('#' + file_id(file) + ' .action').empty().append('<ul class="action-links"></ul>');
+            $('#' + file_id(file) + ' .action').empty().append('<ul class="links"></ul>');
             if (json.viewable) {
-                $('#' + file_id(file) + ' .action-links').append(
+                $('#' + file_id(file) + ' .links').append(
                     '<li><a href="/attachment/view/' + json.repository_path + '">View</a></li>'
                 );
             }
 
-            $('#' + file_id(file) + ' .action-links').append(
+            $('#' + file_id(file) + ' .links').append(
                 '<li><a href="/attachment/download/' + json.repository_path + '">Download</a></li>'
             );
+
+            $starter.hide();
         });
 
         if (uploader.features.dragdrop) {
             $drop_zone.show();
             $picker.hide();
+            $starter.hide();
         }
     });
 });
