@@ -9,9 +9,6 @@ use HTTP::Throwable::Factory qw( http_throw );
 sub fire {
     my ($self, $ctx) = @_;
 
-    # TODO Check access...
-    warn "TODO CHECK ACCESS\n";
-
     given ($ctx->request->path_parameters->{action}) {
         when ('view')    { $self->view_page($ctx) }
         when ('edit')    { $self->edit_page($ctx) }

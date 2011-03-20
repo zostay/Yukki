@@ -49,20 +49,27 @@ sub view {
 sub dispatch {
     my ($self, $env) = @_;
 
+    my $ctx = Yukki::Web::Context->new(env => $env);
     my $response;
-    try {
-        my $ctx = Yukki::Web::Context->new(env => $env);
 
+    try {
         my $match = $self->router->match($ctx->request->path);
 
         http_throw('NotFound') unless $match;
 
         $ctx->request->path_parameters($match->mapping);
 
+        my $access_level_needed = $match->access_level;
+        http_throw('Forbidden') unless $self->check_access(
+            user       => $ctx->session->{user},
+            repository => $match->mapping->{repository} // '-',
+            needs      => $access_level_needed,
+        );
+
         if ($ctx->session->{user}) {
             $ctx->response->add_navigation_item({
                 label => 'Sign out',
-                href  => '/login/exit',
+                href  => '/logout',
                 sort  => 100,
             });
         }
@@ -83,7 +90,18 @@ sub dispatch {
 
     catch {
         if (blessed $_ and $_->isa('Moose::Object') and $_->does('HTTP::Throwable')) {
-            $response = $_->as_psgi($env);
+
+            if ($_->does('HTTP::Throwable::Role::Status::Forbidden') 
+                    and not $ctx->session->{user}) {
+
+                $response = http_exception(Found => {
+                    location => '/login',
+                })->as_psgi($env);
+            }
+
+            else {
+                $response = $_->as_psgi($env);
+            }
         }
 
         else {

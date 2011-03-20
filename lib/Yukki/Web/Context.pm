@@ -16,7 +16,7 @@ has request => (
     required    => 1,
     lazy        => 1,
     default     => sub { Yukki::Web::Request->new(env => shift->env) },
-    handles     => [ qw( session ) ],
+    handles     => [ qw( session session_options ) ],
 );
 
 has response => (

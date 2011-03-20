@@ -3,7 +3,18 @@ use Moose;
 
 extends 'Path::Router::Route';
 
+use Yukki::Types qw( AccessLevel );
+use Yukki::Web::Router::Route::Match;
+
+use MooseX::Types::Moose qw( ArrayRef HashRef );
+use MooseX::Types::Structured qw( Tuple );
 use List::MoreUtils qw( any );
+
+has acl => (
+    is          => 'ro',
+    isa         => ArrayRef[Tuple[AccessLevel,HashRef]],
+    required    => 1,
+);
 
 sub is_component_slurpy {
     my ($self, $component) = @_;
@@ -29,6 +40,19 @@ sub get_component_name {
 sub has_slurpy_match {
     my $self = shift;
     return any { $self->is_component_slurpy($_) } reverse @{ $self->components };
+}
+
+sub create_default_mapping {
+    my $self = shift;
+
+    my %defaults = %{ $self->defaults };
+    for my $key (keys %defaults) {
+        if (ref $defaults{$key} eq 'ARRAY') {
+            $defaults{$key} = [ @{ $defaults{$key} } ];
+        }
+    }
+
+    return \%defaults;
 }
 
 sub match {
@@ -75,7 +99,7 @@ sub match {
         }
     }
 
-    return Path::Router::Route::Match->new(
+    return Yukki::Web::Router::Route::Match->new(
         path    => join('/', @$parts),
         route   => $self,
         mapping => $mapping,

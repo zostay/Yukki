@@ -5,7 +5,7 @@ p { margin: 1em 0; }
 input { border: 1px solid #99f; font-size: 1.1em; }
 textarea { font-size: 1.1em; border: 1px solid #99f; }
 table th { text-align: left }
-button { margin-top: 0.5em; }
+button { margin: 0.5em; }
 
 table { border: 1px solid #99f; border-collapse: collapse }
 
@@ -21,10 +21,17 @@ td { padding: 3px }
 #main { padding: 1em; background: #fff; }
 #main h1, #main h2, #main h3 { margin: 0.5em 0; border-bottom: 1px solid #ccf; color: #225; }
 
+div.field { margin: 1em; }
+div.field label { display: inline-block; width: 10em; text-align: right }
+
 div.button-group { text-align: right }
 div.progress { height: 15px }
 
 .links li { display: inline-block; margin: 0 3px; list-style: none }
+
+/*** Login ***/
+
+#login-page { width: 30em; margin: 8em auto }
 
 /*** Page ***/
 

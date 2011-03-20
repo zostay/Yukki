@@ -7,6 +7,7 @@ requires qw(
     controller
     locate
     locate_dir
+    check_access
 );
 
 1;

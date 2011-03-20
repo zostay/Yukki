@@ -54,8 +54,8 @@ sub check_login_submission {
 sub logout {
     my ($self, $ctx) = @_;
 
-    $ctx->session->expire;
-    $ctx->response->redirect('/login');
+    $ctx->session_options->{expire} = 1;
+    $ctx->response->redirect('/page/view/main');
 }
 
 1;

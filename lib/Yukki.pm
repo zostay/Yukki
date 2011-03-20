@@ -1,6 +1,9 @@
 package Yukki;
 use Moose;
 
+use Yukki::Types qw( AccessLevel );
+
+use MooseX::Params::Validate;
 use MooseX::Types::Path::Class;
 use Path::Class;
 
@@ -63,6 +66,53 @@ sub locate {
 sub locate_dir {
     my ($self, $base, @extra_path) = @_;
     $self->_locate(dir => $base, @extra_path);
+}
+
+sub check_access {
+    my ($self, $user, $repository, $needs) = validated_list(\@_,
+        user       => { isa => 'Undef|HashRef', optional => 1 },
+        repository => { isa => 'Str' },
+        needs      => { isa => AccessLevel },
+    );
+
+    my $config = $self->settings->{repositories}{$repository}
+              // {};
+
+    my $read_groups  = $config->{read_groups}  // 'NONE';
+    my $write_groups = $config->{write_groups} // 'NONE';
+
+    my %access_level = (none => 0, read => 1, write => 2);
+    my $has_access = sub {
+        $access_level{$_[0] // 'none'} >= $access_level{$needs}
+    };
+
+    # Deal with anonymous users first. 
+    return 1 if $has_access->($config->{anonymous_access_level});
+    return '' unless $user;
+
+    # Only logged users considered here forward.
+    my @user_groups = @{ $user->{groups} // [] };
+
+    for my $level (qw( read write )) {
+        if ($has_access->($level)) {
+
+            return 1 if $config->{"${level}_groups"} ~~ 'ANY';
+
+            if (ref $config->{"${level}_groups"} eq 'ARRAY') {
+                my @level_groups = @{ $config->{"${level}_groups"} };
+
+                for my $level_group (@level_groups) {
+                    return 1 if $level_group ~~ @user_groups;
+                }
+            }
+            else {
+                warn "weird value in ${level}_groups config for ",
+                     "$repository settings";
+            }
+        }
+    } 
+
+    return '';
 }
 
 with qw( Yukki::Role::App );

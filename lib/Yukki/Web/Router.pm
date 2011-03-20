@@ -34,6 +34,9 @@ sub BUILD {
         defaults => {
             redirect => 'page/view/main',
         },
+        acl => [ 
+            [ none => { action => sub { 1 } } ],
+        ],
         target => $self->controller('Redirect'),
     ));
 
@@ -44,6 +47,9 @@ sub BUILD {
         validations => {
             action => qr/^(?:page|submit|exit)$/,
         },
+        acl => [ 
+            [ none => { action => sub { 1 } } ],
+        ],
         target => $self->controller('Login'),
     ));
 
@@ -51,6 +57,9 @@ sub BUILD {
         defaults => {
             action => 'exit',
         },
+        acl => [ 
+            [ none => { action => 'exit' } ] 
+        ],
         target => $self->controller('Login'),
     ));
 
@@ -67,6 +76,10 @@ sub BUILD {
                 all { /^[_a-z0-9-]+(?:\.[_a-z0-9-]+)*$/i } @$_
             }),
         },
+        acl => [
+            [ read  => { action => [ qw( view preview ) ] } ],
+            [ write => { action => [ qw( edit attach ) ]  } ],
+        ],
         target => $self->controller('Page'),
     ));
 
@@ -83,6 +96,10 @@ sub BUILD {
                 all { /^[_a-z0-9-]+(?:\.[_a-z0-9-]+)*$/i } @$_
             }),
         },
+        acl => [
+            [ read  => { action => [ qw( view download ) ] } ],
+            [ write => { action => 'upload'                } ],
+        ],  
         target => $self->controller('Attachment'),
     ));
 }

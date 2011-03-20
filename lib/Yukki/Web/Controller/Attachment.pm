@@ -10,9 +10,6 @@ use HTTP::Throwable::Factory qw( http_throw );
 sub fire {
     my ($self, $ctx) = @_;
 
-    # TODO Check access...
-    warn "TODO CHECK ACCESS\n";
-
     given ($ctx->request->path_parameters->{action}) {
         when ('download') { $self->download_file($ctx) }
         when ('upload')   { $self->upload_file($ctx) }
