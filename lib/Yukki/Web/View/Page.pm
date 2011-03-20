@@ -8,6 +8,8 @@ sub blank {
 
     my $link = "/page/edit/$vars->{repository}/$vars->{page}";
 
+    $ctx->response->page_title($vars->{title});
+
     return $self->render_page(
         template => 'page/blank.html',
         context  => $ctx,
@@ -19,17 +21,19 @@ sub blank {
 }
 
 sub view {
-    my ($self, $ctx, $params) = @_;
+    my ($self, $ctx, $vars) = @_;
+
+    $ctx->response->page_title($vars->{title});
 
     my $html = $self->yukkitext({
-        page       => $params->{page},
-        repository => $params->{repository},
-        yukkitext  => $params->{content},
+        page       => $vars->{page},
+        repository => $vars->{repository},
+        yukkitext  => $vars->{content},
     });
 
     $ctx->response->add_navigation_item({
         label => 'Edit',
-        href  => join('/', '/page/edit', $params->{repository}, $params->{page}),
+        href  => join('/', '/page/edit', $vars->{repository}, $vars->{page}),
     });
 
     return $self->render_page(
@@ -42,24 +46,26 @@ sub view {
 }
 
 sub edit {
-    my ($self, $ctx, $params) = @_;
+    my ($self, $ctx, $vars) = @_;
+
+    $ctx->response->page_title($vars->{title});
 
     $ctx->response->add_navigation_item({
         label => 'View',
-        href  => join('/', '/page/view', $params->{repository}, $params->{page}),
+        href  => join('/', '/page/view', $vars->{repository}, $vars->{page}),
     });
 
     my $html = $self->yukkitext({
-        page       => $params->{page},
-        repository => $params->{repository},
-        yukkitext  => $params->{content},
+        page       => $vars->{page},
+        repository => $vars->{repository},
+        yukkitext  => $vars->{content},
     });
 
     my %attachments;
-    if (@{ $params->{attachments} }) {
+    if (@{ $vars->{attachments} }) {
         %attachments = (
             '#attachments-list@class' => 'attachment-list',
-            '#attachments-list'       => $self->attachments($params->{attachments}),
+            '#attachments-list'       => $self->attachments($vars->{attachments}),
         );
     }
 
@@ -67,8 +73,8 @@ sub edit {
         template => 'page/edit.html',
         context  => $ctx,
         vars     => {
-            '#yukkiname'              => $params->{page},
-            '#yukkitext'              => $params->{content} // '',
+            '#yukkiname'              => $vars->{page},
+            '#yukkitext'              => $vars->{content} // '',
             '#preview-yukkitext'      => \$html,
             %attachments,
         },
@@ -114,12 +120,12 @@ sub attachment_links {
 }
 
 sub preview {
-    my ($self, $ctx, $params) = @_;
+    my ($self, $ctx, $vars) = @_;
 
     my $html = $self->yukkitext({
-        page       => $params->{page},
-        repository => $params->{repository},
-        yukkitext  => $params->{content},
+        page       => $vars->{page},
+        repository => $vars->{repository},
+        yukkitext  => $vars->{content},
     });
 
     return $html;

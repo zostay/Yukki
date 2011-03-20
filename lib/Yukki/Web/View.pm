@@ -70,7 +70,7 @@ sub render_page {
 
     my $main_title;
     if ($ctx->response->has_page_title) {
-        $main_title = $ctx->response->page_title . ' - Yukki';
+        $main_title = 'Yukki - ' . $ctx->response->page_title;
     }
     else {
         $main_title = 'Yukki';

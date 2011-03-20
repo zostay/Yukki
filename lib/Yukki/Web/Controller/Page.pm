@@ -54,6 +54,7 @@ sub view_page {
 
     else {
         $body = $self->view('Page')->view($ctx, { 
+            title      => $page->title,
             repository => $repo_name,
             page       => $page->full_path, 
             content    => $content,
@@ -90,6 +91,7 @@ sub edit_page {
 
     $ctx->response->body( 
         $self->view('Page')->edit($ctx, { 
+            title       => $page->title,
             repository  => $repo_name,
             page        => $page->full_path, 
             content     => $content,
@@ -110,6 +112,7 @@ sub preview_page {
 
     $ctx->response->body(
         $self->view('Page')->preview($ctx, { 
+            title      => $page->title,
             repository => $repo_name,
             page       => $page->full_path,
             content    => $content,

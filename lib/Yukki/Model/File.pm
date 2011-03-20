@@ -7,6 +7,7 @@ extends 'Yukki::Model';
 use Digest::SHA1 qw( sha1_hex );
 use Number::Bytes::Human qw( format_bytes );
 use LWP::MediaTypes qw( guess_media_type );
+use Path::Class;
 
 has path => (
     is         => 'ro',
@@ -68,6 +69,19 @@ sub file_id {
 sub object_id {
     my $self = shift;
     return $self->find_path($self->full_path);
+}
+
+sub title {
+    my $self = shift;
+
+    if ($self->filetype eq 'yukki') {
+        for my $line ($self->fetch) {
+            my ($name, $value) = split m{\s*:\s*}, $line;
+            return $value if lc($name) eq 'title';
+        }
+    }
+
+    return $self->file_name;
 }
 
 sub file_size {
