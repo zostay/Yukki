@@ -75,6 +75,16 @@ sub render_page {
     else {
         $main_title = 'Yukki';
     }
+    
+    my @nav_menu = grep { 
+        my $match = $self->app->router->match($_->{href});
+        my $access_level_needed = $match->access_level;
+        $self->check_access(
+            user       => $ctx->session->{user},
+            repository => $match->mapping->{repository} // '-',
+            needs      => $access_level_needed,
+        );
+    } $ctx->response->navigation_menu;
 
     return $self->render(
         template   => 'shell.html',
@@ -83,10 +93,10 @@ sub render_page {
             '.main-title' => $main_title,
             '#navigation .navigation' => [ map { 
                 { 'a' => $_->{label}, 'a@href' => $_->{href} },
-            } $ctx->response->navigation_menu ],
+            } @nav_menu ],
             '#bottom-navigation .navigation' => [ map { 
                 { 'a' => $_->{label}, 'a@href' => $_->{href} },
-            } $ctx->response->navigation_menu ],
+            } @nav_menu ],
             '#content'    => $self->render(template => $template, vars => $vars),
         },
     );

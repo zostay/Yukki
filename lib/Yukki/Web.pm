@@ -82,6 +82,17 @@ sub dispatch {
             });
         }
 
+        for my $repository (keys %{ $self->settings->{repositories} }) {
+            my $config = $self->settings->{repositories}{$repository};
+
+            my $name = $config->{name} // ucfirst $repository;
+            $ctx->response->add_navigation_item({
+                label => $name,
+                href  => join('/', '/page/view',  $repository),
+                sort  => 90,
+            });
+        }
+
         my $controller = $match->target;
 
         $controller->fire($ctx);
