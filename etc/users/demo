@@ -1,0 +1,8 @@
+---
+login_name: demo
+password: testing
+name: Demo User
+email: user@example.com
+groups:
+    - widget_dept
+    - cog_agency
