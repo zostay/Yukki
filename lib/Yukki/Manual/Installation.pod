@@ -1,0 +1,27 @@
+=head1 NAME
+
+Yukki::Manual::Installation - installation instructions
+
+=head1 SYNOPSIS
+
+  # Install the module
+  perl -MCPAN -e 'install Yukki'
+ 
+  # OR better, install cpanm and run...
+  cpanm Yukki
+
+  # Setup your wiki's installation folder
+  yukki-setup mysite
+  cd mysite
+
+  # Setup the repositories
+  yukki-git-init main
+  yukki-git-init yukki git://github.com/zostay/yukki-help.git
+
+  # Add a user
+  yukki-add-user
+
+  # Start the server
+  yukki.psgi
+
+=cut
