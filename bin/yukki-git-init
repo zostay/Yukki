@@ -14,10 +14,9 @@ my $config = $app->settings->{repositories}{ $repo_name };
 
 my $repo_dir = ''.$app->locate('repository_path', $config->{repository});
 
-my $git = Git::Repository->new( git_dir => $repo_dir );
-
 if (defined $remote_repo) {
-    $git->run('clone', '--mirror', $remote_repo, $repo_dir);
+    Git::Repository->create('clone', '--mirror', 
+        $remote_repo, $repo_dir);
 }
 
 else {
@@ -35,7 +34,7 @@ Cheers.
 
 END_OF_STUB_MAIN
 
-    $git->run('init', '--bare', $repo_dir);
+    my $git = Git::Repository->create('init', '--bare', $repo_dir);
 
     my $object_id = $git->run('hash-object', '-t', 'blob', '-w', '--stdin', '--path', $page, { input => $stub_main });
 

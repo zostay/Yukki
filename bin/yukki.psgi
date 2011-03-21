@@ -1,6 +1,5 @@
-#!/usr/bin/env perl
-use strict;
-use warnings;
+#!/usr/bin/env plackup
+use 5.12.1;
 
 use Plack::App::File;
 use Plack::Builder;

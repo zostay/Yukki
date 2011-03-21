@@ -25,6 +25,20 @@ chmod 0644, "$yaml";
 DumpFile("$yaml", $config);
 chmod 0444, "$yaml";
 
+say "Please read the installation instructions if you have not:\n";
+say "\tperldoc Yukki::Manual::Installation\n";
+
+say "The rest of these remarks assume you run this first:\n";
+say "\tcd $site_dir\n";
+
+say "You probably want to setup your repositories by running:\n";
+say "\tyukki-git-init $_" for sort keys %{ $config->{repositories} };
+print "\n";
+
+say "And then you'll want at least one user, so run:\n";
+say "\tyukki-add-user\n";
+
 say "To start your Yukki server, run:\n";
-say "\tYUKKI_CONFIG=$yaml plackup yukki.psgi\n";
+say "\tcd $site_dir; plackup yukki.psgi\n";
+
 say "Have a nice day!";
