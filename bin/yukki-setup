@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+use 5.12.1;
+
+use Yukki::Web;
+
+use File::ShareDir qw( module_dir );
+use File::Copy::Recursive qw( dircopy );
+use Path::Class;
+use YAML qw( LoadFile DumpFile );
+
+my $site_dir = shift;
+
+my $module_dir = module_dir('Yukki::Web');
+my @files = glob "$module_dir/*";
+
+dircopy($module_dir, $site_dir);
+
+my $root = dir($site_dir)->absolute;
+my $yaml = file($root, 'etc', 'yukki.conf');
+
+my $config = LoadFile(''.$yaml);
+$config->{root} = ''.$root;
+DumpFile(''.$yaml, $config);
+
+say "To start your Yukki server, run:\n";
+say "\tYUKKI_CONFIG=$yaml plackup yukki.psgi\n";
+say "Have a nice day!";

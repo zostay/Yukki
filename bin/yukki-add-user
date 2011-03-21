@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+use 5.12.1;
+
+use Yukki;
+
+use IO::Prompter;
+use YAML qw( DumpFile );
+
+my $app = Yukki->with_traits('Script')->new;
+
+my %user_fields = (
+    login_name => [ 'Login name:', 
+        -must => { 
+            'be only letters, numbers, and underscores' =>  
+                qr{^[a-zA-Z0-9_]+$}
+        },
+    ],
+    password   => [ 'Password:', -echo => '' ],
+    name       => [ 'Name:' ],
+    email      => [ 'Email:' ],
+);
+
+my %user;
+while (my ($name, $label) = each %user_fields) {
+    $user{$name} = prompt @$label;
+}
+
+while (my $group = prompt 'Group name [enter a blank line to end]:') {
+    push @{ $user{groups} } = $group;
+}
+
+my $user_file = $app->locate('user_path', $user{login_name});
+
+# Do not overwrite existing users.
+if (-f "$user_file") {
+    die "User $user{login_name} already exists. Try editing $user_file instead.\n";
+}
+
+DumpFile("$user_file", $group);
