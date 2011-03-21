@@ -3,12 +3,14 @@ use 5.12.1;
 
 use Yukki;
 
+use File::Path;
 use IO::Prompter;
+use Path::Class;
 use YAML qw( DumpFile );
 
 my $app = Yukki->new;
 
-my %user_fields = (
+my @user_fields = (
     login_name => [ 'Login name:', 
         -must => { 
             'be only letters, numbers, and underscores' =>  
@@ -21,12 +23,13 @@ my %user_fields = (
 );
 
 my %user;
-while (my ($name, $label) = each %user_fields) {
-    $user{$name} = prompt @$label;
+while (my ($name, $label) = splice @user_fields, 0, 2) {
+    $user{$name} = prompt @$label, -v;
 }
 
-while (my $group = prompt 'Group name [enter a blank line to end]:') {
-    push @{ $user{groups} } = $group;
+while (my $group = prompt 'Group name [enter a blank line to end]:', -v) {
+    last unless $group =~ /\S/;
+    push @{ $user{groups} }, $group;
 }
 
 my $user_file = $app->locate('user_path', $user{login_name});
@@ -36,5 +39,7 @@ if (-f "$user_file") {
     die "User $user{login_name} already exists. Try editing $user_file instead.\n";
 }
 
-DumpFile("$user_file", $group);
+mkpath(''.$user_file->dir);
+
+DumpFile("$user_file", \%user);
 chmod 0400, "$user_file";

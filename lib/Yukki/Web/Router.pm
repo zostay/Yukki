@@ -67,7 +67,6 @@ sub BUILD {
         defaults => {
             action     => 'view',
             repository => 'main',
-            page       => [ 'home.yukki' ],
         },
         validations => {
             action     => qr/^(?:view|edit|preview|attach)$/,

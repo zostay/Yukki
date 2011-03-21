@@ -39,7 +39,9 @@ sub view_page {
     my ($self, $ctx) = @_;
 
     my $repo_name  = $ctx->request->path_parameters->{repository};
-    my $path       = $ctx->request->path_parameters->{page};
+    my $path       = $ctx->request->path_parameters->{page}
+                  // $self->settings->{repositories}{$repo_name}{default_page}
+                  // 'home.yukki',
 
     my $page    = $self->lookup_page($repo_name, $path);
     my $content = $page->fetch;
@@ -47,6 +49,7 @@ sub view_page {
     my $body;
     if (not defined $content) {
         $body = $self->view('Page')->blank($ctx, { 
+            title      => $page->file_name,
             repository => $repo_name, 
             page       => $page->full_path,
         });
@@ -68,7 +71,9 @@ sub edit_page {
     my ($self, $ctx) = @_;
 
     my $repo_name = $ctx->request->path_parameters->{repository};
-    my $path      = $ctx->request->path_parameters->{page};
+    my $path      = $ctx->request->path_parameters->{page}
+                 // $self->settings->{repositories}{$repo_name}{default_page}
+                 // 'home.yukki',
 
     my $page = $self->lookup_page($repo_name, $path);
 
@@ -104,7 +109,9 @@ sub preview_page {
     my ($self, $ctx) = @_;
 
     my $repo_name = $ctx->request->path_parameters->{repository};
-    my $path      = $ctx->request->path_parameters->{page};
+    my $path      = $ctx->request->path_parameters->{page}
+                 // $self->settings->{repositories}{$repo_name}{default_page}
+                 // 'home.yukki',
 
     my $page = $self->lookup_page($repo_name, $path);
 

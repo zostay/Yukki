@@ -61,7 +61,8 @@ has branch => (
 
 sub _build_branch {
     my $self = shift;
-    $self->repository_settings->{branch} // 'refs/heads/master';
+    $self->repository_settings->{site_branch} 
+        // 'refs/heads/master';
 }
 
 sub make_tree {
