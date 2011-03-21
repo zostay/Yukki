@@ -1,13 +1,12 @@
 package Yukki;
 use Moose;
 
-with 'MooseX::Traits';
-
 use Yukki::Types qw( AccessLevel );
 
 use MooseX::Params::Validate;
 use MooseX::Types::Path::Class;
 use Path::Class;
+use YAML qw( LoadFile );
 
 =head1 NAME
 
@@ -27,13 +26,42 @@ Does it suit your needs? I don't really care, but if I've shared this on the CPA
 
 =cut
 
-has '+_trait_namespace' => ( default => 'Yukki' );
+has config_file => (
+    is          => 'ro',
+    isa         => 'Path::Class::File',
+    required    => 1,
+    coerce      => 1,
+    lazy_build  => 1,
+);
+
+sub _build_config_file {
+    my $self = shift;
+
+    my $cwd_conf = file(dir(), 'etc', 'yukki.conf');
+    if (not $ENV{YUKKI_CONFIG} and -f "$cwd_conf") {
+        return $cwd_conf;
+    }
+
+    die("Please make YUKKI_CONFIG point to your configuration file.\n")
+        unless defined $ENV{YUKKI_CONFIG};
+
+    die("No configuration found at $ENV{YUKKI_CONFIG}. Please set YUKKI_CONFIG to the correct location.\n")
+        unless -f $ENV{YUKKI_CONFIG};
+
+    return $ENV{YUKKI_CONFIG};
+}
 
 has settings => (
     is          => 'ro',
     isa         => 'HashRef',
     required    => 1,
+    lazy_build  => 1,
 );
+
+sub _build_settings {
+    my $self = shift;
+    LoadFile(''.$self->config_file);
+}
 
 sub view { die 'not implemented here' }
 

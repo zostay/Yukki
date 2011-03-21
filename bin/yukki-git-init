@@ -8,7 +8,7 @@ use Git::Repository;
 my $repo_name   = shift;
 my $remote_repo = shift;
 
-my $app = Yukki->with_traits('Script')->new;
+my $app = Yukki->new;
 
 my $config = $app->settings->{repositories}{ $repo_name };
 

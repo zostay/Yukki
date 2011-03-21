@@ -6,7 +6,7 @@ use Yukki;
 use IO::Prompter;
 use YAML qw( DumpFile );
 
-my $app = Yukki->with_traits('Script')->new;
+my $app = Yukki->new;
 
 my %user_fields = (
     login_name => [ 'Login name:', 
@@ -37,3 +37,4 @@ if (-f "$user_file") {
 }
 
 DumpFile("$user_file", $group);
+chmod 0400, "$user_file";

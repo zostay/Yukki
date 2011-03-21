@@ -8,7 +8,7 @@ use YAML qw( LoadFile );
 
 use Yukki::Web;
 
-my $server = Yukki::Web->with_traits('Script')->new;
+my $server = Yukki::Web->new;
 my $app = sub {
     my $env = shift;
     return $server->dispatch($env);

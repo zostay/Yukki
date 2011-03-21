@@ -13,14 +13,17 @@ my $site_dir = shift;
 my $module_dir = module_dir('Yukki::Web');
 my @files = glob "$module_dir/*";
 
+$File::Copy::Recursive::KeepMode = 0;
 dircopy($module_dir, $site_dir);
 
 my $root = dir($site_dir)->absolute;
 my $yaml = file($root, 'etc', 'yukki.conf');
 
-my $config = LoadFile(''.$yaml);
-$config->{root} = ''.$root;
-DumpFile(''.$yaml, $config);
+my $config = LoadFile("$yaml");
+$config->{root} = "$root";
+chmod 0644, "$yaml";
+DumpFile("$yaml", $config);
+chmod 0444, "$yaml";
 
 say "To start your Yukki server, run:\n";
 say "\tYUKKI_CONFIG=$yaml plackup yukki.psgi\n";
