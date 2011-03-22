@@ -66,7 +66,7 @@ sub _build_branch {
 }
 
 has author_name => (
-    is          => 'ro',
+    is          => 'rw',
     isa         => 'Str',
     required    => 1,
     lazy_build  => 1,
@@ -79,7 +79,7 @@ sub _build_author_name {
 }
 
 has author_email => (
-    is          => 'ro',
+    is          => 'rw',
     isa         => 'Str',
     required    => 1,
     lazy_build  => 1,
