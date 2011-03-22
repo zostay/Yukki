@@ -39,8 +39,8 @@ has repository => (
         'list_files'          => 'list_files',
         'fetch_size'          => 'fetch_size',
         'repository_name'     => 'name',
-        'committer_name'      => 'committer_name',
-        'committer_email'     => 'committer_email',
+        'author_name'         => 'author_name',
+        'author_email'        => 'author_email',
     },
 );
 

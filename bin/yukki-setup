@@ -3,10 +3,11 @@ use 5.12.1;
 
 use Yukki::Web;
 
+use autodie;
 use File::ShareDir qw( module_dir );
 use File::Copy::Recursive qw( dircopy );
 use Path::Class;
-use YAML qw( LoadFile DumpFile );
+use YAML qw( LoadFile );
 
 my $site_dir = shift;
 
@@ -19,11 +20,25 @@ dircopy($module_dir, $site_dir);
 my $root = dir($site_dir)->absolute;
 my $yaml = file($root, 'etc', 'yukki.conf');
 
-my $config = LoadFile("$yaml");
-$config->{root} = "$root";
-chmod 0644, "$yaml";
-DumpFile("$yaml", $config);
+# Don't use YAML to load the file or we'll lose spaces and comments
+rename $yaml, "$yaml~";
+open my $out_config, '>', $yaml;
+open my $in_config, '<', "$yaml~";
+while (my $line = <$in_config>) {
+    given ($line) {
+        when (/^root:/) {
+            $line = "root: $root\n";
+        }
+    }
+    print $out_config $line;
+}
+close $out_config;
+close $in_config;
+unlink "$yaml~";
+
 chmod 0444, "$yaml";
+
+my $config = LoadFile("$yaml");
 
 say "Please read the installation instructions if you have not:\n";
 say "\tperldoc Yukki::Manual::Installation\n";

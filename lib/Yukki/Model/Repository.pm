@@ -65,27 +65,27 @@ sub _build_branch {
         // 'refs/heads/master';
 }
 
-has committer_name => (
+has author_name => (
     is          => 'ro',
     isa         => 'Str',
     required    => 1,
     lazy_build  => 1,
 );
 
-sub _build_committer_name {
+sub _build_author_name {
     my $self = shift;
     $self->app->settings->{anonymous}{commiter_name}
         // 'Anonymous'
 }
 
-has committer_email => (
+has author_email => (
     is          => 'ro',
     isa         => 'Str',
     required    => 1,
     lazy_build  => 1,
 );
 
-sub _build_committer_email {
+sub _build_author_email {
     my $self = shift;
     $self->app->settings->{anonymous}{commiter_email}
         // 'anonymous@localhost'
@@ -185,8 +185,8 @@ sub commit_tree {
         'commit-tree', $new_tree_id, '-p', $old_tree_id, { 
             input => $comment,
             env   => {
-                GIT_COMMITTER_NAME  => $self->committer_name,
-                GIT_COMMITTER_EMAIL => $self->committer_email,
+                GIT_AUTHOR_NAME  => $self->author_name,
+                GIT_AUTHOR_EMAIL => $self->author_email,
             },
         },
     );

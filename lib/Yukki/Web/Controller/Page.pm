@@ -95,8 +95,8 @@ sub edit_page {
         my $comment     = $ctx->request->parameters->{comment};
 
         if (my $user = $ctx->session->{user}) {
-            $page->committer_name($user->{name});
-            $page->committer_email($user->{email});
+            $page->author_name($user->{name});
+            $page->author_email($user->{email});
         }
 
         $page->store({ 

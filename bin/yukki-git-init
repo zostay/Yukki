@@ -40,8 +40,13 @@ END_OF_STUB_MAIN
 
     my $stub_tree = "100655 blob $object_id\t$page\n";
     my $tree_id   = $git->run('mktree', { input => $stub_tree });
-    my $commit_id = $git->run('commit-tree', $tree_id, 
-        { input => 'Initializing empty Yukki repository.' });
+    my $commit_id = $git->run('commit-tree', $tree_id, { 
+        input => 'Initializing empty Yukki repository.',
+        env   => {
+            GIT_AUTHOR_NAME  => 'yukki-git-init',
+            GIT_AUTHOR_EMAIL => 'hanenkamp@cpan.org',
+        },
+    });
 
     $git->run('update-ref', $branch, $commit_id, '0' x 40);
 }

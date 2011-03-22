@@ -106,11 +106,11 @@ This is a section configuring the anonymous user information
 
 =over
 
-=item committer_name
+=item author_name
 
 This is the name to use when an anonymous user makes a change to a wiki repository.
 
-=item committer_email
+=item author_email
 
 This is the email address to use when an anonymous user makes a change to a wiki repository.
 
