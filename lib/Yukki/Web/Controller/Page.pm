@@ -20,6 +20,25 @@ sub fire {
     }
 }
 
+sub repo_name_and_path {
+    my ($self, $ctx) = @_;
+
+    my $repo_name  = $ctx->request->path_parameters->{repository};
+    my $path       = $ctx->request->path_parameters->{page};
+
+    if (not defined $path) {
+        my $repo_config 
+            = $self->app->settings->{repositories}{$repo_name};
+
+        my $path_str = $repo_config->{default_page}
+                    // 'home.yukki';
+
+        $path = [ split m{/}, $path_str ];
+    }
+
+    return ($repo_name, $path);
+}
+
 sub lookup_page {
     my ($self, $repo_name, $page) = @_;
 
@@ -38,10 +57,7 @@ sub lookup_page {
 sub view_page {
     my ($self, $ctx) = @_;
 
-    my $repo_name  = $ctx->request->path_parameters->{repository};
-    my $path       = $ctx->request->path_parameters->{page}
-                  // $self->settings->{repositories}{$repo_name}{default_page}
-                  // 'home.yukki',
+    my ($repo_name, $path) = $self->repo_name_and_path($ctx);
 
     my $page    = $self->lookup_page($repo_name, $path);
     my $content = $page->fetch;
@@ -70,10 +86,7 @@ sub view_page {
 sub edit_page {
     my ($self, $ctx) = @_;
 
-    my $repo_name = $ctx->request->path_parameters->{repository};
-    my $path      = $ctx->request->path_parameters->{page}
-                 // $self->settings->{repositories}{$repo_name}{default_page}
-                 // 'home.yukki',
+    my ($repo_name, $path) = $self->repo_name_and_path($ctx);
 
     my $page = $self->lookup_page($repo_name, $path);
 
@@ -108,10 +121,7 @@ sub edit_page {
 sub preview_page {
     my ($self, $ctx) = @_;
 
-    my $repo_name = $ctx->request->path_parameters->{repository};
-    my $path      = $ctx->request->path_parameters->{page}
-                 // $self->settings->{repositories}{$repo_name}{default_page}
-                 // 'home.yukki',
+    my ($repo_name, $path) = $self->repo_name_and_path($ctx);
 
     my $page = $self->lookup_page($repo_name, $path);
 

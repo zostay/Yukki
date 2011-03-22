@@ -30,6 +30,7 @@ has markdown => (
 sub _build_markdown {
     Text::MultiMarkdown->new(
         markdown_in_html_blocks => 1,
+        heading_ids             => 0,
     );
 }
 
