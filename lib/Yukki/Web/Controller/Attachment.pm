@@ -67,6 +67,11 @@ sub upload_file {
 
     my $file      = $self->lookup_file($repo_name, $path);
     
+    if (my $user = $ctx->session->{user}) {
+        $file->committer_name($user->{name});
+        $file->committer_email($user->{email});
+    }
+
     my $upload = $ctx->request->uploads->{file};
     $file->store({
         filename => $upload->tempname,

@@ -94,6 +94,11 @@ sub edit_page {
         my $new_content = $ctx->request->parameters->{yukkitext};
         my $comment     = $ctx->request->parameters->{comment};
 
+        if (my $user = $ctx->session->{user}) {
+            $page->committer_name($user->{name});
+            $page->committer_email($user->{email});
+        }
+
         $page->store({ 
             content => $new_content,
             comment => $comment,

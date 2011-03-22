@@ -65,6 +65,32 @@ sub _build_branch {
         // 'refs/heads/master';
 }
 
+has committer_name => (
+    is          => 'ro',
+    isa         => 'Str',
+    required    => 1,
+    lazy_build  => 1,
+);
+
+sub _build_committer_name {
+    my $self = shift;
+    $self->app->settings->{anonymous}{commiter_name}
+        // 'Anonymous'
+}
+
+has committer_email => (
+    is          => 'ro',
+    isa         => 'Str',
+    required    => 1,
+    lazy_build  => 1,
+);
+
+sub _build_committer_email {
+    my $self = shift;
+    $self->app->settings->{anonymous}{commiter_email}
+        // 'anonymous@localhost'
+}
+
 sub make_tree {
     my ($self, $base, $tree, $blob) = @_;
     my @tree = @$tree;
@@ -155,7 +181,15 @@ sub find_root {
 sub commit_tree {
     my ($self, $old_tree_id, $new_tree_id, $comment) = @_;
 
-    return $self->git->run('commit-tree', $new_tree_id, '-p', $old_tree_id, { input => $comment });
+    return $self->git->run(
+        'commit-tree', $new_tree_id, '-p', $old_tree_id, { 
+            input => $comment,
+            env   => {
+                GIT_COMMITTER_NAME  => $self->committer_name,
+                GIT_COMMITTER_EMAIL => $self->committer_email,
+            },
+        },
+    );
 }
 
 sub update_root {

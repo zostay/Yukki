@@ -100,6 +100,22 @@ THis is the folder where Yukki will find the static files to serve for your appl
 
 This is the folder where the list of user files can be found.
 
+=item anonymous
+
+This is a section configuring the anonymous user information
+
+=over
+
+=item committer_name
+
+This is the name to use when an anonymous user makes a change to a wiki repository.
+
+=item committer_email
+
+This is the email address to use when an anonymous user makes a change to a wiki repository.
+
+=back
+
 =item repositories
 
 This is a section under which each repository is configured. The keys under here are the name found in the URL. It is also the name to use when running the F<yukki-git-init> and other repository-related commands.
