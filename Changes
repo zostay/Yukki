@@ -1,0 +1,7 @@
+{{$NEXT}}
+
+    * First release of Yukki to CPAN
+    * You can login and has support for groups and ACLs
+    * Anonymous users may edit or not depending on the reposotiry configuration
+    * Support for yukkitext with yukkilinks and attachment URLs
+    * You can upload attachments with drag and drop
