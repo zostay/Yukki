@@ -210,7 +210,7 @@ sub make_tree {
     if (defined $base) {
         my @old_tree = $git->run('ls-tree', $base);
         for my $line (@old_tree) {
-            my ($old_mode, $old_type, $old_object_id, $old_file) = split /\s+/, $line;
+            my ($old_mode, $old_type, $old_object_id, $old_file) = split /\s+/, $line, 4;
 
             if ($old_file eq $name) {
                 $overwrite++;
@@ -290,7 +290,7 @@ sub find_root {
     my $old_tree_id;
     my @ref_info = $self->git->run('show-ref', $self->branch);
     REF: for my $line (@ref_info) {
-        my ($object_id, $name) = split /\s+/, $line;
+        my ($object_id, $name) = split /\s+/, $line, 2;
 
         if ($name eq $self->branch) {
             $old_tree_id = $object_id;
@@ -357,7 +357,7 @@ sub find_path {
     my $object_id;
     my @files = $self->git->run('ls-tree', $self->branch, $path);
     FILE: for my $line (@files) {
-        my ($mode, $type, $id, $name) = split /\s+/, $line;
+        my ($mode, $type, $id, $name) = split /\s+/, $line, 4;
 
         if ($name eq $path) {
             $object_id = $id;
@@ -394,7 +394,7 @@ sub fetch_size {
 
     my @files = $self->git->run('ls-tree', '-l', $self->branch, $path);
     FILE: for my $line (@files) {
-        my ($mode, $type, $id, $size, $name) = split /\s+/, $line;
+        my ($mode, $type, $id, $size, $name) = split /\s+/, $line, 5;
         return $size if $name eq $path;
     }
 
@@ -416,7 +416,7 @@ sub list_files {
 
     my @tree_files = $self->git->run('ls-tree', $self->branch, $path . '/');
     FILE: for my $line (@tree_files) {
-        my ($mode, $type, $id, $name) = split /\s+/, $line;
+        my ($mode, $type, $id, $name) = split /\s+/, $line, 4;
 
         my $filetype;
         if ($name =~ s/\.(?<filetype>[a-z0-9]+)$//) {
