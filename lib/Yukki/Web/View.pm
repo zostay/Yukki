@@ -284,6 +284,7 @@ sub yukkitext {
 
     # Yukki Links
     $yukkitext =~ s{ 
+        (?<!\\)                 # \ will escape the link
         \[\[ \s*                # [[ to start it
 
             (?: ([\w]+) : )?    # repository: is optional
@@ -304,8 +305,24 @@ sub yukkitext {
         });
     }xeg;
 
+    # Handle escaped links, hide the escape
+    $yukkitext =~ s{ 
+        \\                      # \ will escape the link
+        (\[\[ \s*               # [[ to start it
+
+            (?: [\w]+ : )?      # repository: is optional
+            [\w/.\-]+ \s*       # link/to/page is mandatory
+
+            (?: \|              # | to split link from label
+                [^\]]+          # a pretty label (needs trimming)
+            )?                  # is optional
+
+        \]\])                    # ]] to end
+    }{$1}gx;
+
     # Yukki Plugins
     $yukkitext =~ s{
+        (?<!\\)                 # \ will escape the plugin
         \{\{ \s*                # {{ to start it
 
             ([\w]+) :           # plugin_name: is required
@@ -321,6 +338,18 @@ sub yukkitext {
             arg         => $2,
         });
     }xeg;
+
+    # Handle the escaped plugin thing
+    $yukkitext =~ s{
+        \\                      # \ will escape the plugin
+        (\{\{ \s*               # {{ to start it
+
+            [\w]+ :             # plugin_name: is required
+
+            .*                  # plugin arguments
+
+        \}\})                   # }} to end
+    }{$1}xg;
 
     return '<div>' . $self->format_markdown($yukkitext) . '</div>';
 }
