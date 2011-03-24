@@ -7,8 +7,8 @@ If you download it from github, you will need to install it using Dist::Zilla.
 
 The preferred installation would be to fetch it from CPAN:
 
-  cpanm Yukki
+    cpanm Yukki
 
 or if you don't have App::cpanminus installed (you should), you can run:
 
-  perl -MCPAN -e 'install Yukki'
+    perl -MCPAN -e 'install Yukki'
