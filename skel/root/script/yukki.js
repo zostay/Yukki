@@ -91,7 +91,7 @@ $(document).ready(function() {
                 $.each(files, function(i, file) {
                     var new_row = $file_list.find('.attachment-table #' + file_id(file));
                     var cloned = false;
-                    if (!new_row) {
+                    if (new_row.length == 0) {
                         new_row = $file_list.find('.attachment-table .file:first').clone();
                         cloned = true;
                     }
