@@ -10,6 +10,8 @@ use MooseX::Types::Moose qw( ArrayRef HashRef );
 use MooseX::Types::Structured qw( Tuple );
 use List::MoreUtils qw( any );
 
+# ABSTRACT: Adds ACLs to routes
+
 =head1 DESCRIPTION
 
 Each route in L<Yukki::Web::Router> is defined using this class.

@@ -43,3 +43,23 @@ mkpath(''.$user_file->dir);
 
 DumpFile("$user_file", \%user);
 chmod 0400, "$user_file";
+
+# ABSTRACT: add users to a Yukki installation
+# PODNAME: yukki-add-user
+
+=head1 SYNOPSIS
+
+  yukki-add-user
+
+=head1 DESCRIPTION
+
+Interactively adds a user to a Yukki installation. There are no command-line
+options.
+
+=head1 ENVIRONMENT
+
+Normally, this script tries to find F<etc/yukki.conf> from the current working
+directory. If no configuraiton file is found, it checks C<YUKKI_CONFIG> for the
+path to this file.
+
+=cut

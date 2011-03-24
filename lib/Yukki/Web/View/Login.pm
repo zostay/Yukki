@@ -3,6 +3,8 @@ use Moose;
 
 extends 'Yukki::Web::View';
 
+# ABSTRACT: show a login form
+
 =head1 DESCRIPTION
 
 Renders the login form.

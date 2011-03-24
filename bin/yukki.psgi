@@ -24,3 +24,26 @@ builder {
         $app;
     };
 };
+
+# ABSTRACT: the Yukki web application
+# PODNAME: yukki.psgi
+
+=head1 SYNOPSIS
+
+  yukki.psgi
+
+=head1 DESCRIPTION
+
+If you have L<Plack> installed, you should be able to run this script from the
+command line to start a simple test server. It is not recommend that you use
+this web server in production.
+
+See L<Yukki::Manual::Installation>.
+
+=head1 ENVIRONMENT
+
+Normally, this script tries to find F<etc/yukki.conf> from the current working
+directory. If no configuraiton file is found, it checks C<YUKKI_CONFIG> for the
+path to this file.
+
+=cut

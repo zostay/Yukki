@@ -151,7 +151,7 @@ sub render_page {
     );
 }
 
-=head2 render
+=head2 render_links
 
   my $document = $self->render_links(\@navigation_links);
 

@@ -50,3 +50,37 @@ END_OF_STUB_MAIN
 
     $git->run('update-ref', $branch, $commit_id, '0' x 40);
 }
+
+# ABSTRACT: Initialize a git repository for use with Yukki
+# PODNAME: yukki-git-init
+
+=head1 SYNOPSIS
+
+  yukki-git-init repository
+  yukki-git-init repository remote-repository
+
+=head1 DESCRIPTION
+
+This will initialize a git repository for use with Yukki. The script must be
+called with at least one argument and accepts an optional second argument.
+
+=over
+
+=item repository
+
+The repository is the name of the repository to initalized. It should be one of
+the repository keys in the C<repositories> section of the F<yukki.conf>.
+
+=item remote-repository
+
+This is a git path to a repository to clone as a mirror for use with Yukki.
+
+=back
+
+=head1 ENVIRONMENT
+
+Normally, this script tries to find F<etc/yukki.conf> from the current working
+directory. If no configuraiton file is found, it checks C<YUKKI_CONFIG> for the
+path to this file.
+
+=cut

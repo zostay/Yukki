@@ -3,6 +3,8 @@ use Moose;
 
 extends 'Yukki::Web::View';
 
+# ABSTRACT: render HTML for viewing and editing wiki pages
+
 =head1 DESCRIPTION
 
 Renders wiki pages.

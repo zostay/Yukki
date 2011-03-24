@@ -1,6 +1,5 @@
-=head1 NAME
-
-Yukki::Manual::Installation - installation instructions
+# PODNAME: Yukki::Manual::Installation
+# ABSTRACT: installaction instructions
 
 =head1 SYNOPSIS
 
