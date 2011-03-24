@@ -4,6 +4,20 @@ use Moose;
 
 use HTTP::Throwable::Factory qw( http_throw );
 
+# ABSTRACT: Simple controller for handling internal redirects
+
+=head1 DESCRIPTION
+
+Simple controller for handling internal redirects.
+
+=head1 METHODS
+
+=head2 fire
+
+When fired, performs the requested redirect.
+
+=cut
+
 sub fire {
     my ($self, $ctx) = @_;
 

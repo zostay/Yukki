@@ -6,6 +6,20 @@ extends 'Yukki::Web::Controller';
 
 use HTTP::Throwable::Factory qw( http_throw );
 
+# ABSTRACT: shows the login page and handles login
+
+=head1 DESCRIPTION
+
+Shows the login page and handles login.
+
+=head1 METHODS
+
+=head2 fire
+
+Routes page reqquests to L</show_login_page>, submit requests to L</check_login_submission>, and exit requests to L</logout>.
+
+=cut
+
 sub fire {
     my ($self, $ctx) = @_;
 
@@ -18,11 +32,23 @@ sub fire {
     }
 }
 
+=head2 show_login_page
+
+Calls L<Yukki::Web::View::Login/page> to display the login page.
+
+=cut
+
 sub show_login_page {
     my ($self, $ctx) = @_;
 
     $ctx->response->body( $self->view('Login')->page($ctx) );
 }
+
+=head2 check_login_submission
+
+Authenticates a user login.
+
+=cut
 
 sub check_login_submission {
     my ($self, $ctx) = @_;
@@ -50,6 +76,12 @@ sub check_login_submission {
         return;
     }
 }
+
+=head2 logout
+
+Expires the session, causing logout.
+
+=cut
 
 sub logout {
     my ($self, $ctx) = @_;

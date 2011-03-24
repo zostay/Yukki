@@ -7,6 +7,20 @@ extends 'Yukki::Web::Controller';
 use JSON;
 use HTTP::Throwable::Factory qw( http_throw );
 
+# ABSTRACT: Controller for uploading, downloading, and viewing attachments
+
+=head1 DESCRIPTION
+
+Handles uploading, downloading, and viewing attachments.
+
+=head1 METHODS
+
+=head2 fire
+
+Maps download requests to L</download_file>, upload requests to L</upload_file>, and view requestst to L</view_file>.
+
+=cut
+
 sub fire {
     my ($self, $ctx) = @_;
 
@@ -19,6 +33,15 @@ sub fire {
         }
     }
 }
+
+=head2 lookup_file
+
+  my $file = $self->lookup_file($repository, $path);
+
+This is a helper for locating and returning a L<Yukki::Model::File> for the
+requested repository and path.
+
+=cut
 
 sub lookup_file {
     my ($self, $repo_name, $file) = @_;
@@ -35,6 +58,13 @@ sub lookup_file {
     return $repository->file({ path => $path, filetype => $filetype });
 }
 
+=head2 download_file
+
+Returns the file in the response with a MIME type of "application/octet". This
+should force the browser to treat it like a download.
+
+=cut
+
 sub download_file {
     my ($self, $ctx) = @_;
 
@@ -47,6 +77,13 @@ sub download_file {
     $ctx->response->body([ scalar $file->fetch ]);
 }
 
+=head2 view_file
+
+Returns the file in the response with a MIME type reported by
+L<Yukki::Model::File/media_type>.
+
+=cut
+
 sub view_file {
     my ($self, $ctx) = @_;
 
@@ -58,6 +95,12 @@ sub view_file {
     $ctx->response->content_type($file->media_type);
     $ctx->response->body([ scalar $file->fetch ]);
 }
+
+=head2 upload_file
+
+This uploads the file given into the wiki.
+
+=cut
 
 sub upload_file {
     my ($self, $ctx) = @_;

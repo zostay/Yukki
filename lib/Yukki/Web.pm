@@ -11,9 +11,19 @@ use HTTP::Throwable::Factory qw( http_throw http_exception );
 use Scalar::Util qw( blessed );
 use Try::Tiny;
 
-=head1 NAME
+# ABSTRACT: the Yukki web server
 
-Yukki::Web - the Yukki web-server
+=head1 DESCRIPTION
+
+This class handles the work of dispatching incoming requests to the various
+controllers.
+
+=head1 ATTRIBUTES
+
+=head2 router
+
+This is the L<Path::Router> that will determine where incoming requests are
+sent. It is automatically set to a L<Yukki::Web::Router> instance.
 
 =cut
 
@@ -29,6 +39,14 @@ sub _build_router {
     Yukki::Web::Router->new( app => $self );
 }
 
+=head1 METHODS
+
+=head2 component
+
+Helper method used by L</controller> and L</view>.
+
+=cut
+
 sub component {
     my ($self, $type, $name) = @_;
     my $class_name = join '::', 'Yukki::Web', $type, $name;
@@ -36,15 +54,41 @@ sub component {
     return $class_name->new(app => $self);
 }
 
+=head2 controller
+
+  my $controller = $app->controller($name);
+
+Returns an instance of the named L<Yukki::Web::Controller>.
+
+=cut
+
 sub controller { 
     my ($self, $name) = @_;
     return $self->component(Controller => $name);
 }
 
+=head2 view
+
+  my $view = $app->view($name);
+
+Returns an instance of the named L<Yukki::Web::View>.
+
+=cut
+
 sub view {
     my ($self, $name) = @_;
     return $self->component(View => $name);
 }
+
+=head2 dispatch
+
+  my $response = $app->dispatch($env);
+
+This is a PSGI application in a method call. Given a L<PSGI> environment, maps
+that to the appropriate controller and fires it. Whether successful or failure,
+it returns a PSGI response.
+
+=cut
 
 sub dispatch {
     my ($self, $env) = @_;

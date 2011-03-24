@@ -6,6 +6,20 @@ extends 'Yukki::Web::Controller';
 
 use HTTP::Throwable::Factory qw( http_throw );
 
+# ABSTRACT: controller for viewing and editing pages
+
+=head1 DESCRIPTION
+
+Controller for viewing and editing pages
+
+=head1 METHODS
+
+=head2 fire
+
+On a view request routes to L</view_page>, edit request to L</edit_page>, preview request to L</preview_page>, and attach request to L</upload_attachment>.
+
+=cut
+
 sub fire {
     my ($self, $ctx) = @_;
 
@@ -19,6 +33,12 @@ sub fire {
         }
     }
 }
+
+=head2 repo_name_and_path
+
+This is a helper for looking up the repository name and path for the request.
+
+=cut
 
 sub repo_name_and_path {
     my ($self, $ctx) = @_;
@@ -39,6 +59,12 @@ sub repo_name_and_path {
     return ($repo_name, $path);
 }
 
+=head2 lookup_page
+
+Given a repository name and page, returns a L<Yukki::Model::File> for it.
+
+=cut
+
 sub lookup_page {
     my ($self, $repo_name, $page) = @_;
 
@@ -53,6 +79,13 @@ sub lookup_page {
     my $path = join '/', @$page, $final_part;
     return $repository->file({ path => $path, filetype => $filetype });
 }
+
+=head2 view_page
+
+Tells either L<Yukki::Web::View::Page/blank> or L<Yukki::Web::View::Page/view>
+to show the page.
+
+=cut
 
 sub view_page {
     my ($self, $ctx) = @_;
@@ -82,6 +115,12 @@ sub view_page {
 
     $ctx->response->body($body);
 }
+
+=head2 edit_page
+
+Displays or processes the edit form for a page using.
+
+=cut
 
 sub edit_page {
     my ($self, $ctx) = @_;
@@ -123,6 +162,12 @@ sub edit_page {
     );
 }
 
+=head2 preview_page
+
+Shows the preview for an edit to a page using L<Yukki::Web::View::Page/preview>..
+
+=cut
+
 sub preview_page {
     my ($self, $ctx) = @_;
 
@@ -141,6 +186,12 @@ sub preview_page {
         })
     );
 }
+
+=head2 upload_attachment
+
+This is a facade that wraps L<Yukki::Web::Controller::Attachment/upload>.
+
+=cut
 
 sub upload_attachment {
     my ($self, $ctx) = @_;

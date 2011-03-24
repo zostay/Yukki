@@ -8,11 +8,46 @@ use Yukki::Model::File;
 use Git::Repository;
 use MooseX::Types::Path::Class;
 
+# ABSTRACT: model for accessing objects in a git repository
+
+=head1 SYNOPSIS
+
+  my $repository = $app->model('Repository', { name => 'main' });
+  my $file = $repository->file({ path => 'foo.yukki' });
+
+=head1 DESCRIPTION
+
+This model contains methods for performing all the individual operations
+required to store files into and fetch files from the git repository. It
+includes tools for building trees, commiting, creating blobs, fetching file
+lists, etc.
+
+=head1 EXTENDS
+
+L<Yukki::Model>
+
+=head1 ATTRIBUTES
+
+=head2 name
+
+This is the name of the repository. This is used to lookup the configuration for
+the repository from the F<yukki.conf>.
+
+=cut
+
 has name => (
     is          => 'ro',
     isa         => 'Str',
     required    => 1,
 );
+
+=head2 repository_settings
+
+These are the settings telling this model where to find the git repository and
+how to access it. It is loaded automatically using the L</name> to look up
+information in the F<yukki.conf>.
+
+=cut
 
 has repository_settings => (
     is          => 'ro',
@@ -24,6 +59,13 @@ has repository_settings => (
         $self->app->settings->{repositories}{$self->name};
     },
 );
+
+=head2 repository_path
+
+This is the path to the repository. It is located using the C<repository_path>
+and C<repository> keys in the configuration.
+
+=cut
 
 has repository_path => (
     is          => 'ro',
@@ -40,6 +82,12 @@ sub _build_repository_path {
     return $self->locate_dir('repository_path', $repo_settings->{repository});
 }
 
+=head2 git
+
+This is a L<Git::Repository> object which helps us do the real work.
+
+=cut
+
 has git => (
     is          => 'ro',
     isa         => 'Git::Repository',
@@ -51,6 +99,14 @@ sub _build_git {
     my $self = shift;
     return Git::Repository->new( git_dir => $self->repository_path );
 }
+
+=head2 branch
+
+This is the branch to use when working with the git repository. This is either
+pulled from the C<site_branch> key in the configuration or defaults to
+"refs/heads/master".
+
+=cut
 
 has branch => (
     is          => 'ro',
@@ -65,6 +121,15 @@ sub _build_branch {
         // 'refs/heads/master';
 }
 
+=head2 author_name
+
+This is the author name to use when making changes to the repository.
+
+This is taken from the C<author_name> of the C<anonymous> key in the
+configuration or defaults to "Anonymous".
+
+=cut
+
 has author_name => (
     is          => 'rw',
     isa         => 'Str',
@@ -74,9 +139,18 @@ has author_name => (
 
 sub _build_author_name {
     my $self = shift;
-    $self->app->settings->{anonymous}{commiter_name}
+    $self->app->settings->{anonymous}{author_name}
         // 'Anonymous'
 }
+
+=head2 author_email
+
+This is the author email to use when making changes to the repository.
+
+This is taken from teh C<author_email> of the C<anonymous> key in the
+configuration or defaults to "anonymous@localhost".
+
+=cut
 
 has author_email => (
     is          => 'rw',
@@ -87,9 +161,32 @@ has author_email => (
 
 sub _build_author_email {
     my $self = shift;
-    $self->app->settings->{anonymous}{commiter_email}
+    $self->app->settings->{anonymous}{author_email}
         // 'anonymous@localhost'
 }
+
+=head1 METHODS
+
+=head2 make_tree
+
+  my $tree_id = $repository->make_tree($old_tree_id, \@parts, $object_id);
+
+This will construct one or more trees in the git repository to place the
+C<$object_id> into the deepest tree. This starts by reading the tree found using
+the object ID in C<$old_tree_id>. The first path part in C<@parts> is shifted
+off. If an existing path is found there, that path will be replaced. If not, a
+new path will be added. A tree object will be constructed for all byt he final
+path part in C<@parts>.
+
+When the final part is reached, that path will be placed into the final tree
+as a blob using the given C<$object_id>.
+
+This method will fail if it runs into a situation where a blob would be replaced
+by a tree or a tree would be replaced by a blob. 
+
+The method returns the object ID of the top level tree created.
+
+=cut
 
 sub make_tree {
     my ($self, $base, $tree, $blob) = @_;
@@ -148,6 +245,15 @@ sub make_tree {
     return $git->run('mktree', { input => join "\n", @new_tree });
 }
 
+=head2 make_blob
+
+  my $object_id = $repository->make_blob($name, $content);
+
+This creates a new file blob in the git repository with the given name and the
+file contents.
+
+=cut
+
 sub make_blob {
     my ($self, $name, $content) = @_;
 
@@ -155,11 +261,28 @@ sub make_blob {
         { input => $content });
 }
 
+=head2 make_blob_from_file
+
+  my $object_id = $repository->make_blob_from_file($name, $filename);
+
+This is identical to L</make_blob>, except that the contents are read from the
+given filename on the local disk.
+
+=cut
+
 sub make_blob_from_file {
     my ($self, $name, $filename) = @_;
 
     return $self->git->run('hash-object', '-t', 'blob', '-w', '--path', $name, $filename);
 }
+
+=head2 find_root
+
+  my $tree_id = $repository->find_root;
+
+This returns the object ID for the tree at the root of the L</branch>.
+
+=cut
 
 sub find_root {
     my ($self) = @_;
@@ -178,6 +301,18 @@ sub find_root {
     return $old_tree_id;
 }
 
+=head2 commit_tree
+
+  my $commit_id = $self->commit_tree($old_tree_id, $new_tree_id, $comment);
+
+This takes an existing tree commit (generally found with L</find_root>), a new
+tree to replace it (generally constructed by L</make_tree>) and creates a
+commit using the given comment.
+
+The object ID of the committed ID is returned.
+
+=cut
+
 sub commit_tree {
     my ($self, $old_tree_id, $new_tree_id, $comment) = @_;
 
@@ -192,10 +327,29 @@ sub commit_tree {
     );
 }
 
+=head2 update_root
+
+  $self->update_root($old_tree_id, $new_tree_id);
+
+Given a old commit ID and a new commit ID, this moves the HEAD of the L</branch>
+so that it points to the new commit. This is called after L</commit_tree> has
+setup the commit.
+
+=cut
+
 sub update_root {
     my ($self, $old_commit_id, $new_commit_id) = @_;
     $self->git->command('update-ref', $self->branch, $new_commit_id, $old_commit_id);
 }
+
+=head2 find_path
+
+  my $object_id = $self->find_path($path);
+
+Given a path within the repository, this will find the object ID of that tree or
+blob at that path for the L</branch>.
+
+=cut
 
 sub find_path {
     my ($self, $path) = @_;
@@ -214,10 +368,26 @@ sub find_path {
     return $object_id;
 }
 
+=head2 show
+
+  my $content = $repository->show($object_id);
+
+Returns the contents of the blob for the given object ID.
+
+=cut
+
 sub show {
     my ($self, $object_id) = @_;
     return $self->git->run('show', $object_id);
 }
+
+=head2 fetch_size
+
+  my $bytes = $repository->fetch_size($path);
+
+Returns the size, in bites, of the blob at the given path.
+
+=cut
 
 sub fetch_size {
     my ($self, $path) = @_;
@@ -230,6 +400,15 @@ sub fetch_size {
 
     return;
 }
+
+=head2 list_files
+
+  my @files = $repository->list_files($path);
+
+Returns a list of L<Yukki::Model::File> objects for all the files found at
+C<$path> in the repository.
+
+=cut
 
 sub list_files {
     my ($self, $path) = @_;
@@ -249,6 +428,14 @@ sub list_files {
 
     return @files;
 }
+
+=head2 file
+
+  my $file = $repository->file({ path => 'foo', filetype => 'yukki' });
+
+Returns a single L<Yukki::Model::File> object for the given path and filetype.
+
+=cut
 
 sub file {
     my ($self, $params) = @_;

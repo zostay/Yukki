@@ -8,9 +8,26 @@ use Yukki::Web::Router::Route;
 use Moose::Util::TypeConstraints qw( subtype where );
 use List::MoreUtils qw( all );
 
-=head1 NAME
+# ABSTRACT: send requests to the correct controllers, yo
 
-Yukki::Web::Router - send requests to the correct controllers, yo
+=head1 DESCRIPTION
+
+This maps incoming paths to the controllers that should be used to handle them.
+This is based on L<Path::Router>, but adds "slurpy" variables.
+
+=head1 EXTENDS
+
+L<Path::Router>
+
+=head1 ATTRIBUTES
+
+=head2 route_class
+
+Defaults to L<Yukki::Web::Router::Route>.
+
+=head2 inline
+
+This is turned off because inline slurpy routing is not implemented.
 
 =cut
 
@@ -19,6 +36,12 @@ Yukki::Web::Router - send requests to the correct controllers, yo
 has '+route_class' => ( default => 'Yukki::Web::Router::Route' );
 has '+inline'      => ( default => 0 );
 
+=head2 app
+
+This is the L<Yukki> handler.
+
+=cut
+
 has app => (
     is          => 'ro',
     isa         => 'Yukki',
@@ -26,6 +49,14 @@ has app => (
     weak_ref    => 1,
     handles     => 'Yukki::Role::App',
 );
+
+=head1 METHODS
+
+=head2 BUILD
+
+Builds the routing table used by L<Yukki::Web>.
+
+=cut
 
 sub BUILD {
     my $self = shift;

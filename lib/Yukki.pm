@@ -1,4 +1,5 @@
 package Yukki;
+use 5.12.1;
 use Moose;
 
 use Yukki::Types qw( AccessLevel );
@@ -8,9 +9,7 @@ use MooseX::Types::Path::Class;
 use Path::Class;
 use YAML qw( LoadFile );
 
-=head1 NAME
-
-Yukki - Yet Uh-nother wiki
+# ABSTRACT: Yet Uh-nother wiki
 
 =head1 DESCRIPTION
 
@@ -18,11 +17,21 @@ This is intended to be the simplest, stupidest wiki on the planet. It uses git f
 
 For information on getting started see L<Yukki::Manual::Installation>.
 
-=head1 WHY?
+=head1 WITH ROLES
 
-I wanted a Perl-based, MultiMarkdown-supporting wiki that I could take sermon notes and personal study notes for church and Bible study and such. However, I'm offline at church, so I want to do this from my laptop and sync it up to the master wiki when I get home. That's it.
+=over
 
-Does it suit your needs? I don't really care, but if I've shared this on the CPAN or the GitHub, then I'm offering it to you in case you might find it useful WITHOUT WARRANTY. If you want it to suit your needs, bug me by email at C<< hanenkamp@cpan.org >> and send me patches.
+=item *
+
+L<Yukki::Role::App>
+
+=back
+
+=head1 ATTRIBUTES
+
+=head2 config_file
+
+This is the name of the configuraiton file. The application will try to find it in F<etc> within the current working directory first. If not there, it will check the C<YUKKI_CONFIG> environment variable.
 
 =cut
 
@@ -51,6 +60,12 @@ sub _build_config_file {
     return $ENV{YUKKI_CONFIG};
 }
 
+=head2 settings
+
+This is the configuration loaded from the L</config_file>.
+
+=cut
+
 has settings => (
     is          => 'ro',
     isa         => 'HashRef',
@@ -63,9 +78,36 @@ sub _build_settings {
     LoadFile(''.$self->config_file);
 }
 
-sub view { die 'not implemented here' }
+=head1 METHODS
 
-sub controller { die 'not implemented here' }
+=head2 view
+
+  my $view = $app->view('Page');
+
+Not implemented in this class. See L<Yukki::Web>.
+
+=cut
+
+sub view { ... }
+
+=head2 controller
+
+  my $controller = $app->controller('Page');
+
+Not implemented in this class. See L<Yukki::Web>.
+
+=cut
+
+sub controller { ... }
+
+=head2 model
+
+  my $model = $app->model('Repository', { repository => 'main' });
+
+Returns an instance of the requested model class. The parameters are passed to
+the instance constructor.
+
+=cut
 
 sub model {
     my ($self, $name, $params) = @_;
@@ -73,6 +115,17 @@ sub model {
     Class::MOP::load_class($class_name);
     return $class_name->new(app => $self, %{ $params // {} });
 }
+
+=head2 locate
+
+  my $file = $app->locate('user_path', 'test_user');
+
+The first argument is the name of the configuration directive naming the path.
+It may be followed by one or more path components to be tacked on to the end.
+
+Returns a L<Path::Class::File> for the file.
+
+=cut
 
 sub _locate {
     my ($self, $type, $base, @extra_path) = @_;
@@ -95,10 +148,36 @@ sub locate {
     $self->_locate(file => $base, @extra_path);
 }
 
+=head2 locate_dir
+
+  my $dir = $app->locate_dir('repository_path', 'main.git');
+
+The arguments are identical to L</locate>, but returns a L<Path::Class::Dir> for
+the given file.
+
+=cut
+
 sub locate_dir {
     my ($self, $base, @extra_path) = @_;
     $self->_locate(dir => $base, @extra_path);
 }
+
+=head2 check_access
+
+  my $access_is_ok = $app->check_access({
+      user       => $user, 
+      repository => 'main',
+      needs      => 'read',
+  });
+
+The C<user> is optional. It should be an object returned from
+L<Yukki::Model::User>. The C<repository> is required and should be the name of
+the repository the user is trying to gain access to. The C<needs> is the access
+level the user needs. It must be an L<Yukki::Types/AccessLevel>.
+
+The method returns a true value if access should be granted or false otherwise.
+
+=cut
 
 sub check_access {
     my ($self, $user, $repository, $needs) = validated_list(\@_,
@@ -148,5 +227,13 @@ sub check_access {
 }
 
 with qw( Yukki::Role::App );
+
+=head1 WHY?
+
+I wanted a Perl-based, MultiMarkdown-supporting wiki that I could take sermon notes and personal study notes for church and Bible study and such. However, I'm offline at church, so I want to do this from my laptop and sync it up to the master wiki when I get home. That's it.
+
+Does it suit your needs? I don't really care, but if I've shared this on the CPAN or the GitHub, then I'm offering it to you in case you might find it useful WITHOUT WARRANTY. If you want it to suit your needs, bug me by email at C<< hanenkamp@cpan.org >> and send me patches.
+
+=cut
 
 1;

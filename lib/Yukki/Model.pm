@@ -1,6 +1,20 @@
 package Yukki::Model;
 use Moose;
 
+# ABSTRACT: Base class for model objects
+
+=head1 DESCRIPTION
+
+This is the base class used for model objects.
+
+=head1 ATTRIBUTES
+
+=head2 app
+
+This is the L<Yukki> application instance.
+
+=cut
+
 has app => (
     is          => 'ro',
     isa         => 'Yukki',

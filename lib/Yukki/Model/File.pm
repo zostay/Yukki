@@ -9,11 +9,43 @@ use Number::Bytes::Human qw( format_bytes );
 use LWP::MediaTypes qw( guess_media_type );
 use Path::Class;
 
+# ABSTRACT: the model for loading and saving files in the wiki
+
+=head1 SYNOPSIS
+
+  my $repository = $app->model('Repository', { repository => 'main' });
+  my $file = $repository->file({
+      path     => 'foobar',
+      filetype => 'yukki',
+  });
+
+=head1 DESCRIPTION
+
+Tools for fetching files from the git repository and storing them there.
+
+=head1 EXTENDS
+
+L<Yukki::Model>
+
+=head1 ATTRIBUTES
+
+=head2 path
+
+This is the path to the file in the repository, but without the file suffix.
+
+=cut
+
 has path => (
     is         => 'ro',
     isa        => 'Str',
     required   => 1,
 );
+
+=head2 filetype
+
+The suffix of the file. Defaults to "yukki".
+
+=cut
 
 has filetype => (
     is         => 'ro',
@@ -21,6 +53,13 @@ has filetype => (
     required   => 1,
     default    => 'yukki',
 );
+
+=head2 repository
+
+This is the the L<Yukki::Model::Repository> the file will be fetched from or
+stored into.
+
+=cut
 
 has repository => (
     is         => 'ro',
@@ -44,6 +83,15 @@ has repository => (
     },
 );
 
+=head1 METHODS
+
+=head2 full_path
+
+This is the complete path to the file in the repository with the L</filetype>
+tacked onto the end.
+
+=cut
+
 sub full_path {
     my $self = shift;
 
@@ -56,6 +104,12 @@ sub full_path {
     return $full_path;
 }
 
+=head2 file_name
+
+This is the base name of the file.
+
+=cut
+
 sub file_name {
     my $self = shift;
     my $full_path = $self->full_path;
@@ -63,15 +117,33 @@ sub file_name {
     return $file_name;
 }
 
+=head2 file_id
+
+This is a SHA-1 of the file name in hex.
+
+=cut
+
 sub file_id {
     my $self = shift;
     return sha1_hex($self->file_name);
 }
 
+=head2 object_id
+
+This is the git object ID of the file blob.
+
+=cut
+
 sub object_id {
     my $self = shift;
     return $self->find_path($self->full_path);
 }
+
+=head2 title
+
+This is the title for the file. For most files this is the file name. For files with the "yukki" L</filetype>, the title metadata or first heading found in the file is used.
+
+=cut
 
 sub title {
     my $self = shift;
@@ -94,20 +166,57 @@ sub title {
     return $self->file_name;
 }
 
+=head2 file_size
+
+This is the size of the file in bytes.
+
+=cut
+
 sub file_size {
     my $self = shift;
     return $self->fetch_size($self->full_path);
 }
+
+=head2 formatted_file_size
+
+This returns a human-readable version of the file size.
+
+=cut
 
 sub formatted_file_size {
     my $self = shift;
     return format_bytes($self->file_size);
 }
 
+=head2 media_type
+
+This is the MIME type detected for the file.
+
+=cut
+
 sub media_type {
     my $self = shift;
     return guess_media_type($self->full_path);
 }
+
+=head2 store
+
+  $file->store({ 
+      content => 'text to put in file...', 
+      comment => 'comment describing the change',
+  });
+
+  # OR
+  
+  $file->store({
+      filename => 'file.pdf',
+      comment  => 'comment describing the change',
+  });
+
+This stores a new version of the file, either from the given content string or a
+named local file.
+
+=cut
 
 sub store {
     my ($self, $params) = @_;
@@ -140,12 +249,27 @@ sub store {
     $self->update_root($old_tree_id, $commit_id);
 }
 
+=head2 exists
+
+Returns true if the file exists in the repository already.
+
+=cut
+
 sub exists {
     my $self = shift;
 
     my $path = $self->full_path;
     return $self->find_path($path);
 }
+
+=head2 fetch
+
+  my $content = $self->fetch;
+  my @lines   = $self->fetch;
+
+Returns the contents of the file.
+
+=cut
 
 sub fetch {
     my $self = shift;

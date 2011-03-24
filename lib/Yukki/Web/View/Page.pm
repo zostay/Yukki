@@ -3,6 +3,19 @@ use Moose;
 
 extends 'Yukki::Web::View';
 
+=head1 DESCRIPTION
+
+Renders wiki pages.
+
+=head1 METHODS
+
+=head2 blank
+
+Renders a page that links to the edit page for this location. This helps you
+create the links.
+
+=cut
+
 sub blank {
     my ($self, $ctx, $vars) = @_;
 
@@ -19,6 +32,12 @@ sub blank {
         },
     );
 }
+
+=head2 view
+
+Renders a page as a view.
+
+=cut
 
 sub view {
     my ($self, $ctx, $vars) = @_;
@@ -44,6 +63,12 @@ sub view {
         },
     );
 }
+
+=head2 edit
+
+Renders the editor for a page.
+
+=cut
 
 sub edit {
     my ($self, $ctx, $vars) = @_;
@@ -81,6 +106,12 @@ sub edit {
     );
 }
 
+=head2 attachments
+
+Renders the attachments table.
+
+=cut
+
 sub attachments {
     my ($self, $attachments) = @_;
 
@@ -96,6 +127,12 @@ sub attachments {
         },
     );
 }
+
+=head2 attachment_links
+
+Renders the links listed in the action column of the attachments table.
+
+=cut
 
 sub attachment_links {
     my ($self, $attachment) = @_;
@@ -118,6 +155,12 @@ sub attachment_links {
 
     return $self->render_links(links => \@links);
 }
+
+=head2 preview
+
+Renders a preview of an edit in progress.
+
+=cut
 
 sub preview {
     my ($self, $ctx, $vars) = @_;
