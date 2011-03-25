@@ -146,9 +146,12 @@ sub render_page {
             '#bottom-navigation .navigation' => [ map { 
                 { 'a' => $_->{label}, 'a@href' => $_->{href} },
             } @nav_menu ],
+            '#breadcrumb li' => [ map {
+                { 'a' => $_->{label}, 'a@href' => $_->{href} },
+            } $ctx->response->breadcrumb_links ],
             '#content'    => $self->render(template => $template, vars => $vars),
         },
-    );
+    )->{dom}->toStringHTML;
 }
 
 =head2 render_links
@@ -193,7 +196,7 @@ sub render {
     );
     
     my $template_file = $self->locate('template_path', $template);
-
+    
     return $self->semantic->process($template_file, $vars);
 }
 

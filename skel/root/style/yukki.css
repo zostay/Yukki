@@ -22,6 +22,7 @@ blockquote, pre { margin: 1em 1em; padding: 1em; border: 1px solid #ddf; backgro
 
 #main { padding: 1em; background: #fff; }
 #main h1, #main h2, #main h3 { margin: 0.5em 0; border-bottom: 1px solid #ccf; color: #225; }
+#breadcrumb li { list-style: none; display: inline-block; margin: 0; }
 
 div.field { margin: 1em; }
 div.field label { display: inline-block; width: 10em; text-align: right }

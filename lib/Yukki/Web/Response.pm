@@ -1,6 +1,8 @@
 package Yukki::Web::Response;
 use Moose;
 
+use Yukki::Types qw( BreadcrumbLinks NavigationLinks );
+
 use Plack::Response;
 
 # ABSTRACT: the response to the client
@@ -35,7 +37,7 @@ has response => (
 
 sub _build_response {
     my $self = shift;
-    return Plack::Response->new(200, [ 'Content-type' => 'text/html' ]);
+    return Plack::Response->new(200, [ 'Content-type' => 'text/html; charset=utf-8' ]);
 }
 
 =head2 page_title
@@ -66,7 +68,7 @@ A sorted list of items is retrieved using C<navigation_menu>. New items can be a
 
 has navigation => (
     is          => 'rw',
-    isa         => 'ArrayRef[HashRef]',
+    isa         => NavigationLinks,
     required    => 1,
     default     => sub { [] },
     traits      => [ 'Array' ],
@@ -74,6 +76,23 @@ has navigation => (
         navigation_menu      => [ sort => sub { ($_[0]->{sort}//50) <=> ($_[1]->{sort}//50) } ],
         add_navigation_item  => 'push',
         add_navigation_items => 'push',
+    },
+);
+
+=head2 breadcrumb
+
+This is the breadcrumb to display. It is an empty array by default (meaning no breadcrumb). Each element of the breadcrumb is formatted like navigation, except that C<sort> is not used here.
+
+=cut
+
+has breadcrumb => (
+    is          => 'rw',
+    isa         => BreadcrumbLinks,
+    required    => 1,
+    default     => sub { [] },
+    traits      => [ 'Array' ],
+    handles     => {
+        breadcrumb_links => 'elements',
     },
 );
 
