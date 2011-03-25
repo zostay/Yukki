@@ -101,7 +101,7 @@ sub BUILDARGS {
     if ($args{full_path}) {
         my $full_path = delete $args{full_path};
 
-        my ($path, $filetype) = split m{\.}, $full_path, 2;
+        my ($path, $filetype) = $full_path =~ m{^(.*)(?:\.(\w+))?$};
 
         $args{path}     = $path;
         $args{filetype} = $filetype;

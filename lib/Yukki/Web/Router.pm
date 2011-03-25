@@ -103,7 +103,7 @@ sub BUILD {
             action     => qr/^(?:view|edit|preview|attach)$/,
             repository => qr/^[_a-z0-9]+$/i,
             page       => subtype('ArrayRef[Str]' => where {
-                all { /^[_a-z0-9-]+(?:\.[_a-z0-9-]+)*$/i } @$_
+                all { /^[_a-z0-9-.]+(?:\.[_a-z0-9-]+)*$/i } @$_
             }),
         },
         acl => [
