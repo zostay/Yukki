@@ -7,6 +7,7 @@ use Path::Class;
 use Scalar::Util qw( blessed reftype );
 use Template::Semantic;
 use Text::MultiMarkdown;
+use URI::Escape qw( uri_escape );
 use XML::Twig;
 
 # ABSTRACT: base class for Yukki::Web views
@@ -264,7 +265,7 @@ sub yukkiplugin {
             ^\s*
 
                 (?: ([\w]+) : )?    # repository: is optional
-                ([\w/.\-]+)         # link/to/page is mandatory
+                (.+)                # link/to/page is mandatory
 
             \s*$
 
@@ -275,6 +276,7 @@ sub yukkiplugin {
         my $link       = $2;
 
         $page =~ s{\.yukki$}{};
+        $link = join "/", map { uri_escape($_) } split m{/}, $link;
 
         if ($link =~ m{^/}) {
             return "/attachment/view/$repository$link";
