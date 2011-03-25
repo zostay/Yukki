@@ -121,6 +121,25 @@ sub _build_branch {
         // 'refs/heads/master';
 }
 
+=head2 title
+
+This is the name given to the repository.
+
+=cut
+
+has title => (
+    is          => 'ro',
+    isa         => 'Str',
+    required    => 1,
+    lazy_build  => 1,
+);
+
+sub _build_title {
+    my $self = shift;
+    $self->repository_settings->{name}
+        // $self->name;
+}
+
 =head2 author_name
 
 This is the author name to use when making changes to the repository.

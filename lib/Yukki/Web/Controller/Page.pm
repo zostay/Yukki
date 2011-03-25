@@ -231,6 +231,11 @@ sub breadcrumb {
 
     my @breadcrumb;
     my @path_acc;
+
+    push @breadcrumb, {
+        label => $repository->title,
+        href  => join('/', '/page/view/', $repository->name),
+    };
     
     for my $path_part (@$path_parts) {
         push @path_acc, $path_part;
