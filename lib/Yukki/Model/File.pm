@@ -85,6 +85,31 @@ has repository => (
 
 =head1 METHODS
 
+=head2 BUILDARGS
+
+Allows C<full_path> to be given instead of C<path> and C<filetype>.
+
+=cut
+
+sub BUILDARGS {
+    my $class = shift;
+
+    my %args;
+    if (@_ == 1) { %args = %{ $_[0] }; }
+    else         { %args = @_; }
+
+    if ($args{full_path}) {
+        my $full_path = delete $args{full_path};
+
+        my ($path, $filetype) = split m{\.}, $full_path, 2;
+
+        $args{path}     = $path;
+        $args{filetype} = $filetype;
+    }
+
+    return \%args;
+}
+
 =head2 full_path
 
 This is the complete path to the file in the repository with the L</filetype>

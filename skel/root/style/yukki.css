@@ -1,5 +1,5 @@
 * { margin: 0; padding: 0; color: #333; font-family: Optima }
-* body { background: #ddf; font-size: 10pt; }
+* body { background: #ddf; font-size: 12pt; }
 li { margin-left: 2em; }
 p { margin: 1em 0; }
 input { border: 1px solid #99f; font-size: 1.1em; }
@@ -37,6 +37,8 @@ div.progress { height: 15px }
 #login-page { width: 30em; margin: 8em auto }
 
 /*** Page ***/
+
+a.not-exists { color: #800; }
 
 textarea#yukkitext { width: 100%; height: 20em; }
 input#comment { width: 100%; }

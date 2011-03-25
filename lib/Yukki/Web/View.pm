@@ -240,9 +240,13 @@ sub yukkilink {
 
     $link = join '/', @base_name, $link if $link =~ m{^\./};
     $link =~ s{^/}{};
+    $link =~ s{/\./}{/}g;
 
     $label =~ s/^\s*//; $label =~ s/\s*$//;
-    return qq{<a href="/page/view/$repository/$link">$label</a>};
+
+    my $file = $self->model('Repository', { name => $repository })->file({ full_path => $link });
+    my $class = $file->exists ? 'exists' : 'not-exists';
+    return qq{<a class="$class" href="/page/view/$repository/$link">$label</a>};
 }
 
 =head2 yukkiplugin
