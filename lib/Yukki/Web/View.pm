@@ -208,9 +208,34 @@ sub yukkilink {
 
     my $repository = $params->{repository};
     my $link       = $params->{link};
-    my $label      = $params->{label} // $link;
+    my $label      = $params->{label};
 
-    ($repository, $link) = split /:/, 2 if $link =~ /:/;
+    my ($repo_name, $local_link) = split /:/, $link, 2 if $link =~ /:/;
+    if (defined $repo_name and defined $self->app->settings->{repositories}{$repo_name}) {
+        $repository = $repo_name;
+        $link       = $local_link;
+    }
+    
+    # If we did not get a label, make the label into the link
+    if (not defined $label) {
+        ($label) = $link =~ m{([^/]+)$};
+
+        $link =~ s{[^a-zA-Z0-9-_./]+}{-}g;
+        $link =~ s{-+}{-}g;
+        $link =~ s{^-}{};
+        $link =~ s{-$}{};
+
+        $link .= '.yukki';
+    }
+
+    my @base_name;
+    if ($params->{page}) {
+        $base_name[0] = $params->{page};
+        $base_name[0] =~ s/\.yukki$//g;
+    }
+
+    $link = join '/', @base_name, $link if $link =~ m{^\./};
+    $link =~ s{^/}{};
 
     $label =~ s/^\s*//; $label =~ s/\s*$//;
     return qq{<a href="/page/view/$repository/$link">$label</a>};
@@ -288,7 +313,7 @@ sub yukkitext {
         \[\[ \s*                # [[ to start it
 
             (?: ([\w]+) : )?    # repository: is optional
-            ([\w/.\-]+) \s*     # link/to/page is mandatory
+            ([^|\]]+) \s*       # link/to/page is mandatory
 
             (?: \|              # | to split link from label
                 ([^\]]+)        # a pretty label (needs trimming)
