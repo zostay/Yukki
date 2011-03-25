@@ -19,7 +19,7 @@ builder {
     mount "/template" => Plack::App::File->new( root => $server->locate_dir('static_path', 'template') );
 
     mount "/"       => builder { 
-        enable 'Session';
+        enable $server->session_middleware;
 
         $app;
     };

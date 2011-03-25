@@ -7,7 +7,9 @@ use Yukki::Error;
 use Yukki::Web::Context;
 use Yukki::Web::Router;
 
+use CHI;
 use HTTP::Throwable::Factory qw( http_throw http_exception );
+use Plack::Session::Store::Cache;
 use Scalar::Util qw( blessed );
 use Try::Tiny;
 
@@ -169,6 +171,25 @@ sub dispatch {
     };
 
     return $response;
+}
+
+=head2 session_middleware
+
+  enable $app->session_middleware;
+
+Returns the setup for the PSGI session middleware.
+
+=cut
+
+sub session_middleware {
+    my $self = shift;
+
+    # TODO Make this configurable
+    return ('Session', 
+        store => Plack::Session::Store::Cache->new(
+            cache => CHI->new(driver => 'FastMmap'),
+        ),
+    );
 }
 
 1;
