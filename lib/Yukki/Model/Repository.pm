@@ -437,6 +437,8 @@ sub list_files {
     FILE: for my $line (@tree_files) {
         my ($mode, $type, $id, $name) = split /\s+/, $line, 4;
 
+        next unless $type eq 'blob';
+
         my $filetype;
         if ($name =~ s/\.(?<filetype>[a-z0-9]+)$//) {
             $filetype = $+{filetype};
