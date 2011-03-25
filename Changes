@@ -1,5 +1,15 @@
 {{$NEXT}}
 
+    * Improved links and the hierarchical arrangement of files in the
+      repository.
+        * You can put links in a sub-topic via ./Foo
+        * You can put links in a absolute path via /Foo
+        * Better labels for links, especially links to different parts of the
+          file tree
+    * Better formatting for pre and blockquote
+    * Sessions now persist across restarts via CHI and FastMmap caching.
+    * Added a breadcrumb to the shell template
+
 0.110830  2011-03-23 23:45:57 America/Chicago
 
     * First release of Yukki to CPAN
