@@ -214,6 +214,8 @@ sub yukkilink {
     my $link       = $params->{link};
     my $label      = $params->{label};
 
+    $link =~ s/^\s+//; $link =~ s/\s+$//;
+
     my ($repo_name, $local_link) = split /:/, $link, 2 if $link =~ /:/;
     if (defined $repo_name and defined $self->app->settings->{repositories}{$repo_name}) {
         $repository = $repo_name;
@@ -278,6 +280,8 @@ sub yukkiplugin {
         my $repository = $1 // $params->{repository};
         my $page       = $params->{page};
         my $link       = $2;
+
+        $link =~ s/^\s+//; $link =~ s/\s+$//;
 
         $page =~ s{\.yukki$}{};
         $link = join "/", map { uri_escape($_) } split m{/}, $link;
@@ -345,7 +349,7 @@ sub yukkitext {
         (\[\[ \s*               # [[ to start it
 
             (?: [\w]+ : )?      # repository: is optional
-            [\w/.\-]+ \s*       # link/to/page is mandatory
+            [^|\]]+ \s*         # link/to/page is mandatory
 
             (?: \|              # | to split link from label
                 [^\]]+          # a pretty label (needs trimming)
