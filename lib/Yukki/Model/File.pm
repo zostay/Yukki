@@ -188,7 +188,9 @@ sub title {
         }
     }
 
-    return $self->file_name;
+    my $title = $self->file_name;
+    $title =~ s/\.(\w+)$//g;
+    return $title;
 }
 
 =head2 file_size
