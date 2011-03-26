@@ -1,5 +1,15 @@
 {{$NEXT}}
 
+    * The repository is now the left-most breadcrumb item
+    * Directories will no longer be listed in attachment lists.
+    * URIs and links are better escaped and handle a wider variety of formats
+      and characters
+    * Links to pages that have not be created now show in red
+    * Better finding and handling of file name and file type.
+    * Breadcurmb and other automatic titles will not include the file suffix in
+      the title any longer (i.e., .yukki does not show so often)
+    * Various styling and layout fixes
+
 0.110840  2011-03-25 00:33:26 America/Chicago
 
     * Improved links and the hierarchical arrangement of files in the
