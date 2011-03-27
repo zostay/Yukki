@@ -9,6 +9,7 @@ use Path::Class;
 use YAML qw( DumpFile );
 
 my $app = Yukki->new;
+my $digest = $app->hasher;
 
 my @user_fields = (
     login_name => [ 'Login name:', 
@@ -26,6 +27,9 @@ my %user;
 while (my ($name, $label) = splice @user_fields, 0, 2) {
     $user{$name} = prompt @$label, -v;
 }
+
+$digest->add($user{password});
+$user{password} = $digest->generate;
 
 while (my $group = prompt 'Group name [enter a blank line to end]:', -v) {
     last unless $group =~ /\S/;

@@ -44,6 +44,21 @@ sub show_login_page {
     $ctx->response->body( $self->view('Login')->page($ctx) );
 }
 
+=head2 check_password
+
+Checks that the user's password is valid.
+
+=cut
+
+sub check_password {
+    my ($self, $user, $password) = @_;
+
+    return scalar $self->app->hasher->validate(
+        $user->{password}, 
+        $password,
+    );
+}
+
 =head2 check_login_submission
 
 Authenticates a user login.
@@ -60,7 +75,7 @@ sub check_login_submission {
 
     $ctx->add_errors('no such user or you typed your password incorrectly') unless $user;
 
-    if ($user and $user->{password} ne $password) {
+    if (not ($user and $self->check_password($user, $password))) {
         $ctx->add_errors('no such user or you typed your password incorrectly');
     }
 

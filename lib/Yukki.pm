@@ -4,6 +4,7 @@ use Moose;
 
 use Yukki::Types qw( AccessLevel );
 
+use Crypt::SaltedHash;
 use MooseX::Params::Validate;
 use MooseX::Types::Path::Class;
 use Path::Class;
@@ -224,6 +225,20 @@ sub check_access {
     } 
 
     return '';
+}
+
+=head2 hasher
+
+Returns a message digest object that can be used to create a cryptographic hash.
+
+=cut
+
+sub hasher {
+    my $self = shift;
+
+    return Crypt::SaltedHash->new(
+        algorithm => $self->settings->{digest} // 'SHA-512',
+    );
 }
 
 with qw( Yukki::Role::App );
