@@ -51,12 +51,16 @@ information in the F<yukki.conf>.
 
 has repository_settings => (
     is          => 'ro',
-    isa         => 'HashRef',
+    isa         => 'Yukki::Settings::Repository',
     required    => 1,
     lazy        => 1,
     default     => sub { 
         my $self = shift;
-        $self->app->settings->{repositories}{$self->name};
+        $self->app->settings->repositories->{$self->name};
+    },
+    handles     => {
+        'title'  => 'name',
+        'branch' => 'site_branch',
     },
 );
 
@@ -79,7 +83,7 @@ sub _build_repository_path {
     my $self = shift;
     
     my $repo_settings = $self->repository_settings;
-    return $self->locate_dir('repository_path', $repo_settings->{repository});
+    return $self->locate_dir('repository_path', $repo_settings->repository);
 }
 
 =head2 git
@@ -100,45 +104,7 @@ sub _build_git {
     return Git::Repository->new( git_dir => $self->repository_path );
 }
 
-=head2 branch
-
-This is the branch to use when working with the git repository. This is either
-pulled from the C<site_branch> key in the configuration or defaults to
-"refs/heads/master".
-
-=cut
-
-has branch => (
-    is          => 'ro',
-    isa         => 'Str',
-    required    => 1,
-    lazy_build  => 1,
-);
-
-sub _build_branch {
-    my $self = shift;
-    $self->repository_settings->{site_branch} 
-        // 'refs/heads/master';
-}
-
-=head2 title
-
-This is the name given to the repository.
-
-=cut
-
-has title => (
-    is          => 'ro',
-    isa         => 'Str',
-    required    => 1,
-    lazy_build  => 1,
-);
-
-sub _build_title {
-    my $self = shift;
-    $self->repository_settings->{name}
-        // $self->name;
-}
+=head1 METHODS
 
 =head2 author_name
 
@@ -149,18 +115,7 @@ configuration or defaults to "Anonymous".
 
 =cut
 
-has author_name => (
-    is          => 'rw',
-    isa         => 'Str',
-    required    => 1,
-    lazy_build  => 1,
-);
-
-sub _build_author_name {
-    my $self = shift;
-    $self->app->settings->{anonymous}{author_name}
-        // 'Anonymous'
-}
+sub author_name { shift->app->settings->anonymous->author_name }
 
 =head2 author_email
 
@@ -171,20 +126,7 @@ configuration or defaults to "anonymous@localhost".
 
 =cut
 
-has author_email => (
-    is          => 'rw',
-    isa         => 'Str',
-    required    => 1,
-    lazy_build  => 1,
-);
-
-sub _build_author_email {
-    my $self = shift;
-    $self->app->settings->{anonymous}{author_email}
-        // 'anonymous@localhost'
-}
-
-=head1 METHODS
+sub author_email { shift->app->settings->anonymous->author_email }
 
 =head2 make_tree
 

@@ -48,10 +48,9 @@ sub repo_name_and_path {
 
     if (not defined $path) {
         my $repo_config 
-            = $self->app->settings->{repositories}{$repo_name};
+            = $self->app->settings->repositories->{$repo_name};
 
-        my $path_str = $repo_config->{default_page}
-                    // 'home.yukki';
+        my $path_str = $repo_config->default_page;
 
         $path = [ split m{/}, $path_str ];
     }

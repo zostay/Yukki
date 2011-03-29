@@ -6,6 +6,7 @@ extends qw( Yukki );
 use Yukki::Error;
 use Yukki::Web::Context;
 use Yukki::Web::Router;
+use Yukki::Web::Settings;
 
 use CHI;
 use HTTP::Throwable::Factory qw( http_throw http_exception );
@@ -21,6 +22,10 @@ This class handles the work of dispatching incoming requests to the various
 controllers.
 
 =head1 ATTRIBUTES
+
+=cut
+
+has '+settings' => ( isa => 'Yukki::Web::Settings' );
 
 =head2 router
 
@@ -128,10 +133,10 @@ sub dispatch {
             });
         }
 
-        for my $repository (keys %{ $self->settings->{repositories} }) {
-            my $config = $self->settings->{repositories}{$repository};
+        for my $repository (keys %{ $self->settings->repositories }) {
+            my $config = $self->settings->repositories->{$repository};
 
-            my $name = $config->{name} // ucfirst $repository;
+            my $name = $config->name;
             $ctx->response->add_navigation_item({
                 label => $name,
                 href  => join('/', '/page/view',  $repository),
