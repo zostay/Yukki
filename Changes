@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.110880  2011-03-28 22:07:48 America/Chicago
     
     * Bugfix: Links sometimes treated whitespace incorrectly
     * Bugfix: Escaping links did not work in some cases
