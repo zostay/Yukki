@@ -225,8 +225,9 @@ sub check_access {
                     return 1 if $level_group ~~ @user_groups;
                 }
             }
-            else {
-                warn "weird value in $groups config for $repository settings";
+            elsif ($config->$groups ne 'NONE') {
+                warn "weird value ", $config->$groups, 
+                    " in $groups config for $repository settings";
             }
         }
     } 
