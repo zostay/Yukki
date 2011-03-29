@@ -1,4 +1,14 @@
 {{$NEXT}}
+    
+    * Bugfix: Links sometimes treated whitespace incorrectly
+    * Bugfix: Escaping links did not work in some cases
+    * Up until now passwords were stored in plain text. They will no be stored
+      as a salted hash using the digest configured in the digest directory (or
+      SHA-512 if not given). If someone out there has been trying this out, you
+      MUST run yukki-passwd for every user to hash the passwords.
+    * Added the yukki-passwd script to help with password changes.
+    * Added the first few unit tests.
+    * The configuration file is now checked for correctness when it is loaded.
 
 0.110850  2011-03-25 23:24:42 America/Chicago
 
