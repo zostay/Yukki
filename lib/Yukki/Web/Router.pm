@@ -100,14 +100,14 @@ sub BUILD {
             repository => 'main',
         },
         validations => {
-            action     => qr/^(?:view|edit|preview|attach)$/,
+            action     => qr/^(?:view|edit|history|preview|attach)$/,
             repository => qr/^[_a-z0-9]+$/i,
             page       => subtype('ArrayRef[Str]' => where {
                 all { /^[_a-z0-9-.]+(?:\.[_a-z0-9-]+)*$/i } @$_
             }),
         },
         acl => [
-            [ read  => { action => [ qw( view preview ) ] } ],
+            [ read  => { action => [ qw( view preview history ) ] } ],
             [ write => { action => [ qw( edit attach ) ]  } ],
         ],
         target => $self->controller('Page'),

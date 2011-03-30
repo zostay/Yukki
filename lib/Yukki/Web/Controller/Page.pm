@@ -26,6 +26,7 @@ sub fire {
     given ($ctx->request->path_parameters->{action}) {
         when ('view')    { $self->view_page($ctx) }
         when ('edit')    { $self->edit_page($ctx) }
+        when ('history') { $self->view_history($ctx) }
         when ('preview') { $self->preview_page($ctx) }
         when ('attach')  { $self->upload_attachment($ctx) }
         default {
@@ -165,6 +166,32 @@ sub edit_page {
             content     => $content,
             attachments => \@attachments,
         }) 
+    );
+}
+
+=head2 view_history
+
+Displays the page's revision history.
+
+=cut
+
+sub view_history {
+    my ($self, $ctx) = @_;
+
+    my ($repo_name, $path) = $self->repo_name_and_path($ctx);
+
+    my $page = $self->lookup_page($repo_name, $path);
+
+    my $breadcrumb = $self->breadcrumb($page->repository, $path);
+
+    $ctx->response->body(
+        $self->view('Page')->history($ctx, {
+            title      => $page->title,
+            breadcrumb => $breadcrumb,
+            repository => $repo_name,
+            page       => $page->full_path,
+            revisions  => [ $page->history ],
+        })
     );
 }
 

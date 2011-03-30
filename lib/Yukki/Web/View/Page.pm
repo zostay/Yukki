@@ -36,6 +36,26 @@ sub blank {
     );
 }
 
+=head2 page_navigation
+
+Sets up the page navigation menu.
+
+=cut
+
+sub page_navigation {
+    my ($self, $response, $this_action, $vars) = @_;
+
+    for my $action (qw( view edit history )) {
+        next if $action eq $this_action;
+
+        $response->add_navigation_item({
+            label => ucfirst $action,
+            href  => join('/', '/page', $action, $vars->{repository}, $vars->{page}),
+            sort  => undef,
+        });
+    }
+}
+
 =head2 view
 
 Renders a page as a view.
@@ -54,17 +74,57 @@ sub view {
         yukkitext  => $vars->{content},
     });
 
-    $ctx->response->add_navigation_item({
-        label => 'Edit',
-        href  => join('/', '/page/edit', $vars->{repository}, $vars->{page}),
-        sort  => undef,
-    });
+    $self->page_navigation($ctx->response, 'view', $vars);
 
     return $self->render_page(
         template => 'page/view.html',
         context  => $ctx,
         vars     => {
             '#yukkitext' => \$html,
+        },
+    );
+}
+
+=head2 history
+
+Display the history for a page.
+
+=cut
+
+sub history {
+    my ($self, $ctx, $vars) = @_;
+
+    $self->page_navigation($ctx->response, 'history', $vars);
+
+    my $i = 0;
+    return $self->render_page(
+        template => 'page/history.html',
+        context  => $ctx,
+        vars     => {
+            'form@action' => join('/', '/page/diff', $vars->{repository}, $vars->{page}),
+            '.revision'   => [
+                map { 
+                    my $r = {
+                        '.first-revision input@value'  => $_->{object_id},
+                        '.second-revision input@value' => $_->{object_id},
+                        '.date'                        => $_->{time_ago},
+                        '.author'                      => $_->{author_name},
+                        '.diffstat'                    => sprintf('+%d/-%d', 
+                            $_->{lines_added}, $_->{lines_removed},
+                        ),
+                        '.comment'                     => $_->{comment} || '(no comment)',
+                    }; 
+
+                    my $checked = sub { shift->setAttribute(checked => 'checked'); \$_ };
+
+                    $r->{'.first-revision  input'} = $checked if $i == 0;
+                    $r->{'.second-revision input'} = $checked if $i == 1;
+
+                    $i++;
+
+                    $r;
+                } @{ $vars->{revisions} }
+            ],
         },
     );
 }
@@ -80,12 +140,6 @@ sub edit {
 
     $ctx->response->page_title($vars->{title});
     $ctx->response->breadcrumb($vars->{breadcrumb});
-
-    $ctx->response->add_navigation_item({
-        label => 'View',
-        href  => join('/', '/page/view', $vars->{repository}, $vars->{page}),
-        sort  => 50,
-    });
 
     my $html = $self->yukkitext({
         page       => $vars->{page},

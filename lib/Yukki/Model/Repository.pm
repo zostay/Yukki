@@ -1,10 +1,13 @@
 package Yukki::Model::Repository;
+use 5.12.1;
 use Moose;
 
 extends 'Yukki::Model';
 
+use Yukki::Error;
 use Yukki::Model::File;
 
+use DateTime::Format::Mail;
 use Git::Repository;
 use MooseX::Types::Path::Class;
 
@@ -408,6 +411,101 @@ sub file {
         app        => $self->app,
         repository => $self,
     );
+}
+
+=head2 log
+
+  my @log = $repository->log( full_path => 'foo.yukk' );
+
+Returns a list of revisions. Each revision is a hash with the following keys:
+
+=over
+
+=item object_id
+
+The object ID of the commit.
+
+=item author_name
+
+The name of the commti author.
+
+=item date
+
+The date the commit was made.
+
+=item time_ago
+
+A string showing how long ago the edit took place.
+
+=item comment
+
+The comment the author made about the comment.
+
+=item lines_added
+
+Number of lines added.
+
+=item lines_removed
+
+Number of lines removed.
+
+=back
+
+=cut
+
+sub log {
+    my ($self, $full_path) = @_;
+
+    my @lines = $self->git->run(
+        'log', $self->branch, '--pretty=format:%H~%an~%aD~%ar~%s', '--numstat', 
+        '--', $full_path
+    );
+
+    my @revisions;
+    my $current_revision;
+
+    my $mode = 'log';
+    for my $line (@lines) {
+        given ($mode) {
+            
+            # First line is the log line
+            when ('log') {
+                $current_revision = {};
+
+                @{ $current_revision }{qw( object_id author_name date time_ago comment )}
+                    = split /~/, $line, 5;
+
+                $current_revision->{date} = DateTime::Format::Mail->parse_datetime(
+                    $current_revision->{date}
+                );
+
+                $mode = 'stat';
+            }
+
+            # Remaining lines are the numstat
+            when ('stat') {
+                my ($added, $removed, $path) = split /\s+/, $line, 3;
+                if ($path eq $full_path) {
+                    $current_revision->{lines_added}   = $added;
+                    $current_revision->{lines_removed} = $removed;
+                }
+
+                $mode = 'skip';
+            }
+
+            # Once we know the numstat, search for the blank and start over
+            when ('skip') {
+                push @revisions, $current_revision;
+                $mode = 'log' if $line !~ /\S/;
+            }
+
+            default {
+                Yukki::Error->throw("invalid parse mode '$mode'");
+            }
+        }
+    }
+
+    return @revisions;
 }
 
 1;

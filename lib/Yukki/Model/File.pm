@@ -80,6 +80,7 @@ has repository => (
         'repository_name'     => 'name',
         'author_name'         => 'author_name',
         'author_email'        => 'author_email',
+        'log'                 => 'log',
     },
 );
 
@@ -307,6 +308,51 @@ sub fetch {
     return unless defined $object_id;
 
     return $self->show($object_id);
+}
+
+=head2 history
+
+  my @revisions = $self->history;
+
+Returns a list of revisions. Each revision is a hash with the following keys:
+
+=over
+
+=item object_id
+
+The object ID of the commit.
+
+=item author_name
+
+The name of the commti author.
+
+=item date
+
+The date the commit was made.
+
+=item time_ago
+
+A string showing how long ago the edit took place.
+
+=item comment
+
+The comment the author made about the comment.
+
+=item lines_added
+
+Number of lines added.
+
+=item lines_removed
+
+Number of lines removed.
+
+=back
+
+=cut
+
+sub history {
+    my $self = shift;
+    return $self->log($self->full_path);
 }
 
 1;
