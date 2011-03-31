@@ -43,6 +43,17 @@ $(document).ready(function() {
         });
     }
 
+    function show_hide_revision_checkbox(rx, object_id) {
+        $('input[name="' + rx + '"][value!="' + object_id + '"]').fadeIn();
+        $('input[name="' + rx + '"][value="' + object_id + '"]').fadeOut();
+    };
+
+    show_hide_revision_checkbox('r2', $('input[name="r1"]:checked').val());
+    show_hide_revision_checkbox('r1', $('input[name="r2"]:checked').val());
+
+    $('input[name="r1"]').live('click', function() { show_hide_revision_checkbox('r2', $(this).val()) });
+    $('input[name="r2"]').live('click', function() { show_hide_revision_checkbox('r1', $(this).val()) });
+
     $('.attachments').each(function() {
         var $this = $(this);
 

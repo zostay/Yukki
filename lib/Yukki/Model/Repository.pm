@@ -508,4 +508,56 @@ sub log {
     return @revisions;
 }
 
+=head2 diff_blobs
+
+  my @chunks = $self->diff_blobs('file.yukki', 'a939fe...', 'b7763d...');
+
+Given a file path and two object IDs, returns a list of chunks showing the difference between to revisions of that path. Each chunk is a two element array. The first element is the type of chunk and the second is any detail for that chunk.
+
+The types are:
+
+    "+"    This chunk was added to the second revision.
+    "-"    This chunk was removed in the second revision.
+    " "    This chunk is the same in both revisions.
+
+=cut
+
+sub diff_blobs {
+    my ($self, $path, $object_id_1, $object_id_2) = @_;
+
+    my @lines = $self->git->run(
+        'diff', '--word-diff=porcelain', '--unified=10000000', '--patience',
+        $object_id_1, $object_id_2, '--', $path,
+    );
+
+    my @chunks;
+    my $last_chunk_type = '';
+
+    my $i = 0;
+    LINE: for my $line (@lines) {
+        next if $i++ < 5;
+
+        my ($type, $detail) = $line =~ /^(.)(.*)$/;
+        given ($type) {
+            when ([ '~', ' ', '+', '-' ]) { 
+                if ($last_chunk_type eq $type) {
+                    $chunks[-1][1] .= $detail;
+                }
+                elsif ($type eq '~') {
+                    $chunks[-1][1] .= "\n";
+                }
+                else {
+                    push @chunks, [ $type, $detail ];
+                    $last_chunk_type = $type;
+                }
+            }
+
+            when ('\\') { }
+            default { warn "unknown diff line type $type" }
+        }
+    }
+
+    return @chunks;
+}
+
 1;

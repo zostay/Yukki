@@ -27,6 +27,7 @@ sub fire {
         when ('view')    { $self->view_page($ctx) }
         when ('edit')    { $self->edit_page($ctx) }
         when ('history') { $self->view_history($ctx) }
+        when ('diff')    { $self->view_diff($ctx) }
         when ('preview') { $self->preview_page($ctx) }
         when ('attach')  { $self->upload_attachment($ctx) }
         default {
@@ -191,6 +192,35 @@ sub view_history {
             repository => $repo_name,
             page       => $page->full_path,
             revisions  => [ $page->history ],
+        })
+    );
+}
+
+=head2 view_diff
+
+Displays a diff of the page.
+
+=cut
+
+sub view_diff {
+    my ($self, $ctx) = @_;
+
+    my ($repo_name, $path) = $self->repo_name_and_path($ctx);
+
+    my $page = $self->lookup_page($repo_name, $path);
+
+    my $breadcrumb = $self->breadcrumb($page->repository, $path);
+
+    my $r1 = $ctx->request->query_parameters->{r1};
+    my $r2 = $ctx->request->query_parameters->{r2};
+
+    $ctx->response->body(
+        $self->view('Page')->diff($ctx, {
+            title      => $page->title,
+            breadcrumb => $breadcrumb,
+            repository => $repo_name,
+            page       => $page->full_path,
+            diff       => [ $page->diff($r1, $r2) ],
         })
     );
 }

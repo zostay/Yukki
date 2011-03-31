@@ -81,6 +81,7 @@ has repository => (
         'author_name'         => 'author_name',
         'author_email'        => 'author_email',
         'log'                 => 'log',
+        'diff_blobs'          => 'diff_blobs',
     },
 );
 
@@ -353,6 +354,24 @@ Number of lines removed.
 sub history {
     my $self = shift;
     return $self->log($self->full_path);
+}
+
+=head2 diff
+
+  my @chunks = $self->diff('a939fe...', 'b7763d...');
+
+Given two object IDs, returns a list of chunks showing the difference between two revisions of this path. Each chunk is a two element array. The first element is the type of chunk and the second is any detail for that chunk.
+
+The types are:
+
+    "+"    This chunk was added to the second revision.
+    "-"    This chunk was removed in the second revision.
+    " "    This chunk is the same in both revisions.
+=cut
+
+sub diff {
+    my ($self, $object_id_1, $object_id_2) = @_;
+    return $self->diff_blobs($self->full_path, $object_id_1, $object_id_2);
 }
 
 1;

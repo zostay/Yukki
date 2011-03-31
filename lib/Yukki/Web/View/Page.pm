@@ -1,4 +1,5 @@
 package Yukki::Web::View::Page;
+use 5.12.1;
 use Moose;
 
 extends 'Yukki::Web::View';
@@ -94,6 +95,9 @@ Display the history for a page.
 sub history {
     my ($self, $ctx, $vars) = @_;
 
+    $ctx->response->page_title($vars->{title});
+    $ctx->response->breadcrumb($vars->{breadcrumb});
+
     $self->page_navigation($ctx->response, 'history', $vars);
 
     my $i = 0;
@@ -117,14 +121,53 @@ sub history {
 
                     my $checked = sub { shift->setAttribute(checked => 'checked'); \$_ };
 
-                    $r->{'.first-revision  input'} = $checked if $i == 0;
-                    $r->{'.second-revision input'} = $checked if $i == 1;
+                    $r->{'.first-revision  input'} = $checked if $i == 1;
+                    $r->{'.second-revision input'} = $checked if $i == 0;
 
                     $i++;
 
                     $r;
                 } @{ $vars->{revisions} }
             ],
+        },
+    );
+}
+
+=head2 diff
+
+Display a diff for a file.
+
+=cut
+
+sub diff {
+    my ($self, $ctx, $vars) = @_;
+
+    $ctx->response->page_title($vars->{title});
+    $ctx->response->breadcrumb($vars->{breadcrumb});
+
+    $self->page_navigation($ctx->response, 'diff', $vars);
+
+    my $diff = '';
+    for my $chunk (@{ $vars->{diff} }) {
+        given ($chunk->[0]) {
+            when (' ') { $diff .= $chunk->[1] }
+            when ('+') { $diff .= sprintf '<ins markdown="1">%s</ins>', $chunk->[1] }
+            when ('-') { $diff .= sprintf '<del markdown="1">%s</del>', $chunk->[1] }
+            default { warn "unknown chunk type $chunk->[0]" }
+        }
+    }
+
+    my $html = $self->yukkitext({
+        page       => $vars->{page},
+        repository => $vars->{repository},
+        yukkitext  => $diff,
+    });
+
+    return $self->render_page(
+        template => 'page/diff.html',
+        context  => $ctx,
+        vars     => {
+            '#diff' => \$html,
         },
     );
 }

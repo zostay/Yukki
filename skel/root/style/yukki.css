@@ -14,6 +14,9 @@ td { vertical-align: top; padding: 3px }
 
 blockquote, pre { margin: 1em 1em; padding: 1em; border: 1px solid #ddf; background-color: #eef; }
 
+del, del * { background-color: #fdd; text-decoration: none }
+ins, ins * { background-color: #dfd; text-decoration: none }
+
 #masthead { padding: 2em 1em; background: #ddf; }
 #masthead .main-title { color: #339; }
 #navigation .navigation, #bottom-navigation .navigation { margin: 0 3px; list-style: none; float: left }
