@@ -1,5 +1,11 @@
 {{$NEXT}}
 
+    * Added a diff viewer, which will show a diff for any selected pair of
+      revisions from the hsitory page. This differ is naive and makes some
+      uglifying mistakes that still need to be addressed.
+    * Added a history viewer, which will show all the revisions for a page.
+    * Added more tests
+
 0.110880  2011-03-28 22:07:48 America/Chicago
     
     * Bugfix: Links sometimes treated whitespace incorrectly
