@@ -190,6 +190,8 @@ sub edit {
         yukkitext  => $vars->{content},
     });
 
+    $self->page_navigation($ctx->response, 'edit', $vars);
+
     my %attachments;
     if (@{ $vars->{attachments} }) {
         %attachments = (
