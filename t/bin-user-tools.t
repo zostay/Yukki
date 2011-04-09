@@ -4,14 +4,16 @@ use 5.12.1;
 use File::Temp qw( tempdir );
 use IPC::Run3;
 use Probe::Perl;
-use Test::More tests => 12;
+use Test::More tests => 14;
 use Test::Script;
 use Try::Tiny;
 use YAML qw( LoadFile );
 
 $File::Temp::KEEP_ALL = 1 if $ENV{YUKKI_TEST_KEEP_FILES};
 
+script_compiles('bin/yukki-setup', 'yukki-setup compiles');
 script_compiles('bin/yukki-add-user', 'yukki-add-user compiles');
+script_compiles('bin/yukki-passwd', 'yukki-passwd compiles');
 
 my $tempdir = tempdir;
 diag("TEMPDIR = $tempdir") if $ENV{YUKKI_TEST_KEEP_FILES};
