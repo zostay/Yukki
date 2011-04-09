@@ -21,7 +21,7 @@ if (defined $remote_repo) {
 
 else {
     my $title  = $config->{name} // ucfirst($repo_name);
-    my $page   = $config->{default_page} // 'main.yukki';
+    my $page   = $config->{default_page} // 'home.yukki';
     my $branch = $config->{site_branch} // 'refs/heads/master';
 
     my $stub_main = <<END_OF_STUB_MAIN;
