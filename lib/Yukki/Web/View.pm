@@ -226,6 +226,7 @@ sub yukkilink {
     if (not defined $label) {
         ($label) = $link =~ m{([^/]+)$};
 
+        $link =~ s{([a-zA-Z])'([a-zA-Z])}{$1$2}g; # foo's -> foos, isn't -> isnt
         $link =~ s{[^a-zA-Z0-9-_./]+}{-}g;
         $link =~ s{-+}{-}g;
         $link =~ s{^-}{};
