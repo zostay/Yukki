@@ -1,9 +1,10 @@
 #!/usr/bin/env perl
 use 5.12.1;
 
+use lib 't/lib';
+use Yukki::Test;
+
 use File::Temp qw( tempdir );
-use IPC::Run3;
-use Probe::Perl;
 use Test::More tests => 14;
 use Test::Script;
 use Try::Tiny;
@@ -25,41 +26,21 @@ ok(-d "$tempdir/yukki-test", 'created the test directory');
 ok(!-f "$tempdir/yukki-test/var/db/users/foo", 
     'the user we are about to create does not exist yet');
 
-# I can't use script_runs() here because I need to send input
-my $perl = Probe::Perl->find_perl_interpreter;
-
 $ENV{YUKKI_CONFIG} = "$tempdir/yukki-test/etc/yukki.conf";
 
-sub yukki {
-    my $cmd   = shift;
-    my $stdin = shift;
-
-    my $stdout = '';
-    my $stderr = '';
-
-    try { 
-        my $rv = run3([ $perl, '-Mblib', "bin/yukki-$cmd" ], 
-            \$stdin, \$stdout, \$stderr);
-
-        my $exit   = $? ? ($? >> 8) : 0;
-        my $ok     = !! ( $rv and $exit == 0 );
-
-        is($exit, 0, "bin/yukki-$cmd exits normally");
-        diag("bin/yukki-$cmd - $exit - $stdout - $stderr") unless $ok;
-    }
-
-    catch {
-        fail("bin/yukki-$cmd - ERROR: $_");
-    };
-}
-
-yukki('add-user', qq[foo
+try {
+    yukki('add-user', qq[foo
 secret
 Foo Bar
 foo\@bar.com
 some_group
 another_group
 ]);
+    pass('ran yukki-add-user');
+};
+catch {
+    fail("ran yukki-add-user: $_");
+};
 
 ok(-f "$tempdir/yukki-test/var/db/users/foo",
     'the user file has been created');
@@ -79,7 +60,13 @@ my $digest = $app->hasher;
 
 ok(scalar $digest->validate($password, 'secret'), 'password is valid');
 
-yukki('passwd', "foo\nMy Other Secret\n");
+try {
+    yukki('passwd', "foo\nMy Other Secret\n");
+    pass("ran yukki-passwd");
+}
+catch {
+    fail("ran yukki-passwd: $_");
+};
 
 my $user_again = LoadFile("$tempdir/yukki-test/var/db/users/foo");
 my $new_password = delete $user_again->{password};
