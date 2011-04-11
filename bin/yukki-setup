@@ -11,6 +11,10 @@ use YAML qw( LoadFile );
 
 my $site_dir = shift;
 
+die "usage: $0 path/to/new-site-directory\n" unless $site_dir;
+die qq[A file or directory named "$site_dir" already exists, will not overwrite.\n]
+    if -e $site_dir;
+
 my $module_dir = module_dir('Yukki::Web');
 my @files = glob "$module_dir/*";
 
