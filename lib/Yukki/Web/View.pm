@@ -136,9 +136,14 @@ sub render_page {
         );
     } $ctx->response->navigation_menu;
 
+    my @scripts = $self->app->settings->all_scripts;
+    my @styles  = $self->app->settings->all_styles;
+
     return $self->render(
         template   => 'shell.html',
         vars       => {
+            'head script.local' => [ map { { '@src'  => $_ } } @scripts ],
+            'head link.local'   => [ map { { '@href' => $_ } } @styles ],
             '#messages'   => $messages,
             '.main-title' => $main_title,
             '#navigation .navigation' => [ map { 
