@@ -51,7 +51,10 @@ say "The rest of these remarks assume you run this first:\n";
 say "\tcd $site_dir\n";
 
 say "You probably want to setup your repositories by running:\n";
-say "\tyukki-git-init $_" for sort keys %{ $config->{repositories} };
+for (sort keys %{ $config->{repositories} }) {
+    when ('yukki') { say "\tyukki-git-init $_ git://github.com/zostay/yukki-help.git" }
+    default        { say "\tyukki-git-init $_" }
+}
 print "\n";
 
 say "And then you'll want at least one user, so run:\n";
