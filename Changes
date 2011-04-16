@@ -1,5 +1,15 @@
 {{$NEXT}}
 
+    * Bugfix: Corrected a problem with the navigation menu on edit pages
+    * There is now a "scripts" and "styles" section for listing JavaScript and
+      CSS fiels (respectively) for inclusion in the shell template. If not
+      present, a default list is provided. (See the man page for
+      Yukki::Web::Settings for details.)
+    * The yukki-setup script does a better job validating parameters.
+    * Made some small style adjustments
+    * Added more tests, particularly tests for setting up a new Yukki
+      installation.
+
 0.110900  2011-03-31 17:31:42 America/Chicago
 
     * Added a diff viewer, which will show a diff for any selected pair of

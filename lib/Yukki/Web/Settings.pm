@@ -44,7 +44,24 @@ has static_path => (
 
 =head2 styles
 
-These are the JavaScript and CSS files to load into the shell template.
+This is a list of the JavaScript and CSS files, respectively, to load into the
+shell template. If not set, the defaults are:
+
+  scripts:
+      - /script/lib/jquery/jquery.js
+      - /script/lib/jquery/jquery-ui.js
+      - /script/lib/plupload/gears_init.js
+      - /script/lib/plupload/plupload.full.min.js
+      - /script/lib/sha1/sha1.js
+      - /script/yukki.js
+
+  styles:
+      - /style/yukki.css
+      - /style/lib/jquery/jquery.css
+
+As you can see, these are full paths and may be given as paths to foreign hosts.
+In order to keep Yukki working in good order, you will probaby want to include
+at least the scripts listed above.
 
 =cut
 
