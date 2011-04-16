@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+0.111060  2011-04-15 21:27:56 America/Chicago
+
     * Bugfix: Corrected a problem with the navigation menu on edit pages
     * There is now a "scripts" and "styles" section for listing JavaScript and
       CSS fiels (respectively) for inclusion in the shell template. If not
