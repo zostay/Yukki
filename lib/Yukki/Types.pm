@@ -1,13 +1,15 @@
 package Yukki::Types;
+use 5.12.1;
 use Moose;
 
 use MooseX::Types -declare => [ qw(
     LoginName AccessLevel NavigationLinks
-    BreadcrumbLinks RepositoryMap
+    BaseURL BaseURLEnum BreadcrumbLinks RepositoryMap
 ) ];
 
 use MooseX::Types::Moose qw( Str Int ArrayRef Maybe HashRef );
 use MooseX::Types::Structured qw( Dict );
+use MooseX::Types::URI qw( Uri );
 
 use Email::Address;
 
@@ -70,9 +72,19 @@ subtype NavigationLinks,
         ],
     ];
 
+=head2 BaseURL
+
+This is either an absolute URL or the words C<SCRIPT_NAME> or C<REWRITE>.
+
+=cut
+
+enum BaseURLEnum, qw( SCRIPT_NAME REWRITE );
+
+subtype BaseURL, as BaseURLEnum|Uri;
+
 =head2 BreadcrumbLinks
 
-THis is an array of hashes formatted like:
+This is an array of hashes formatted like:
 
   {
       label => 'Label',
@@ -155,6 +167,5 @@ class_type 'Yukki::Settings::Anonymous';
 coerce 'Yukki::Settings::Anonymous',
     from HashRef,
     via { Yukki::Settings::Anonymous->new($_) };
-
 
 1;

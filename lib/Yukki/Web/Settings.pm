@@ -4,6 +4,8 @@ use Moose;
 
 extends 'Yukki::Settings';
 
+use Yukki::Types qw( BaseURL );
+
 # ABSTRACT: provides structure and validation to web settings in yukki.conf
 
 =head1 DESCRIPTION
@@ -40,6 +42,22 @@ has static_path => (
     default     => 'root',
 );
 
+=head2 base_url
+
+This configures the L<Yukki::Web::Context/base_url> attribute. It is either an absolute URL or the words C<SCRIPT_NAME> or C<REWRITE>. See L<Yukki::Web::Context/base_url> for more information.
+
+The default is C<SCRIPT_NAME>.
+
+=cut
+
+has base_url => (
+    is          => 'ro',
+    isa         => BaseURL,
+    required    => 1,
+    coerce      => 1,
+    default     => 'SCRIPT_NAME',
+);
+
 =head2 scripts
 
 =head2 styles
@@ -48,16 +66,16 @@ This is a list of the JavaScript and CSS files, respectively, to load into the
 shell template. If not set, the defaults are:
 
   scripts:
-      - /script/lib/jquery/jquery.js
-      - /script/lib/jquery/jquery-ui.js
-      - /script/lib/plupload/gears_init.js
-      - /script/lib/plupload/plupload.full.min.js
-      - /script/lib/sha1/sha1.js
-      - /script/yukki.js
+      - script/lib/jquery/jquery.js
+      - script/lib/jquery/jquery-ui.js
+      - script/lib/plupload/gears_init.js
+      - script/lib/plupload/plupload.full.min.js
+      - script/lib/sha1/sha1.js
+      - script/yukki.js
 
   styles:
-      - /style/yukki.css
-      - /style/lib/jquery/jquery.css
+      - style/yukki.css
+      - style/lib/jquery/jquery.css
 
 As you can see, these are full paths and may be given as paths to foreign hosts.
 In order to keep Yukki working in good order, you will probaby want to include
@@ -71,12 +89,12 @@ has scripts => (
     required    => 1,
     default     => sub { 
         [ qw(
-            /script/lib/jquery/jquery.js
-            /script/lib/jquery/jquery-ui.js
-            /script/lib/plupload/gears_init.js
-            /script/lib/plupload/plupload.full.min.js
-            /script/lib/sha1/sha1.js
-            /script/yukki.js
+            script/lib/jquery/jquery.js
+            script/lib/jquery/jquery-ui.js
+            script/lib/plupload/gears_init.js
+            script/lib/plupload/plupload.full.min.js
+            script/lib/sha1/sha1.js
+            script/yukki.js
         ) ]
     },
     traits      => [ 'Array' ],
@@ -91,8 +109,8 @@ has styles => (
     required    => 1,
     default     => sub { 
         [ qw(
-            /style/yukki.css
-            /style/lib/jquery/jquery.css
+            style/yukki.css
+            style/lib/jquery/jquery.css
         ) ]
     },
     traits      => [ 'Array' ],

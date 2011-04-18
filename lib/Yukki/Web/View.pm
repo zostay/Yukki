@@ -85,6 +85,14 @@ sub _build_semantic {
 
 =head1 METHODS
 
+=cut
+
+sub _url_rebaser {
+    my ($self, $ctx) = @_;
+    my $base_url = $ctx->base_url;
+    return sub { URI->new($_[0])->abs($base_url) };
+}
+
 =head2 render_page
 
   my $document = $self->render_page({
@@ -139,21 +147,23 @@ sub render_page {
     my @scripts = $self->app->settings->all_scripts;
     my @styles  = $self->app->settings->all_styles;
 
+    my $b = $self->_url_rebaser($ctx);
+
     return $self->render(
         template   => 'shell.html',
         vars       => {
-            'head script.local' => [ map { { '@src'  => $_ } } @scripts ],
-            'head link.local'   => [ map { { '@href' => $_ } } @styles ],
+            'head script.local' => [ map { { '@src'  => $b->($_) } } @scripts ],
+            'head link.local'   => [ map { { '@href' => $b->($_) } } @styles ],
             '#messages'   => $messages,
             '.main-title' => $main_title,
             '#navigation .navigation' => [ map { 
-                { 'a' => $_->{label}, 'a@href' => $_->{href} },
+                { 'a' => $_->{label}, 'a@href' => $b->($_->{href}) },
             } @nav_menu ],
             '#bottom-navigation .navigation' => [ map { 
-                { 'a' => $_->{label}, 'a@href' => $_->{href} },
+                { 'a' => $_->{label}, 'a@href' => $b->($_->{href}) },
             } @nav_menu ],
             '#breadcrumb li' => [ map {
-                { 'a' => $_->{label}, 'a@href' => $_->{href} },
+                { 'a' => $_->{label}, 'a@href' => $b->($_->{href}) },
             } $ctx->response->breadcrumb_links ],
             '#content'    => $self->render(template => $template, vars => $vars),
         },
@@ -169,15 +179,18 @@ This renders a set of links using the F<links.html> template.
 =cut
 
 sub render_links {
-    my ($self, $links) = validated_list(\@_,
+    my ($self, $ctx, $links) = validated_list(\@_,
+        context  => { isa => 'Yukki::Web::Context' },
         links    => { isa => 'ArrayRef[HashRef]' },
     );
+
+    my $b = $self->_url_rebaser($ctx);
 
     return $self->render(
         template => 'links.html',
         vars     => {
             'li' => [ map {
-                { 'a' => $_->{label}, 'a@href' => $_->{href} },
+                { 'a' => $_->{label}, 'a@href' => $b->($_->{href}) },
             } @$links ],
         },        
     );
@@ -215,6 +228,7 @@ Used to help render yukkilinks. Do not use.
 sub yukkilink {
     my ($self, $params) = @_;
 
+    my $ctx        = $params->{context};
     my $repository = $params->{repository};
     my $link       = $params->{link};
     my $label      = $params->{label};
@@ -252,9 +266,11 @@ sub yukkilink {
 
     $label =~ s/^\s*//; $label =~ s/\s*$//;
 
+    my $b = $self->_url_rebaser($ctx);
+
     my $file = $self->model('Repository', { name => $repository })->file({ full_path => $link });
     my $class = $file->exists ? 'exists' : 'not-exists';
-    return qq{<a class="$class" href="/page/view/$repository/$link">$label</a>};
+    return qq{<a class="$class" href="}.$b->("page/view/$repository/$link").qq{">$label</a>};
 }
 
 =head2 yukkiplugin
@@ -266,6 +282,7 @@ Used to render plugged in markup. Do not use.
 sub yukkiplugin {
     my ($self, $params) = @_;
 
+    my $ctx         = $params->{context};
     my $plugin_name = $params->{plugin_name};
     my $arg         = $params->{arg};
 
@@ -292,11 +309,13 @@ sub yukkiplugin {
         $page =~ s{\.yukki$}{};
         $link = join "/", map { uri_escape($_) } split m{/}, $link;
 
+        my $b = $self->_url_rebaser($ctx);
+
         if ($link =~ m{^/}) {
-            return "/attachment/view/$repository$link";
+            return $b->("attachment/view/$repository$link");
         }
         else {
-            return "/attachment/view/$repository/$page/$link";
+            return $b->("attachment/view/$repository/$page/$link");
         }
     }
     

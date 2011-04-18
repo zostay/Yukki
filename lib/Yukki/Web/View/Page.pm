@@ -51,7 +51,7 @@ sub page_navigation {
 
         $response->add_navigation_item({
             label => ucfirst $action,
-            href  => join('/', '/page', $action, $vars->{repository}, $vars->{page}),
+            href  => join('/', 'page', $action, $vars->{repository}, $vars->{page}),
             sort  => undef,
         });
     }
@@ -70,6 +70,7 @@ sub view {
     $ctx->response->breadcrumb($vars->{breadcrumb});
 
     my $html = $self->yukkitext({
+        context    => $ctx,
         page       => $vars->{page},
         repository => $vars->{repository},
         yukkitext  => $vars->{content},
@@ -158,6 +159,7 @@ sub diff {
     }
 
     my $html = $self->yukkitext({
+        context    => $ctx,
         page       => $vars->{page},
         repository => $vars->{repository},
         yukkitext  => $diff,
@@ -185,6 +187,7 @@ sub edit {
     $ctx->response->breadcrumb($vars->{breadcrumb});
 
     my $html = $self->yukkitext({
+        context    => $ctx,
         page       => $vars->{page},
         repository => $vars->{repository},
         yukkitext  => $vars->{content},
@@ -196,7 +199,7 @@ sub edit {
     if (@{ $vars->{attachments} }) {
         %attachments = (
             '#attachments-list@class' => 'attachment-list',
-            '#attachments-list'       => $self->attachments($vars->{attachments}),
+            '#attachments-list'       => $self->attachments($ctx, $vars->{attachments}),
         );
     }
 
@@ -219,7 +222,7 @@ Renders the attachments table.
 =cut
 
 sub attachments {
-    my ($self, $attachments) = @_;
+    my ($self, $ctx, $attachments) = @_;
 
     return $self->render(
         template   => 'page/attachments.html',
@@ -228,7 +231,7 @@ sub attachments {
                 './@id'     => $_->file_id,
                 '.filename' => $_->file_name,
                 '.size'     => $_->formatted_file_size,
-                '.action'   => $self->attachment_links($_),
+                '.action'   => $self->attachment_links($ctx, $_),
             } } @$attachments ],
         },
     );
@@ -241,7 +244,7 @@ Renders the links listed in the action column of the attachments table.
 =cut
 
 sub attachment_links {
-    my ($self, $attachment) = @_;
+    my ($self, $ctx, $attachment) = @_;
 
     my @links;
 
@@ -259,7 +262,7 @@ sub attachment_links {
                  $attachment->full_path),
     };
 
-    return $self->render_links(links => \@links);
+    return $self->render_links(context => $ctx, links => \@links);
 }
 
 =head2 preview
@@ -272,6 +275,7 @@ sub preview {
     my ($self, $ctx, $vars) = @_;
 
     my $html = $self->yukkitext({
+        context    => $ctx,
         page       => $vars->{page},
         repository => $vars->{repository},
         yukkitext  => $vars->{content},

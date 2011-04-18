@@ -1,8 +1,11 @@
 package Yukki::Web::Context;
+use 5.12.1;
 use Moose;
 
 use Yukki::Web::Request;
 use Yukki::Web::Response;
+
+use MooseX::Types::URI qw( Uri );
 
 # ABSTRACT: request-response context descriptor
 
@@ -83,6 +86,74 @@ has stash => (
     required    => 1,
     default     => sub { +{} },
 );
+
+=head2 base_url
+
+This is a L<URI> describing the base path to get to this Yukki wiki site. It is configured from the L<Yukki::Web::Settings/base_url> setting. The value of the setting will determine how this value is calculated or may set it explicitly.
+
+=over
+
+=item *
+
+C<SCRIPT_NAME>. When C<base_url> is set to C<SCRIPT_NAME>, then the full path to the script name will be used as the base URL. This is the default and, generally, the safest option.
+
+=item *
+
+C<REWRITE>. The C<REWRITE> option takes a slightly different approach to building the base URL. It looks at the C<REQUEST_URI> and compares that to the C<PATH_INFO> and finds the common components. For example:
+
+  PATH_INFO=/page/view/main
+  REQUEST_URI=/yukki-site/page/view/main
+
+this leads to a base URL of:
+
+  /yukki-site
+
+If C<PATH_INFO> is not a sub-path of C<REQUEST_URI>, this will fall back to the same solution as C<SCRIPT_NAME> above.
+
+=item *
+
+Anything else will be considered an absolute URL and used as the base URL.
+
+=back
+
+This may be used to construct redirects or URLs for links and form actions.
+
+=cut
+
+has base_url => (
+    is          => 'rw',
+    isa         => Uri,
+    required    => 1,
+    coerce      => 1,
+    lazy_build  => 1,
+);
+
+sub _build_base_url {
+    my $self = shift;
+
+    given ($self->env->{'yukki.settings'}->base_url) {
+        when ('SCRIPT_NAME') {
+            return $self->request->base;
+        }
+
+        when ('REWRITE') {
+            my $path_info   = $self->env->{PATH_INFO};
+            my $request_uri = $self->env->{REQUEST_URI};
+
+            if ($request_uri =~ s/$path_info$//) {
+                my $base_url = $self->request->uri;
+                $base_url->path($request_uri);
+                return $base_url->canonical;
+            }
+
+            return $self->request->base;
+        }
+
+        default {
+            return $_;
+        }
+    }
+}
 
 =head2 errors
 

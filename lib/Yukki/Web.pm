@@ -100,6 +100,9 @@ it returns a PSGI response.
 sub dispatch {
     my ($self, $env) = @_;
 
+    $env->{'yukki.app'}      = $self;
+    $env->{'yukki.settings'} = $self->settings;
+
     my $ctx = Yukki::Web::Context->new(env => $env);
     my $response;
 
