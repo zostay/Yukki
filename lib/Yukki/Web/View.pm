@@ -336,20 +336,44 @@ sub yukkiplugin {
 
             $map->{ $name } = $new_cell if $name;
 
+            my $error = 0;
             my $lookup_name = sub {
-                my $name = shift;
-                return q['#NYI!'] if $name =~ /!/; # not yet supported
-                my $cell = $map->{ $name };
-                return q['#NAME?'] unless defined $cell;
-                return $cell;
+                my $name = shift; 
+
+                if ($name =~ /!/) {
+                    $error++;
+                    $sheet->execute(qq[set $new_cell constant e#NYI!  Not yet implemented.]);
+                    return '';
+                }
+
+                if (not exists $map->{ $name }) {
+                    $error++;
+                    $sheet->execute(qq[set $new_cell constant e#NAME?]);
+                    return '';
+                }
+
+                return $map->{ $name };
             };
 
             $formula =~ s/\[([^\]]+)\]/$lookup_name->($1)/gex;
 
-            $sheet->execute("set $new_cell formula $formula");
+            $sheet->execute("set $new_cell formula $formula") unless $error;
             $sheet->recalc;
 
-            $text = $sheet->raw->{datavalues}{ $new_cell };
+            my $raw = $sheet->raw;
+            my $attrs = defined $name ? qq[ id="spreadsheet-$name"] : '';
+            my $value;
+            if ($raw->{cellerrors}{ $new_cell }) {
+                $attrs .= qq[ title="$arg (ERROR: $raw->{formulas}{ $new_cell })"]
+                       .  qq[ class="spreadsheet-cell error" ];
+                $value  = $raw->{cellerrors}{ $new_cell };
+            }
+            else {
+                $attrs .= qq[ title="$arg" class="spreadsheet-cell error" ];
+                $value = $raw->{datavalues}{ $new_cell };
+            }
+
+            $text   = qq[<span$attrs>$value</span>];
         }
     
         default { $text = "{{$plugin_name:$arg}}"; }
@@ -426,7 +450,7 @@ sub yukkitext {
 
             ([^:]+) :           # plugin_name: is required
 
-            (.*)                # plugin arguments
+            (.*?)               # plugin arguments
 
         \}\}                    # }} to end
     }{
@@ -445,7 +469,7 @@ sub yukkitext {
 
             [^:]+ :             # plugin_name: is required
 
-            .*                  # plugin arguments
+            .*?                 # plugin arguments
 
         \}\})                   # }} to end
     }{$1}xg;
