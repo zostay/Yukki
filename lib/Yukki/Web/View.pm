@@ -5,6 +5,7 @@ use Moose;
 use MooseX::Params::Validate;
 use Path::Class;
 use Scalar::Util qw( blessed reftype );
+use Spreadsheet::Engine;
 use Template::Semantic;
 use Text::MultiMarkdown;
 use URI::Escape qw( uri_escape );
@@ -287,39 +288,74 @@ sub yukkiplugin {
     my $arg         = $params->{arg};
 
     # TODO Not very pluggable yet
-    return "{{$plugin_name:$arg}}" unless $plugin_name eq 'attachment';
+    my $text;
+    given ($plugin_name) {
+        when ('attachment') {
 
-    if ($arg =~ m{
+            if ($arg =~ m{
 
-            ^\s*
+                    ^\s*
 
-                (?: ([\w]+) : )?    # repository: is optional
-                (.+)                # link/to/page is mandatory
+                        (?: ([\w]+) : )?    # repository: is optional
+                        (.+)                # link/to/page is mandatory
 
-            \s*$
+                    \s*$
 
-            }x) {
+                    }x) {
 
-        my $repository = $1 // $params->{repository};
-        my $page       = $params->{page};
-        my $link       = $2;
+                my $repository = $1 // $params->{repository};
+                my $page       = $params->{page};
+                my $link       = $2;
 
-        $link =~ s/^\s+//; $link =~ s/\s+$//;
+                $link =~ s/^\s+//; $link =~ s/\s+$//;
 
-        $page =~ s{\.yukki$}{};
-        $link = join "/", map { uri_escape($_) } split m{/}, $link;
+                $page =~ s{\.yukki$}{};
+                $link = join "/", map { uri_escape($_) } split m{/}, $link;
 
-        my $b = $self->_url_rebaser($ctx);
+                my $b = $self->_url_rebaser($ctx);
 
-        if ($link =~ m{^/}) {
-            return $b->("attachment/view/$repository$link");
+                if ($link =~ m{^/}) {
+                    $text = $b->("attachment/view/$repository$link");
+                }
+                else {
+                    $text = $b->("attachment/view/$repository/$page/$link");
+                }
+            }
         }
-        else {
-            return $b->("attachment/view/$repository/$page/$link");
+
+        when ('=') {
+            $ctx->stash->{'SpreadSheet.sheet'} //= Spreadsheet::Engine->new;
+            $ctx->stash->{'SpreadSheet.map'}   //= {};
+
+            my $sheet = $ctx->stash->{'SpreadSheet.sheet'};
+            my $map   = $ctx->stash->{'SpreadSheet.map'};
+
+            my ($name, $formula) = $arg =~ /^(?:(\w+):)?(.*)/;
+
+            my $new_cell = 'A' . ($sheet->raw->{sheetattribs}{lastrow} + 1);
+
+            $map->{ $name } = $new_cell if $name;
+
+            my $lookup_name = sub {
+                my $name = shift;
+                return q['#NYI!'] if $name =~ /!/; # not yet supported
+                my $cell = $map->{ $name };
+                return q['#NAME?'] unless defined $cell;
+                return $cell;
+            };
+
+            $formula =~ s/\[([^\]]+)\]/$lookup_name->($1)/gex;
+
+            $sheet->execute("set $new_cell formula $formula");
+            $sheet->recalc;
+
+            $text = $sheet->raw->{datavalues}{ $new_cell };
         }
-    }
     
-    return "{{$plugin_name:$arg}}";
+        default { $text = "{{$plugin_name:$arg}}"; }
+    }
+
+    return $text;
 }
 
 =head2 yukkitext
@@ -388,7 +424,7 @@ sub yukkitext {
         (?<!\\)                 # \ will escape the plugin
         \{\{ \s*                # {{ to start it
 
-            ([\w]+) :           # plugin_name: is required
+            ([^:]+) :           # plugin_name: is required
 
             (.*)                # plugin arguments
 
@@ -407,7 +443,7 @@ sub yukkitext {
         \\                      # \ will escape the plugin
         (\{\{ \s*               # {{ to start it
 
-            [\w]+ :             # plugin_name: is required
+            [^:]+ :             # plugin_name: is required
 
             .*                  # plugin arguments
 
