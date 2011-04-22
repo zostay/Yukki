@@ -190,4 +190,20 @@ for my $message_type (qw( errors warnings info )) {
     );
 }
 
+=head1 METHODS
+
+=head2 rebase_url
+
+  my $url = $ctx->rebase_url($path);
+
+Given a relative URL, this returns an absolute URL using the L</base_url>.
+
+=cut
+
+sub rebase_url {
+    my ($self, $url) = @_;
+    return URI->new($url)->abs($self->base_url);
+}
+
+
 1;

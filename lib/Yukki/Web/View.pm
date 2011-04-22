@@ -8,7 +8,7 @@ use Scalar::Util qw( blessed reftype );
 use Spreadsheet::Engine;
 use Template::Semantic;
 use Text::MultiMarkdown;
-use URI::Escape qw( uri_escape );
+use Try::Tiny;
 use XML::Twig;
 
 # ABSTRACT: base class for Yukki::Web views
@@ -86,14 +86,6 @@ sub _build_semantic {
 
 =head1 METHODS
 
-=cut
-
-sub _url_rebaser {
-    my ($self, $ctx) = @_;
-    my $base_url = $ctx->base_url;
-    return sub { URI->new($_[0])->abs($base_url) };
-}
-
 =head2 render_page
 
   my $document = $self->render_page({
@@ -148,7 +140,7 @@ sub render_page {
     my @scripts = $self->app->settings->all_scripts;
     my @styles  = $self->app->settings->all_styles;
 
-    my $b = $self->_url_rebaser($ctx);
+    my $b = sub { $ctx->rebase_url($_[0]) };
 
     return $self->render(
         template   => 'shell.html',
@@ -185,7 +177,7 @@ sub render_links {
         links    => { isa => 'ArrayRef[HashRef]' },
     );
 
-    my $b = $self->_url_rebaser($ctx);
+    my $b = sub { $self->rebae_url($ctx, $_[0]) };
 
     return $self->render(
         template => 'links.html',
@@ -267,7 +259,7 @@ sub yukkilink {
 
     $label =~ s/^\s*//; $label =~ s/\s*$//;
 
-    my $b = $self->_url_rebaser($ctx);
+    my $b = sub { $ctx->rebase_url($_[0]) };
 
     my $file = $self->model('Repository', { name => $repository })->file({ full_path => $link });
     my $class = $file->exists ? 'exists' : 'not-exists';
@@ -287,98 +279,31 @@ sub yukkiplugin {
     my $plugin_name = $params->{plugin_name};
     my $arg         = $params->{arg};
 
-    # TODO Not very pluggable yet
     my $text;
-    given ($plugin_name) {
-        when ('attachment') {
 
-            if ($arg =~ m{
-
-                    ^\s*
-
-                        (?: ([\w]+) : )?    # repository: is optional
-                        (.+)                # link/to/page is mandatory
-
-                    \s*$
-
-                    }x) {
-
-                my $repository = $1 // $params->{repository};
-                my $page       = $params->{page};
-                my $link       = $2;
-
-                $link =~ s/^\s+//; $link =~ s/\s+$//;
-
-                $page =~ s{\.yukki$}{};
-                $link = join "/", map { uri_escape($_) } split m{/}, $link;
-
-                my $b = $self->_url_rebaser($ctx);
-
-                if ($link =~ m{^/}) {
-                    $text = $b->("attachment/view/$repository$link");
-                }
-                else {
-                    $text = $b->("attachment/view/$repository/$page/$link");
-                }
+    my @plugins = $self->app->yukkitext_helper_plugins;
+    PLUGIN: for my $plugin (@plugins) {
+        my $helpers = $plugin->yukkitext_helpers;
+        if (defined $helpers->{ $plugin_name }) {
+            $text = try {
+                $helpers->{ $plugin_name }->({
+                    context     => $ctx,
+                    repository  => $params->{repository},
+                    page        => $params->{page},
+                    helper_name => $plugin_name,
+                    arg         => $arg,
+                });
             }
-        }
-
-        when ('=') {
-            $ctx->stash->{'SpreadSheet.sheet'} //= Spreadsheet::Engine->new;
-            $ctx->stash->{'SpreadSheet.map'}   //= {};
-
-            my $sheet = $ctx->stash->{'SpreadSheet.sheet'};
-            my $map   = $ctx->stash->{'SpreadSheet.map'};
-
-            my ($name, $formula) = $arg =~ /^(?:(\w+):)?(.*)/;
-
-            my $new_cell = 'A' . ($sheet->raw->{sheetattribs}{lastrow} + 1);
-
-            $map->{ $name } = $new_cell if $name;
-
-            my $error = 0;
-            my $lookup_name = sub {
-                my $name = shift; 
-
-                if ($name =~ /!/) {
-                    $error++;
-                    $sheet->execute(qq[set $new_cell constant e#NYI!  Not yet implemented.]);
-                    return '';
-                }
-
-                if (not exists $map->{ $name }) {
-                    $error++;
-                    $sheet->execute(qq[set $new_cell constant e#NAME?]);
-                    return '';
-                }
-
-                return $map->{ $name };
+            
+            catch {
+                warn "Plugin Error: $_";
             };
 
-            $formula =~ s/\[([^\]]+)\]/$lookup_name->($1)/gex;
-
-            $sheet->execute("set $new_cell formula $formula") unless $error;
-            $sheet->recalc;
-
-            my $raw = $sheet->raw;
-            my $attrs = defined $name ? qq[ id="spreadsheet-$name"] : '';
-            my $value;
-            if ($raw->{cellerrors}{ $new_cell }) {
-                $attrs .= qq[ title="$arg (ERROR: $raw->{formulas}{ $new_cell })"]
-                       .  qq[ class="spreadsheet-cell error" ];
-                $value  = $raw->{cellerrors}{ $new_cell };
-            }
-            else {
-                $attrs .= qq[ title="$arg" class="spreadsheet-cell error" ];
-                $value = $raw->{datavalues}{ $new_cell };
-            }
-
-            $text   = qq[<span$attrs>$value</span>];
+            last PLUGIN if defined $text;
         }
-    
-        default { $text = "{{$plugin_name:$arg}}"; }
     }
 
+    $text //= "{{$plugin_name:$arg}}";
     return $text;
 }
 

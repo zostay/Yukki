@@ -5,6 +5,7 @@ use Moose;
 use MooseX::Types -declare => [ qw(
     LoginName AccessLevel NavigationLinks
     BaseURL BaseURLEnum BreadcrumbLinks RepositoryMap
+    PluginConfig
 ) ];
 
 use MooseX::Types::Moose qw( Str Int ArrayRef Maybe HashRef );
@@ -12,6 +13,7 @@ use MooseX::Types::Structured qw( Dict );
 use MooseX::Types::URI qw( Uri );
 
 use Email::Address;
+use List::MoreUtils qw( all );
 
 # ABSTRACT: standard types for use in Yukki
 
@@ -119,6 +121,16 @@ coerce RepositoryMap,
                 keys %$source
         }
     };
+
+=head2 PluginConfig
+
+A plugin configuration is an array of hashes. Each hash must have at least one key named "module" defined.
+
+=cut
+
+subtype PluginConfig,
+    as ArrayRef[HashRef],
+    where { all { defined $_->{module} } @$_ };
 
 =head1 COERCIONS
 

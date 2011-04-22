@@ -46,6 +46,47 @@ sub _build_router {
     Yukki::Web::Router->new( app => $self );
 }
 
+=head2 plugins
+
+  my @plugins           = $app->all_plugins;
+  my @yukkitext_helpers = $app->yukkitext_helper_plugins;
+
+This attribute stores all the loaded plugins.
+
+=cut
+
+has plugins => (
+    is          => 'ro',
+    isa         => 'ArrayRef[Yukki::Web::Plugin]',
+    required    => 1,
+    lazy_build  => 1,
+    traits      => [ 'Array' ],
+    handles     => {
+        all_plugins              => 'elements',
+        yukkitext_helper_plugins => [ grep => sub { 
+            $_->does('Yukki::Web::Plugin::Role::YukkiTextHelper')
+        } ],
+    },
+);
+
+sub _build_plugins {
+    my $self = shift;
+
+    my @plugins;
+    for my $plugin_settings (@{ $self->settings->plugins }) {
+        my $module = $plugin_settings->{module};
+
+        my $class  = $module;
+           $class  = "Yukki::Web::Plugin::$class" unless $class =~ s/^\+//;
+
+        Class::MOP::load_class($class);
+
+        push @plugins, $class->new(%$plugin_settings, app => $self);
+    }
+
+    return \@plugins;
+}
+
 =head1 METHODS
 
 =head2 component

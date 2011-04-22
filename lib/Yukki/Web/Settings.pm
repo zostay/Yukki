@@ -4,7 +4,7 @@ use Moose;
 
 extends 'Yukki::Settings';
 
-use Yukki::Types qw( BaseURL );
+use Yukki::Types qw( BaseURL PluginConfig );
 
 # ABSTRACT: provides structure and validation to web settings in yukki.conf
 
@@ -117,6 +117,21 @@ has styles => (
     handles     => {
         all_styles => 'elements',
     },
+);
+
+=head2 plugins
+
+This is the list of plugins to use. This is an array of hashes. The hashes must have a C<module> key naming the class defining the plugin. The rest of the keys will be passed to the plugin constructor.
+
+=cut
+
+has plugins => (
+    is          => 'ro',
+    isa         => PluginConfig,
+    required    => 1,
+    default     => sub { [
+        { module => 'Attachment' },
+    ] },
 );
 
 1;
