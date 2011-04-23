@@ -69,11 +69,12 @@ sub view {
     $ctx->response->page_title($vars->{title});
     $ctx->response->breadcrumb($vars->{breadcrumb});
 
-    my $html = $self->yukkitext({
+    my $html = $self->format({
         context    => $ctx,
         page       => $vars->{page},
         repository => $vars->{repository},
-        yukkitext  => $vars->{content},
+        media_type => 'text/yukki',
+        content    => $vars->{content},
     });
 
     $self->page_navigation($ctx->response, 'view', $vars);
@@ -158,11 +159,12 @@ sub diff {
         }
     }
 
-    my $html = $self->yukkitext({
+    my $html = $self->format({
         context    => $ctx,
         page       => $vars->{page},
         repository => $vars->{repository},
-        yukkitext  => $diff,
+        media_type => 'text/yukki',
+        content    => $diff,
     });
 
     return $self->render_page(
@@ -186,11 +188,12 @@ sub edit {
     $ctx->response->page_title($vars->{title});
     $ctx->response->breadcrumb($vars->{breadcrumb});
 
-    my $html = $self->yukkitext({
+    my $html = $self->format({
         context    => $ctx,
         page       => $vars->{page},
         repository => $vars->{repository},
-        yukkitext  => $vars->{content},
+        media_type => 'text/yukki',
+        content    => $vars->{content},
     });
 
     $self->page_navigation($ctx->response, 'edit', $vars);
@@ -274,11 +277,12 @@ Renders a preview of an edit in progress.
 sub preview {
     my ($self, $ctx, $vars) = @_;
 
-    my $html = $self->yukkitext({
+    my $html = $self->format({
         context    => $ctx,
         page       => $vars->{page},
         repository => $vars->{repository},
-        yukkitext  => $vars->{content},
+        media_type => 'text/yukki',
+        content    => $vars->{content},
     });
 
     return $html;

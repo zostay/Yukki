@@ -66,6 +66,9 @@ has plugins => (
         yukkitext_helper_plugins => [ grep => sub { 
             $_->does('Yukki::Web::Plugin::Role::YukkiTextHelper')
         } ],
+        formatter_plugins => [ grep => sub { 
+            $_->does('Yukki::Web::Plugin::Role::Formatter')
+        } ],
     },
 );
 

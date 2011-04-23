@@ -212,194 +212,50 @@ sub render {
     return $self->semantic->process($template_file, $vars);
 }
 
-=head2 yukkilink
+=head2 has_format
 
-Used to help render yukkilinks. Do not use.
+  my $yes_or_no = $self->has_format($media_type);
 
-=cut
-
-sub yukkilink {
-    my ($self, $params) = @_;
-
-    my $ctx        = $params->{context};
-    my $repository = $params->{repository};
-    my $link       = $params->{link};
-    my $label      = $params->{label};
-
-    $link =~ s/^\s+//; $link =~ s/\s+$//;
-
-    my ($repo_name, $local_link) = split /:/, $link, 2 if $link =~ /:/;
-    if (defined $repo_name and defined $self->app->settings->{repositories}{$repo_name}) {
-        $repository = $repo_name;
-        $link       = $local_link;
-    }
-    
-    # If we did not get a label, make the label into the link
-    if (not defined $label) {
-        ($label) = $link =~ m{([^/]+)$};
-
-        $link =~ s{([a-zA-Z])'([a-zA-Z])}{$1$2}g; # foo's -> foos, isn't -> isnt
-        $link =~ s{[^a-zA-Z0-9-_./]+}{-}g;
-        $link =~ s{-+}{-}g;
-        $link =~ s{^-}{};
-        $link =~ s{-$}{};
-
-        $link .= '.yukki';
-    }
-
-    my @base_name;
-    if ($params->{page}) {
-        $base_name[0] = $params->{page};
-        $base_name[0] =~ s/\.yukki$//g;
-    }
-
-    $link = join '/', @base_name, $link if $link =~ m{^\./};
-    $link =~ s{^/}{};
-    $link =~ s{/\./}{/}g;
-
-    $label =~ s/^\s*//; $label =~ s/\s*$//;
-
-    my $b = sub { $ctx->rebase_url($_[0]) };
-
-    my $file = $self->model('Repository', { name => $repository })->file({ full_path => $link });
-    my $class = $file->exists ? 'exists' : 'not-exists';
-    return qq{<a class="$class" href="}.$b->("page/view/$repository/$link").qq{">$label</a>};
-}
-
-=head2 yukkiplugin
-
-Used to render plugged in markup. Do not use.
+Returns true if the named media type has a format plugin.
 
 =cut
 
-sub yukkiplugin {
-    my ($self, $params) = @_;
+sub has_format {
+    my ($self, $media_type) = @_;
 
-    my $ctx         = $params->{context};
-    my $plugin_name = $params->{plugin_name};
-    my $arg         = $params->{arg};
-
-    my $text;
-
-    my @plugins = $self->app->yukkitext_helper_plugins;
-    PLUGIN: for my $plugin (@plugins) {
-        my $helpers = $plugin->yukkitext_helpers;
-        if (defined $helpers->{ $plugin_name }) {
-            $text = try {
-                $helpers->{ $plugin_name }->({
-                    context     => $ctx,
-                    repository  => $params->{repository},
-                    page        => $params->{page},
-                    helper_name => $plugin_name,
-                    arg         => $arg,
-                });
-            }
-            
-            catch {
-                warn "Plugin Error: $_";
-            };
-
-            last PLUGIN if defined $text;
-        }
+    my @formatters = $self->app->formatter_plugins;
+    for my $formatter (@formatters) {
+        return 1 if $formatter->has_format($media_type);
     }
 
-    $text //= "{{$plugin_name:$arg}}";
-    return $text;
+    return '';
 }
 
-=head2 yukkitext
+=head2 format
 
-  my $html = $view->yukkitext({
-      repository => $repository_name,
-      yukkitext  => $yukkitext,
+  my $html = $self->format({
+      context    => $ctx,
+      repository => $repository,
+      page       => $full_path,
+      media_type => $media_type,
+      content    => $content,
   });
 
-Yukkitext is markdown plus some extra stuff. The extra stuff is:
-
-  [[ main:/link/to/page.yukki | Link Title ]] - wiki link
-  [[ /link/to/page.yukki | Link Title ]]      - wiki link
-  [[ /link/to/page.yukki ]]                   - wiki link
-
-  {{attachment:file.pdf}}                     - attachment URL
+Finds a formatter and renders the text as HTML. If no formatter exists, it returns C<undef>.
 
 =cut
 
-sub yukkitext {
+sub format {
     my ($self, $params) = @_;
 
-    my $repository = $params->{repository};
-    my $yukkitext  = $params->{yukkitext};
+    my $media_type = $params->{media_type};
 
-    # Yukki Links
-    $yukkitext =~ s{ 
-        (?<!\\)                 # \ will escape the link
-        \[\[ \s*                # [[ to start it
+    my $formatter;
+    for my $plugin ($self->app->formatter_plugins) {
+        return $plugin->format($params) if $plugin->has_format($media_type);
+    }
 
-            (?: ([\w]+) : )?    # repository: is optional
-            ([^|\]]+) \s*       # link/to/page is mandatory
-
-            (?: \|              # | to split link from label
-                ([^\]]+)        # a pretty label (needs trimming)
-            )?                  # is optional
-
-        \]\]                    # ]] to end
-    }{ 
-        $self->yukkilink({ 
-            %$params, 
-            
-            repository => $1 // $repository, 
-            link       => $2, 
-            label      => $3,
-        });
-    }xeg;
-
-    # Handle escaped links, hide the escape
-    $yukkitext =~ s{ 
-        \\                      # \ will escape the link
-        (\[\[ \s*               # [[ to start it
-
-            (?: [\w]+ : )?      # repository: is optional
-            [^|\]]+ \s*         # link/to/page is mandatory
-
-            (?: \|              # | to split link from label
-                [^\]]+          # a pretty label (needs trimming)
-            )?                  # is optional
-
-        \]\])                    # ]] to end
-    }{$1}gx;
-
-    # Yukki Plugins
-    $yukkitext =~ s{
-        (?<!\\)                 # \ will escape the plugin
-        \{\{ \s*                # {{ to start it
-
-            ([^:]+) :           # plugin_name: is required
-
-            (.*?)               # plugin arguments
-
-        \}\}                    # }} to end
-    }{
-        $self->yukkiplugin({
-            %$params,
-
-            plugin_name => $1,
-            arg         => $2,
-        });
-    }xeg;
-
-    # Handle the escaped plugin thing
-    $yukkitext =~ s{
-        \\                      # \ will escape the plugin
-        (\{\{ \s*               # {{ to start it
-
-            [^:]+ :             # plugin_name: is required
-
-            .*?                 # plugin arguments
-
-        \}\})                   # }} to end
-    }{$1}xg;
-
-    return '<div>' . $self->format_markdown($yukkitext) . '</div>';
+    return;
 }
 
 1;

@@ -8,17 +8,17 @@ use URI::Escape qw( uri_escape );
 
 has yukkitext_helpers => (
     is          => 'ro',
-    isa         => 'HashRef[CodeRef]',
+    isa         => 'HashRef[Str]',
     required    => 1,
     default     => sub { +{
-        'attachment' => \&attachment_url,
+        'attachment' => 'attachment_url',
     } },
 );
 
 with 'Yukki::Web::Plugin::Role::YukkiTextHelper';
 
 sub attachment_url {
-    my ($params) = @_;
+    my ($self, $params) = @_;
 
     my $ctx = $params->{context};
     my $arg = $params->{arg};

@@ -131,6 +131,7 @@ has plugins => (
     required    => 1,
     default     => sub { [
         { module => 'Attachment' },
+        { module => 'YukkiText' },
     ] },
 );
 

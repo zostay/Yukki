@@ -16,16 +16,16 @@ Yukki::Web::Plugin::Role::YukkiTextHelper - interface for quick yukkitext helper
 
   has yukkitext_helpers => (
       is          => 'ro',
-      isa         => 'HashRef[CodeRef]',
+      isa         => 'HashRef[Str]',
       default     => sub { +{
-          'lc' => \&lc_helper,
+          'lc' => 'lc_helper',
       } },
   );
 
   with 'Yukki::Web::Plugin::Role::YukkiTextHelper';
 
   sub lc_helper { 
-      my ($params) = @_;
+      my ($self, $params) = @_;
       return lc $params->{arg};
   }
 
@@ -39,11 +39,11 @@ An implementor must provide the following methods.
 
 =head2 yukkitext_helpers
 
-This must return a reference to hash mapping quick helper names to the code references that can be used to handle them.
+This must return a reference to hash mapping quick helper names to method names that may be called to handle them.
 
 The names may be any text that does not contain a colon (":").
 
-THe code references will be called with the following parameters:
+The methods will be called with the following parameters:
 
 =over
 

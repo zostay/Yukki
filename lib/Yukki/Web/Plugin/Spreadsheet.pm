@@ -6,17 +6,17 @@ extends 'Yukki::Web::Plugin';
 
 has yukkitext_helpers => (
     is          => 'ro',
-    isa         => 'HashRef[CodeRef]',
+    isa         => 'HashRef[Str]',
     required    => 1,
     default     => sub { +{
-        '=' => \&spreadsheet_eval,
+        '=' => 'spreadsheet_eval',
     } },
 );
 
 with 'Yukki::Web::Plugin::Role::YukkiTextHelper';
 
 sub spreadsheet_eval {
-    my ($params) = @_;
+    my ($self, $params) = @_;
 
     my $ctx         = $params->{context};
     my $plugin_name = $params->{plugin_name};
@@ -73,5 +73,18 @@ sub spreadsheet_eval {
 
     return qq[<span$attrs>$value</span>];
 }
+
+# sub load_spreadsheet {
+#     my ($self, $param) = @_;
+# 
+#     my $repo_name  = $params->{repository};
+#     my $page_name  = $params->{page};
+#     my $variable   = $params->{variable};
+# 
+#     my $repository = $self->model(Repository => { name => $repo_name });
+#     my $page       = $repository->file({ full_path => $page_name });
+# 
+#     ...
+# }
 
 1;
