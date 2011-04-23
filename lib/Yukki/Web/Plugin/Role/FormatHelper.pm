@@ -1,10 +1,10 @@
-package Yukki::Web::Plugin::Role::YukkiTextHelper;
+package Yukki::Web::Plugin::Role::FormatHelper;
 use 5.12.1;
 use Moose::Role;
 
 =head1 NAME
 
-Yukki::Web::Plugin::Role::YukkiTextHelper - interface for quick yukkitext helpers
+Yukki::Web::Plugin::Role::FormatHelper - interface for quick form helpers
 
 =head1 SYNOPSIS
 
@@ -14,7 +14,7 @@ Yukki::Web::Plugin::Role::YukkiTextHelper - interface for quick yukkitext helper
 
   extends 'Yukki::Web::Plugin';
 
-  has yukkitext_helpers => (
+  has format_helpers => (
       is          => 'ro',
       isa         => 'HashRef[Str]',
       default     => sub { +{
@@ -22,7 +22,7 @@ Yukki::Web::Plugin::Role::YukkiTextHelper - interface for quick yukkitext helper
       } },
   );
 
-  with 'Yukki::Web::Plugin::Role::YukkiTextHelper';
+  with 'Yukki::Web::Plugin::Role::FormatHelper';
 
   sub lc_helper { 
       my ($self, $params) = @_;
@@ -37,7 +37,7 @@ This role defines the interface for quick yukkitext helpers. Each plugin impleme
 
 An implementor must provide the following methods.
 
-=head2 yukkitext_helpers
+=head2 format_helpers
 
 This must return a reference to hash mapping quick helper names to method names that may be called to handle them.
 
@@ -75,6 +75,6 @@ If the method throws and exception or returns C<undef> or something other than a
 
 =cut
 
-requires qw( yukkitext_helpers );
+requires qw( format_helpers );
 
 1;

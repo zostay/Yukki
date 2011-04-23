@@ -114,9 +114,9 @@ sub yukkiplugin {
 
     my $text;
 
-    my @plugins = $self->app->yukkitext_helper_plugins;
+    my @plugins = $self->app->format_helper_plugins;
     PLUGIN: for my $plugin (@plugins) {
-        my $helpers = $plugin->yukkitext_helpers;
+        my $helpers = $plugin->format_helpers;
         if (defined $helpers->{ $plugin_name }) {
             $text = try {
                 my $helper = $helpers->{ $plugin_name };

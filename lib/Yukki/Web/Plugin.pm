@@ -14,7 +14,7 @@ Yukki::Web::Plugin - base class for Yukki plugins
 
   extends 'Yukki::Web::Plugin';
 
-  has yukkitext_helpers => (
+  has format_helpers => (
       is          => 'ro',
       isa         => 'HashRef[CodeRef]',
       default     => sub { +{
@@ -22,7 +22,7 @@ Yukki::Web::Plugin - base class for Yukki plugins
       } },
   );
 
-  with 'Yukki::Web::Plugin::Role::YukkiTextHelper';
+  with 'Yukki::Web::Plugin::Role::FormatHelper';
 
   sub lc_helper { 
       my ($params) = @_;
@@ -37,7 +37,11 @@ This is the base class for Yukki plugins. It doesn't do much but allow your plug
 
 =item *
 
-L<Yukki::Web::Plugin::Role::YukkiTextHelper>. This gives you the ability to create quick helpers in your yukkitext using the C<{{helper:...}}> notation.
+L<Yukki::Web::Plugin::Role::Formatter>. Formats a file for output as HTML.
+
+=item *
+
+L<Yukki::Web::Plugin::Role::FormatHelper>. This gives you the ability to create quick helpers in your yukkitext using the C<{{helper:...}}> notation.
 
 =back
 

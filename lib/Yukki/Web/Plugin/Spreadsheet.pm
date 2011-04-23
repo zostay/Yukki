@@ -4,7 +4,7 @@ use Moose;
 
 extends 'Yukki::Web::Plugin';
 
-has yukkitext_helpers => (
+has format_helpers => (
     is          => 'ro',
     isa         => 'HashRef[Str]',
     required    => 1,
@@ -13,7 +13,7 @@ has yukkitext_helpers => (
     } },
 );
 
-with 'Yukki::Web::Plugin::Role::YukkiTextHelper';
+with 'Yukki::Web::Plugin::Role::FormatHelper';
 
 sub spreadsheet_eval {
     my ($self, $params) = @_;

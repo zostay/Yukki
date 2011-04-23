@@ -48,8 +48,9 @@ sub _build_router {
 
 =head2 plugins
 
-  my @plugins           = $app->all_plugins;
-  my @yukkitext_helpers = $app->yukkitext_helper_plugins;
+  my @plugins        = $app->all_plugins;
+  my @format_helpers = $app->format_helper_plugins;
+  my @formatters     = $app->format_plugins;
 
 This attribute stores all the loaded plugins.
 
@@ -63,8 +64,8 @@ has plugins => (
     traits      => [ 'Array' ],
     handles     => {
         all_plugins              => 'elements',
-        yukkitext_helper_plugins => [ grep => sub { 
-            $_->does('Yukki::Web::Plugin::Role::YukkiTextHelper')
+        format_helper_plugins => [ grep => sub { 
+            $_->does('Yukki::Web::Plugin::Role::FormatHelper')
         } ],
         formatter_plugins => [ grep => sub { 
             $_->does('Yukki::Web::Plugin::Role::Formatter')

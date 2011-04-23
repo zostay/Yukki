@@ -6,7 +6,7 @@ extends 'Yukki::Web::Plugin';
 
 use URI::Escape qw( uri_escape );
 
-has yukkitext_helpers => (
+has format_helpers => (
     is          => 'ro',
     isa         => 'HashRef[Str]',
     required    => 1,
@@ -15,7 +15,7 @@ has yukkitext_helpers => (
     } },
 );
 
-with 'Yukki::Web::Plugin::Role::YukkiTextHelper';
+with 'Yukki::Web::Plugin::Role::FormatHelper';
 
 sub attachment_url {
     my ($self, $params) = @_;
