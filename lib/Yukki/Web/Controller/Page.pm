@@ -94,12 +94,11 @@ sub view_page {
     my ($repo_name, $path) = $self->repo_name_and_path($ctx);
 
     my $page    = $self->lookup_page($repo_name, $path);
-    my $content = $page->fetch;
 
     my $breadcrumb = $self->breadcrumb($page->repository, $path);
 
     my $body;
-    if (not defined $content) {
+    if (not $page->exists) {
         $body = $self->view('Page')->blank($ctx, { 
             title      => $page->file_name,
             breadcrumb => $breadcrumb,
@@ -114,7 +113,7 @@ sub view_page {
             breadcrumb => $breadcrumb,
             repository => $repo_name,
             page       => $page->full_path, 
-            content    => $content,
+            file       => $page,
         });
     }
 
@@ -154,8 +153,6 @@ sub edit_page {
         return;
     }
 
-    my $content = $page->fetch;
-
     my @attachments = grep { $_->filetype ne 'yukki' } $page->list_files($page->path);
 
     $ctx->response->body( 
@@ -164,7 +161,7 @@ sub edit_page {
             breadcrumb  => $breadcrumb,
             repository  => $repo_name,
             page        => $page->full_path, 
-            content     => $content,
+            file        => $page,
             attachments => \@attachments,
         }) 
     );
@@ -241,6 +238,7 @@ sub preview_page {
     my $breadcrumb = $self->breadcrumb($page->repository, $path);
 
     my $content = $ctx->request->body_parameters->{yukkitext};
+    my $file_preview = $page->file_preview(content => $content);
 
     $ctx->response->body(
         $self->view('Page')->preview($ctx, { 
@@ -248,7 +246,7 @@ sub preview_page {
             breadcrumb => $breadcrumb,
             repository => $repo_name,
             page       => $page->full_path,
-            content    => $content,
+            file       => $file_preview,
         })
     );
 }

@@ -177,7 +177,7 @@ sub render_links {
         links    => { isa => 'ArrayRef[HashRef]' },
     );
 
-    my $b = sub { $self->rebae_url($ctx, $_[0]) };
+    my $b = sub { $ctx->rebase_url($ctx, $_[0]) };
 
     return $self->render(
         template => 'links.html',
@@ -210,52 +210,6 @@ sub render {
     my $template_file = $self->locate('template_path', $template);
     
     return $self->semantic->process($template_file, $vars);
-}
-
-=head2 has_format
-
-  my $yes_or_no = $self->has_format($media_type);
-
-Returns true if the named media type has a format plugin.
-
-=cut
-
-sub has_format {
-    my ($self, $media_type) = @_;
-
-    my @formatters = $self->app->formatter_plugins;
-    for my $formatter (@formatters) {
-        return 1 if $formatter->has_format($media_type);
-    }
-
-    return '';
-}
-
-=head2 format
-
-  my $html = $self->format({
-      context    => $ctx,
-      repository => $repository,
-      page       => $full_path,
-      media_type => $media_type,
-      content    => $content,
-  });
-
-Finds a formatter and renders the text as HTML. If no formatter exists, it returns C<undef>.
-
-=cut
-
-sub format {
-    my ($self, $params) = @_;
-
-    my $media_type = $params->{media_type};
-
-    my $formatter;
-    for my $plugin ($self->app->formatter_plugins) {
-        return $plugin->format($params) if $plugin->has_format($media_type);
-    }
-
-    return;
 }
 
 1;

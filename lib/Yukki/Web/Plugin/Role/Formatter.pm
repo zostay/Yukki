@@ -69,7 +69,7 @@ The body of the page as a string.
 
 =back
 
-The method should return a two element array reference. The first is a hash reference of metadata about the page. The second is the HTML document.
+The method should return an HTML document.
 
 =cut
 
@@ -87,6 +87,7 @@ Returns true if this formatter plugin has a formatter for the named media type.
 
 sub has_format {
     my ($self, $media_type) = @_;
+    return unless defined $media_type;
     return defined $self->html_formatters->{$media_type};
 }
 
@@ -108,7 +109,7 @@ returns C<undef>.
 sub format {
     my ($self, $params) = @_;
 
-    my $media_type = $params->{media_type};
+    my $media_type = $params->{file}->media_type;
     return unless $self->has_format($media_type);
 
     my $format = $self->html_formatters->{$media_type};

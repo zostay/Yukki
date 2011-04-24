@@ -135,4 +135,21 @@ has plugins => (
     ] },
 );
 
+=head2 media_types
+
+This is a list of custom media types. Because media types are detected using L<LWP::MediaTypes>, you may also configured media types by putting a F<.media.types> file in the home directory of the user running Yukki.
+
+By default, "text/yukki" is mapped to the "yukki" file extension.
+
+=cut
+
+has media_types => (
+    is          => 'ro',
+    isa         => 'HashRef[Str|ArrayRef[Str]]',
+    required    => 1,
+    default     => sub { +{
+        'text/yukki' => 'yukki',
+    } },
+);
+
 1;

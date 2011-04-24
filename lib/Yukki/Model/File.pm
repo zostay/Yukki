@@ -311,6 +311,49 @@ sub fetch {
     return $self->show($object_id);
 }
 
+=head2 has_format
+
+  my $yes_or_no = $self->has_format($media_type);
+
+Returns true if the named media type has a format plugin.
+
+=cut
+
+sub has_format {
+    my ($self, $media_type) = @_;
+
+    my @formatters = $self->app->formatter_plugins;
+    for my $formatter (@formatters) {
+        return 1 if $formatter->has_format($media_type);
+    }
+
+    return '';
+}
+
+=head2 fetch_formatted
+
+  my $html_content = $self->fetch_formatted($ctx);
+
+Returns the contents of the file. If there are any configured formatter plugins for the media type of the file, those will be used to return the file.
+
+=cut
+
+sub fetch_formatted {
+    my ($self, $ctx) = @_;
+
+    my $media_type = $self->media_type;
+
+    my $formatter;
+    for my $plugin ($self->app->formatter_plugins) {
+        return $plugin->format({
+            context    => $ctx,
+            file       => $self,
+        }) if $plugin->has_format($media_type);
+    }
+
+    return $self->fetch;
+}
+
 =head2 history
 
   my @revisions = $self->history;
@@ -372,6 +415,28 @@ The types are:
 sub diff {
     my ($self, $object_id_1, $object_id_2) = @_;
     return $self->diff_blobs($self->full_path, $object_id_1, $object_id_2);
+}
+
+=head2 file_preview
+
+  my $file_preview = $self->file_preview(
+      content => $content,
+  );
+
+Takes this file and returns a L<Yukki::Model::FilePreview> object, with the file contents "replaced" by the given content.
+
+=cut
+
+sub file_preview {
+    my ($self, %params) = @_;
+
+    Class::MOP::load_class('Yukki::Model::FilePreview');
+    return Yukki::Model::FilePreview->new(
+        %params,
+        app        => $self->app,
+        repository => $self->repository,
+        path       => $self->path,
+    );
 }
 
 1;

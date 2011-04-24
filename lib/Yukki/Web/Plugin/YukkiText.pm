@@ -55,7 +55,7 @@ sub yukkilink {
     my ($self, $params) = @_;
 
     my $ctx        = $params->{context};
-    my $repository = $params->{repository};
+    my $repository = $params->{file}->repository_name;
     my $link       = $params->{link};
     my $label      = $params->{label};
 
@@ -147,7 +147,7 @@ sub yukkiplugin {
       context    => $ctx,
       repository => $repository_name,
       page       => $page,
-      content    => $yukkitext,
+      file       => $file,
   });
 
 Yukkitext is markdown plus some extra stuff. The extra stuff is:
@@ -164,7 +164,7 @@ sub yukkitext {
     my ($self, $params) = @_;
 
     my $repository = $params->{repository};
-    my $yukkitext  = $params->{content};
+    my $yukkitext  = $params->{file}->fetch;
 
     # Yukki Links
     $yukkitext =~ s{ 

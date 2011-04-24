@@ -65,17 +65,12 @@ Renders a page as a view.
 
 sub view {
     my ($self, $ctx, $vars) = @_;
+    my $file = $vars->{file};
 
     $ctx->response->page_title($vars->{title});
     $ctx->response->breadcrumb($vars->{breadcrumb});
 
-    my $html = $self->format({
-        context    => $ctx,
-        page       => $vars->{page},
-        repository => $vars->{repository},
-        media_type => 'text/yukki',
-        content    => $vars->{content},
-    });
+    my $html = $file->fetch_formatted($ctx);
 
     $self->page_navigation($ctx->response, 'view', $vars);
 
@@ -143,6 +138,7 @@ Display a diff for a file.
 
 sub diff {
     my ($self, $ctx, $vars) = @_;
+    my $file = $vars->{file};
 
     $ctx->response->page_title($vars->{title});
     $ctx->response->breadcrumb($vars->{breadcrumb});
@@ -159,13 +155,7 @@ sub diff {
         }
     }
 
-    my $html = $self->format({
-        context    => $ctx,
-        page       => $vars->{page},
-        repository => $vars->{repository},
-        media_type => 'text/yukki',
-        content    => $diff,
-    });
+    my $html = $file->fetch_formatted($ctx);
 
     return $self->render_page(
         template => 'page/diff.html',
@@ -184,17 +174,12 @@ Renders the editor for a page.
 
 sub edit {
     my ($self, $ctx, $vars) = @_;
+    my $file = $vars->{file};
 
     $ctx->response->page_title($vars->{title});
     $ctx->response->breadcrumb($vars->{breadcrumb});
 
-    my $html = $self->format({
-        context    => $ctx,
-        page       => $vars->{page},
-        repository => $vars->{repository},
-        media_type => 'text/yukki',
-        content    => $vars->{content},
-    });
+    my $html = $file->fetch_formatted($ctx);
 
     $self->page_navigation($ctx->response, 'edit', $vars);
 
@@ -276,14 +261,9 @@ Renders a preview of an edit in progress.
 
 sub preview {
     my ($self, $ctx, $vars) = @_;
+    my $file = $vars->{file};
 
-    my $html = $self->format({
-        context    => $ctx,
-        page       => $vars->{page},
-        repository => $vars->{repository},
-        media_type => 'text/yukki',
-        content    => $vars->{content},
-    });
+    my $html = $file->fetch_formatted($ctx);
 
     return $html;
 }

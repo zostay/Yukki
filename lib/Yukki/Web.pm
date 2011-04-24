@@ -10,6 +10,7 @@ use Yukki::Web::Settings;
 
 use CHI;
 use HTTP::Throwable::Factory qw( http_throw http_exception );
+use LWP::MediaTypes qw( add_type );
 use Plack::Session::Store::Cache;
 use Scalar::Util qw( blessed );
 use Try::Tiny;
@@ -92,6 +93,18 @@ sub _build_plugins {
 }
 
 =head1 METHODS
+
+=cut
+
+sub BUILD {
+    my $self = shift;
+
+    my $types = $self->settings->media_types;
+    while (my ($mime_type, $ext) = each %$types) {
+        my @ext = ref $ext ? @$ext : ($ext);
+        add_type($mime_type, @ext);
+    }
+};
 
 =head2 component
 
