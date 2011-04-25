@@ -95,7 +95,10 @@ sub yukkilink {
 
     my $b = sub { $ctx->rebase_url($_[0]) };
 
-    my $class = $file->exists ? 'exists' : 'not-exists';
+    my $link_repo = $self->model('Repository', { name => $repository });
+    my $link_file = $link_repo->file({ full_path => $link });
+
+    my $class = $link_file->exists ? 'exists' : 'not-exists';
     return qq{<a class="$class" href="}.$b->("page/view/$repository/$link").qq{">$label</a>};
 }
 
