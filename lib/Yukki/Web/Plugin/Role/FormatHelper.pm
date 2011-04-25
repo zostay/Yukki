@@ -51,13 +51,9 @@ The methods will be called with the following parameters:
 
 The curent L<Yukki::Web::Context> object.
 
-=item repository
+=item file
 
-The name of the current repository.
-
-=item page
-
-The path to the current page of that repository.
+This is the L<Yukki::Model::File> being formatted.
 
 =item helper_name
 

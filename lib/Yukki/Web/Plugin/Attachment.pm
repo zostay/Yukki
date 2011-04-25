@@ -20,8 +20,9 @@ with 'Yukki::Web::Plugin::Role::FormatHelper';
 sub attachment_url {
     my ($self, $params) = @_;
 
-    my $ctx = $params->{context};
-    my $arg = $params->{arg};
+    my $ctx  = $params->{context};
+    my $file = $params->{file};
+    my $arg  = $params->{arg};
 
     if ($arg =~ m{
 
@@ -34,8 +35,8 @@ sub attachment_url {
 
             }x) {
 
-        my $repository = $1 // $params->{repository};
-        my $page       = $params->{page};
+        my $repository = $1 // $file->repository_name;
+        my $page       = $file->full_path;
         my $link       = $2;
 
         $link =~ s/^\s+//; $link =~ s/\s+$//;

@@ -122,8 +122,7 @@ sub yukkiplugin {
                 my $helper = $helpers->{ $plugin_name };
                 $plugin->$helper({
                     context     => $ctx,
-                    repository  => $params->{repository},
-                    page        => $params->{page},
+                    file        => $params->{file},
                     helper_name => $plugin_name,
                     arg         => $arg,
                 });

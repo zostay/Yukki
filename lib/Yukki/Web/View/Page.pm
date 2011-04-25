@@ -196,7 +196,7 @@ sub edit {
         context  => $ctx,
         vars     => {
             '#yukkiname'              => $vars->{page},
-            '#yukkitext'              => $vars->{content} // '',
+            '#yukkitext'              => scalar $vars->{file}->fetch // '',
             '#preview-yukkitext'      => \$html,
             %attachments,
         },
