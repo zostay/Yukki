@@ -4,6 +4,7 @@ use Moose;
 extends qw( Yukki );
 
 use Yukki::Error;
+use Yukki::Types qw( PluginList );
 use Yukki::Web::Context;
 use Yukki::Web::Router;
 use Yukki::Web::Settings;
@@ -59,7 +60,7 @@ This attribute stores all the loaded plugins.
 
 has plugins => (
     is          => 'ro',
-    isa         => 'ArrayRef[Yukki::Web::Plugin]',
+    isa         => PluginList,
     required    => 1,
     lazy_build  => 1,
     traits      => [ 'Array' ],

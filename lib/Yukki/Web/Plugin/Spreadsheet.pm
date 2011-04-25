@@ -4,6 +4,8 @@ use Moose;
 
 extends 'Yukki::Web::Plugin';
 
+use Try::Tiny;
+
 has format_helpers => (
     is          => 'ro',
     isa         => 'HashRef[Str]',
@@ -15,45 +17,87 @@ has format_helpers => (
 
 with 'Yukki::Web::Plugin::Role::FormatHelper';
 
+sub initialize_context {
+    my ($self, $ctx) = @_;
+
+    $ctx->stash->{'Spreadsheet.sheet'}   //= Spreadsheet::Engine->new;
+    $ctx->stash->{'Spreadsheet.map'}     //= {};
+    $ctx->stash->{'Spreadsheet.nextrow'} //= 'A';
+    $ctx->stash->{'Spreadsheet.nextcol'} //= {};
+
+    return $ctx->stash->{'Spreadsheet.sheet'};
+}
+
+sub setup_spreadsheet {
+    my ($self, $params) = @_;
+    
+    my $ctx  = $params->{context};
+    my $file = $params->{file};
+    my $arg  = $params->{arg};
+
+    my $sheet = $ctx->stash->{'Spreadsheet.sheet'};
+    my $map   = $ctx->stash->{'Spreadsheet.map'};
+    my $row   = $ctx->stash->{'Spreadsheet.nextrow'}++;
+
+    my ($name, $formula) = $arg =~ /^(?:(\w+):)?(.*)/;
+
+    my $new_cell = $row . ($sheet->raw->{sheetattribs}{lastrow} + 1);
+
+    $map->{ $file->full_path }{ $name } = $new_cell if $name;
+
+    return ($new_cell, $name, $formula);
+}
+
+sub lookup_name {
+    my ($self, $params) = @_;
+
+    my $ctx  = $params->{context};
+    my $map  = $ctx->stash->{'Spreadsheet.map'};
+    my $file = $params->{file};
+    my $name = $params->{name};
+
+    Yukki::Error->throw('not yet implemented') if $name =~ /!/;
+    Yukki::Error->throw('unknown name')
+        if not exists $map->{ $file->full_path }{ $name };
+
+    return $map->{ $name };
+}
+
 sub spreadsheet_eval {
     my ($self, $params) = @_;
 
     my $ctx         = $params->{context};
     my $plugin_name = $params->{plugin_name};
+    my $file        = $params->{file};
     my $arg         = $params->{arg};
 
-    $ctx->stash->{'SpreadSheet.sheet'} //= Spreadsheet::Engine->new;
-    $ctx->stash->{'SpreadSheet.map'}   //= {};
-
-    my $sheet = $ctx->stash->{'SpreadSheet.sheet'};
-    my $map   = $ctx->stash->{'SpreadSheet.map'};
-
-    my ($name, $formula) = $arg =~ /^(?:(\w+):)?(.*)/;
-
-    my $new_cell = 'A' . ($sheet->raw->{sheetattribs}{lastrow} + 1);
-
-    $map->{ $name } = $new_cell if $name;
+    my $sheet = $self->initialize_context($ctx);
+   
+    my ($new_cell, $name, $formula) = $self->setup_spreadsheet($params);
 
     my $error = 0;
-    my $lookup_name = sub {
-        my $name = shift; 
 
-        if ($name =~ /!/) {
-            $error++;
-            $sheet->execute(qq[set $new_cell constant e#NYI!  Not yet implemented.]);
-            return '';
+    try {
+        $formula =~ s/ \[ ([^\]]+) \] /
+            $self->lookup_name({
+                %$params, 
+                name => $1,
+            })
+        /gex;
+    }
+
+    catch {
+        $error++;
+        when (/not yet implemented/i) {
+            $sheet->execute("set $new_cell constant e#NYI!  Not yet implemented.");
         }
-
-        if (not exists $map->{ $name }) {
-            $error++;
-            $sheet->execute(qq[set $new_cell constant e#NAME?]);
-            return '';
+        when (/unknown name/i) {
+            $sheet->execute("set $new_cell constant e#NAME?");
         }
-
-        return $map->{ $name };
+        default {
+            die $_;
+        }
     };
-
-    $formula =~ s/\[([^\]]+)\]/$lookup_name->($1)/gex;
 
     $sheet->execute("set $new_cell formula $formula") unless $error;
     $sheet->recalc;

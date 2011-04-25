@@ -54,8 +54,9 @@ Used to help render yukkilinks. Do not use.
 sub yukkilink {
     my ($self, $params) = @_;
 
+    my $file       = $params->{file};
     my $ctx        = $params->{context};
-    my $repository = $params->{file}->repository_name;
+    my $repository = $file->repository_name;
     my $link       = $params->{link};
     my $label      = $params->{label};
 
@@ -81,8 +82,8 @@ sub yukkilink {
     }
 
     my @base_name;
-    if ($params->{page}) {
-        $base_name[0] = $params->{page};
+    if ($file->full_path) {
+        $base_name[0] = $file->full_path;
         $base_name[0] =~ s/\.yukki$//g;
     }
 
@@ -94,7 +95,6 @@ sub yukkilink {
 
     my $b = sub { $ctx->rebase_url($_[0]) };
 
-    my $file = $self->model('Repository', { name => $repository })->file({ full_path => $link });
     my $class = $file->exists ? 'exists' : 'not-exists';
     return qq{<a class="$class" href="}.$b->("page/view/$repository/$link").qq{">$label</a>};
 }
@@ -162,8 +162,9 @@ Yukkitext is markdown plus some extra stuff. The extra stuff is:
 sub yukkitext {
     my ($self, $params) = @_;
 
-    my $repository = $params->{repository};
-    my $yukkitext  = $params->{file}->fetch;
+    my $file       = $params->{file};
+    my $repository = $file->repository_name;
+    my $yukkitext  = $file->fetch;
 
     # Yukki Links
     $yukkitext =~ s{ 

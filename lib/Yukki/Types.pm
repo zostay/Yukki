@@ -5,7 +5,7 @@ use Moose;
 use MooseX::Types -declare => [ qw(
     LoginName AccessLevel NavigationLinks
     BaseURL BaseURLEnum BreadcrumbLinks RepositoryMap
-    PluginConfig
+    PluginConfig PluginList
 ) ];
 
 use MooseX::Types::Moose qw( Str Int ArrayRef Maybe HashRef );
@@ -13,6 +13,7 @@ use MooseX::Types::Structured qw( Dict );
 use MooseX::Types::URI qw( Uri );
 
 use Email::Address;
+use List::Util qw( first );
 use List::MoreUtils qw( all );
 
 # ABSTRACT: standard types for use in Yukki
@@ -131,6 +132,23 @@ A plugin configuration is an array of hashes. Each hash must have at least one k
 subtype PluginConfig,
     as ArrayRef[HashRef],
     where { all { defined $_->{module} } @$_ };
+
+=head2 PluginList
+
+A plugin list is a loaded set of plugin objects.
+
+=cut
+
+class_type 'Yukki::Web::Plugin';
+subtype PluginList,
+    as ArrayRef['Yukki::Web::Plugin'],
+    message { 
+        return 'It is not an array of objects.' unless ref $_ eq 'ARRAY';
+        my $bad = first { not blessed $_ or not $_->isa('Yukki::Web::Plugin') }
+                        @$_;
+        $bad = blessed $bad if blessed $bad;
+        return "It contains $bad, which is not a Yukki::Web::Plugin.";
+    };
 
 =head1 COERCIONS
 
