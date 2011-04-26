@@ -259,4 +259,36 @@ sub session_middleware {
     );
 }
 
+=head2 munge_label
+  
+  my $link = $app->munch_label("This is a label");
+
+Turns some label into a link slug using the standard means for doing so.
+
+=cut
+
+sub munge_label {
+    my ($self, $link) = @_;
+
+    $link =~ m{([^/]+)$};
+
+    $link =~ s{([a-zA-Z])'([a-zA-Z])}{$1$2}g; # foo's -> foos, isn't -> isnt
+    $link =~ s{[^a-zA-Z0-9-_./]+}{-}g;
+    $link =~ s{-+}{-}g;
+    $link =~ s{^-}{};
+    $link =~ s{-$}{};
+
+    $link .= '.yukki';
+
+    return $link;
+}
+
+=begin Pod::Coverage
+
+  BUILD
+
+=end Pod::Coverage
+
+=cut
+
 1;

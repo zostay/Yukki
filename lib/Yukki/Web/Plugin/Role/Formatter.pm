@@ -2,9 +2,7 @@ package Yukki::Web::Plugin::Role::Formatter;
 use 5.12.1;
 use Moose::Role;
 
-=head1 NAME
-
-Yukki::Web::Plugin::Role::Formatter - interface for HTML formatters
+# ABSTRACT: interface for HTML formatters
 
 =head1 SYNOPSIS
 

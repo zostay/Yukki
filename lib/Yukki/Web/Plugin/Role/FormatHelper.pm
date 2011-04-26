@@ -1,10 +1,7 @@
 package Yukki::Web::Plugin::Role::FormatHelper;
 use 5.12.1;
 use Moose::Role;
-
-=head1 NAME
-
-Yukki::Web::Plugin::Role::FormatHelper - interface for quick form helpers
+# ABSTRACT: interface for quick format helpers
 
 =head1 SYNOPSIS
 

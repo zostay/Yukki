@@ -4,8 +4,42 @@ use Moose;
 
 extends 'Yukki::Web::Plugin';
 
+# ABSTRACT: format text/yukki files using markdown, etc.
+
 use Text::MultiMarkdown;
 use Try::Tiny;
+
+=head1 SYNOPSIS
+
+  # Plugins are not used directly...
+
+  my $repo = $self->model('Repository', { name => 'main' });
+  my $file = $repo->file({ full_path => "some-file.yukki' });
+  my $html = $file->fetch_formatted($ctx);
+
+=head1 DESCRIPTION
+
+Yukkitext formatting is based on Multi-Markdown, which is an extension to regular markdown that adds tables, metadata, and a few other tidbits. In addition to this, yukkitext adds linking using double-bracket notation:
+
+  [[ A Link ]]
+  [[ ./A Sub-Page Link ]]
+  [[ ./A Sub-Dir/Sub-Page Link ]]
+  [[ ./a-sub-dir/sub-page-link.pdf | Sub-Page PDF ]]
+
+This link format is based loosely upon the format used by MojoMojo, which I was using prior to developing Yukki.
+
+It also adds support for format helpers usinga  double-curly brace notation:
+
+  {{attachment:Path/To/Attachment.pdf}}
+  {{=:5 + 5}}
+
+=head1 ATTRIBUTES
+
+=head2 html_formatters
+
+This returns the yukkitext formatter for "text/yukki".
+
+=cut
 
 has html_formatters => (
     is          => 'ro',
@@ -13,7 +47,6 @@ has html_formatters => (
     required    => 1,
     default     => sub { +{
         'text/yukki'    => 'yukkitext',
-        'text/markdown' => 'markdown',
     } },
 );
 
@@ -45,6 +78,8 @@ sub _build_markdown {
     );
 }
 
+=head1 METHODS
+
 =head2 yukkilink
 
 Used to help render yukkilinks. Do not use.
@@ -71,14 +106,7 @@ sub yukkilink {
     # If we did not get a label, make the label into the link
     if (not defined $label) {
         ($label) = $link =~ m{([^/]+)$};
-
-        $link =~ s{([a-zA-Z])'([a-zA-Z])}{$1$2}g; # foo's -> foos, isn't -> isnt
-        $link =~ s{[^a-zA-Z0-9-_./]+}{-}g;
-        $link =~ s{-+}{-}g;
-        $link =~ s{^-}{};
-        $link =~ s{-$}{};
-
-        $link .= '.yukki';
+        $link = $self->app->munge_label($link);
     }
 
     my @base_name;

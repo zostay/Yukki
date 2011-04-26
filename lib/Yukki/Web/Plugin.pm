@@ -1,10 +1,7 @@
 package Yukki::Web::Plugin;
 use 5.12.1;
 use Moose;
-
-=head1 NAME
-
-Yukki::Web::Plugin - base class for Yukki plugins
+# ABSTRACT:  base class for Yukki plugins
 
 =head1 SYNOPSIS
 
