@@ -1,5 +1,17 @@
 {{$NEXT}}
 
+    * Bugfix: There was a random "HERE" warning that was being output that
+      should never made it to release.
+    * Added the spreadsheet functionality to the wiki via {{=:...}}
+    * Yukkitext, attachments, and spreadsheet features now use the new plugins
+      system. Only the yukkitext and attachments plugins are on by default.
+    * The yukki-setup script shows the remote setup URL for the yukki repository
+      again.
+    * The base URL for the web site is more configurable. The scripts and styles
+      should not longer be specified in the configuration file using absolute
+      paths starting with a slash (unless you want them to be absolute and not
+      biased by the base URL of the yukki site).
+
 0.111060  2011-04-15 21:27:56 America/Chicago
 
     * Bugfix: Corrected a problem with the navigation menu on edit pages
