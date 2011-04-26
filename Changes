@@ -2,7 +2,7 @@
 
     * Bugfix: There was a random "HERE" warning that was being output that
       should never made it to release.
-    * Added the spreadsheet functionality to the wiki via {{=:...}}
+    * Added the spreadsheet functionality to the wiki
     * Yukkitext, attachments, and spreadsheet features now use the new plugins
       system. Only the yukkitext and attachments plugins are on by default.
     * The yukki-setup script shows the remote setup URL for the yukki repository
