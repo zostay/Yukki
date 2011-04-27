@@ -70,7 +70,7 @@ subtype NavigationLinks,
     as ArrayRef[
         Dict[
             label => Str,
-            href  => Str,
+            href  => Str|Uri,
             sort  => Maybe[Int],
         ],
     ];

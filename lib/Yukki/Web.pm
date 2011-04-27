@@ -182,7 +182,7 @@ sub dispatch {
         if ($ctx->session->{user}) {
             $ctx->response->add_navigation_item({
                 label => 'Sign out',
-                href  => $ctx->rebase_url('logout'),
+                href  => 'logout',
                 sort  => 100,
             });
         }
@@ -190,7 +190,7 @@ sub dispatch {
         else {
             $ctx->response->add_navigation_item({
                 label => 'Sign in',
-                href  => $ctx->rebase_url('login'),
+                href  => 'login',
                 sort  => 100,
             });
         }
@@ -201,7 +201,7 @@ sub dispatch {
             my $name = $config->name;
             $ctx->response->add_navigation_item({
                 label => $name,
-                href  => $ctx->rebase_url(join('/', 'page/view',  $repository)),
+                href  => join('/', 'page/view',  $repository),
                 sort  => 90,
             });
         }

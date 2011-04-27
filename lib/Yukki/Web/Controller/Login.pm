@@ -87,7 +87,7 @@ sub check_login_submission {
     else {
         $ctx->session->{user} = $user;
 
-        $ctx->response->redirect('/page/view/main');
+        $ctx->response->redirect($ctx->rebase_url('page/view/main'));
         return;
     }
 }
@@ -102,7 +102,7 @@ sub logout {
     my ($self, $ctx) = @_;
 
     $ctx->session_options->{expire} = 1;
-    $ctx->response->redirect('/page/view/main');
+    $ctx->response->redirect($ctx->rebase_url('page/view/main'));
 }
 
 1;
