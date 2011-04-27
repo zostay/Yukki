@@ -23,6 +23,9 @@ sub page {
     return $self->render_page(
         template   => 'login/page.html', 
         context    => $ctx,
+        vars       => {
+            'form@action' => $ctx->rebase_url('login/submit'),
+        },
     );
 }
 
