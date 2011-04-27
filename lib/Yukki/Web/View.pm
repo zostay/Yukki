@@ -177,7 +177,7 @@ sub render_links {
         links    => { isa => 'ArrayRef[HashRef]' },
     );
 
-    my $b = sub { $ctx->rebase_url($ctx, $_[0]) };
+    my $b = sub { $ctx->rebase_url($_[0]) };
 
     return $self->render(
         template => 'links.html',
