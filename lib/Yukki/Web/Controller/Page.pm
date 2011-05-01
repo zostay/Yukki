@@ -99,11 +99,14 @@ sub view_page {
 
     my $body;
     if (not $page->exists) {
+        my @files = $page->list_files;
+
         $body = $self->view('Page')->blank($ctx, { 
             title      => $page->file_name,
             breadcrumb => $breadcrumb,
             repository => $repo_name, 
             page       => $page->full_path,
+            files      => \@files,
         });
     }
 
@@ -153,7 +156,7 @@ sub edit_page {
         return;
     }
 
-    my @attachments = grep { $_->filetype ne 'yukki' } $page->list_files($page->path);
+    my @attachments = grep { $_->filetype ne 'yukki' } $page->list_files;
 
     $ctx->response->body( 
         $self->view('Page')->edit($ctx, { 

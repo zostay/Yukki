@@ -33,6 +33,7 @@ sub blank {
         vars     => {
             '#yukkiname'        => $vars->{page},
             '#create-page@href' => $link,
+            '#file-list'        => $self->attachments($ctx, $vars->{files}),
         },
     );
 }
@@ -212,22 +213,34 @@ Renders the attachments table.
 sub attachments {
     my ($self, $ctx, $attachments) = @_;
 
+    my @files = map { 
+        my @links = $self->attachment_links($ctx, $_);
+
+        my %primary_link = %{ $links[0] };
+        $primary_link{label} = $_->file_name;
+
+        my $file_name = $self->render_links(
+            context => $ctx, 
+            links   => [ \%primary_link ],
+        );
+
+        +{
+            './@id'     => $_->file_id,
+            '.filename' => $file_name,
+            '.size'     => $_->formatted_file_size,
+            '.action'   => $self->render_attachment_links($ctx, \@links),
+        };
+    } @$attachments;
+
     return $self->render(
         template   => 'page/attachments.html',
         vars       => {
-            '.file' => [ map { +{
-                './@id'     => $_->file_id,
-                '.filename' => $_->file_name,
-                '.size'     => $_->formatted_file_size,
-                '.action'   => $self->attachment_links($ctx, $_),
-            } } @$attachments ],
+            '.file' => \@files,
         },
     );
 }
 
 =head2 attachment_links
-
-Renders the links listed in the action column of the attachments table.
 
 =cut
 
@@ -236,21 +249,42 @@ sub attachment_links {
 
     my @links;
 
-    push @links, { 
-        label => 'View',
-        href  => join('/', '/attachment', 'view', 
-                 $attachment->repository_name, 
-                 $attachment->full_path),
-    } if $attachment->media_type ne 'application/octet';
+    if ($attachment->has_format) {
+        push @links, { 
+            label => 'View',
+            href  => join('/', 'page', 'view', 
+                    $attachment->repository_name, 
+                    $attachment->full_path),
+        };
+    }
+    else {
+        push @links, { 
+            label => 'View',
+            href  => join('/', 'attachment', 'view', 
+                    $attachment->repository_name, 
+                    $attachment->full_path),
+        } if $attachment->media_type ne 'application/octet';
 
-    push @links, {
-        label => 'Download',
-        href  => join('/', '/attachment', 'download',
-                 $attachment->repository_name,
-                 $attachment->full_path),
-    };
+        push @links, {
+            label => 'Download',
+            href  => join('/', 'attachment', 'download',
+                    $attachment->repository_name,
+                    $attachment->full_path),
+        };
+    }
 
-    return $self->render_links(context => $ctx, links => \@links);
+    return @links;
+}
+
+=head2 attachment_links
+
+Renders the links listed in the action column of the attachments table.
+
+=cut
+
+sub render_attachment_links {
+    my ($self, $ctx, $links) = @_;
+    return $self->render_links(context => $ctx, links => $links);
 }
 
 =head2 preview

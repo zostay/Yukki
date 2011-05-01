@@ -75,7 +75,6 @@ has repository => (
         'commit_tree'         => 'commit_tree',
         'update_root'         => 'update_root',
         'find_path'           => 'find_path',
-        'list_files'          => 'list_files',
         'fetch_size'          => 'fetch_size',
         'repository_name'     => 'name',
         'author_name'         => 'author_name',
@@ -321,6 +320,7 @@ Returns true if the named media type has a format plugin.
 
 sub has_format {
     my ($self, $media_type) = @_;
+    $media_type //= $self->media_type;
 
     my @formatters = $self->app->formatter_plugins;
     for my $formatter (@formatters) {
@@ -437,6 +437,19 @@ sub file_preview {
         repository => $self->repository,
         path       => $self->path,
     );
+}
+
+=head2 list_files
+
+  my @files = $self->list_files;
+
+List the files attached to/under this file path.
+
+=cut
+
+sub list_files {
+    my ($self) = @_;
+    return $self->repository->list_files($self->path);
 }
 
 1;
