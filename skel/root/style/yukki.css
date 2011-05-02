@@ -63,4 +63,4 @@ table.attachment-table { width: 100% }
 table.attachment-table .filename { width: 65% }
 table.attachment-table .size { width: 10% }
 table.attachment-table .action { width: 25% }
-div.attachment-dropzone { background: #eef; text-align: center; padding: 1em; margin: 0.5em 0 }
+div.attachment-dropzone { display: none; background: #eef; text-align: center; padding: 1em; margin: 0.5em 0 }
