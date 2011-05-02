@@ -219,7 +219,7 @@ sub dispatch {
                     and not $ctx->session->{user}) {
 
                 $response = http_exception(Found => {
-                    location => $ctx->rebase_url('login'),
+                    location => ''.$ctx->rebase_url('login'),
                 })->as_psgi($env);
             }
 
