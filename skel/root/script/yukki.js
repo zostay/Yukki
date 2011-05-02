@@ -2,6 +2,11 @@
 
 var periodic_tasks = [];
 
+// TODO Naive
+function rebase_url(url) {
+    return yukki_base_url + url;
+}
+
 function add_periodic_task(code) {
     periodic_tasks[periodic_tasks.length] = code;
 }
@@ -16,7 +21,7 @@ function fetch_template(name, code) {
 
     // Load a new template if not already cached
     else {
-        $.get('/template/' + name, function(data) {
+        $.get(rebase_url('template/' + name), function(data) {
             templates[name] = data;
             code(data);
         });
@@ -61,15 +66,15 @@ $(document).ready(function() {
         var $file_list = $this.find('.attachment-list');
         var $drop_zone = $this.find('.attachment-dropzone');
         var $starter   = $this.find('.attachment-start');
-
+            
         var uploader = new plupload.Uploader({
             'runtimes'            : 'gears,html5,flash,silverlight,html4',
             'browse_button'       : $picker[0].id,
             'container'           : $file_list[0].id,
             'drop_element'        : $drop_zone[0].id,
             'url'                 : String(window.location).replace(/\/edit\//, '/attach/'),
-            'flash_swf_url'       : '/script/lib/plupload/plupload.flash.swf',
-            'silverlight_xap_url' : '/script/lib/plupload/plupload.silverlight.xap'
+            'flash_swf_url'       : rebase_url('script/lib/plupload/plupload.flash.swf'),
+            'silverlight_xap_url' : rebase_url('script/lib/plupload/plupload.silverlight.xap')
         });
 
         $starter.click(function(e) {
@@ -138,12 +143,12 @@ $(document).ready(function() {
             $('#' + file_id(file) + ' .action').empty().append('<ul class="links"></ul>');
             if (json.viewable) {
                 $('#' + file_id(file) + ' .links').append(
-                    '<li><a href="/attachment/view/' + json.repository_path + '">View</a></li>'
+                    '<li><a href="' + rebase_url('attachment/view/' + json.repository_path) + '">View</a></li>'
                 );
             }
 
             $('#' + file_id(file) + ' .links').append(
-                '<li><a href="/attachment/download/' + json.repository_path + '">Download</a></li>'
+                '<li><a href="' + rebase_url('attachment/download/' + json.repository_path) + '">Download</a></li>'
             );
 
             $starter.hide();
