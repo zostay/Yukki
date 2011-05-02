@@ -4,7 +4,7 @@ use Moose;
 
 extends 'Yukki::Web::Controller';
 
-use HTTP::Throwable::Factory qw( http_throw );
+use Yukki::Error qw( http_throw );
 
 # ABSTRACT: shows the login page and handles login
 
@@ -28,7 +28,9 @@ sub fire {
         when ('page')   { $self->show_login_page($ctx) }
         when ('submit') { $self->check_login_submission($ctx) }
         when ('exit')   { $self->logout($ctx) }
-        default         { http_throw('NotFound') }
+        default         { http_throw('That login action does not exist.', {
+            status => 'NotFound',
+        }) }
     }
 }
 

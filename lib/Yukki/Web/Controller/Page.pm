@@ -4,7 +4,7 @@ use Moose;
 
 extends 'Yukki::Web::Controller';
 
-use HTTP::Throwable::Factory qw( http_throw );
+use Yukki::Error qw( http_throw );
 
 # ABSTRACT: controller for viewing and editing pages
 
@@ -31,7 +31,9 @@ sub fire {
         when ('preview') { $self->preview_page($ctx) }
         when ('attach')  { $self->upload_attachment($ctx) }
         default {
-            http_throw('NotFound');
+            http_throw('That page action does not exist.', {
+                status => 'NotFound',
+            });
         }
     }
 }

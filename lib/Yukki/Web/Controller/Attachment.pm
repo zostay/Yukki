@@ -5,7 +5,7 @@ use Moose;
 extends 'Yukki::Web::Controller';
 
 use JSON;
-use HTTP::Throwable::Factory qw( http_throw );
+use Yukki::Error qw( http_throw );
 
 # ABSTRACT: Controller for uploading, downloading, and viewing attachments
 
@@ -29,7 +29,9 @@ sub fire {
         when ('upload')   { $self->upload_file($ctx) }
         when ('view')     { $self->view_file($ctx) }
         default {
-            http_throw('NotFound');
+            http_throw('That attachment action does not exist.', {
+                status => 'NotFound',
+            });
         }
     }
 }

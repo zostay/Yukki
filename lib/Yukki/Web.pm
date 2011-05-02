@@ -3,14 +3,13 @@ use Moose;
 
 extends qw( Yukki );
 
-use Yukki::Error;
+use Yukki::Error qw( http_throw http_exception );
 use Yukki::Types qw( PluginList );
 use Yukki::Web::Context;
 use Yukki::Web::Router;
 use Yukki::Web::Settings;
 
 use CHI;
-use HTTP::Throwable::Factory qw( http_throw http_exception );
 use LWP::MediaTypes qw( add_type );
 use Plack::Session::Store::Cache;
 use Scalar::Util qw( blessed );
@@ -168,16 +167,20 @@ sub dispatch {
     try {
         my $match = $self->router->match($ctx->request->path);
 
-        http_throw('NotFound') unless $match;
+        http_throw('No action found matching that URL.', { 
+            status => 'NotFound',
+        }) unless $match;
 
         $ctx->request->path_parameters($match->mapping);
 
         my $access_level_needed = $match->access_level;
-        http_throw('Forbidden') unless $self->check_access(
-            user       => $ctx->session->{user},
-            repository => $match->mapping->{repository} // '-',
-            needs      => $access_level_needed,
-        );
+        http_throw('You are not authorized to run this action.', {
+            status => 'Forbidden',
+        }) unless $self->check_access(
+                user       => $ctx->session->{user},
+                repository => $match->mapping->{repository} // '-',
+                needs      => $access_level_needed,
+            );
 
         if ($ctx->session->{user}) {
             $ctx->response->add_navigation_item({
@@ -213,12 +216,14 @@ sub dispatch {
     }
 
     catch {
+
         if (blessed $_ and $_->isa('Moose::Object') and $_->does('HTTP::Throwable')) {
 
             if ($_->does('HTTP::Throwable::Role::Status::Forbidden') 
                     and not $ctx->session->{user}) {
 
-                $response = http_exception(Found => {
+                $response = http_exception('Please login first.', {
+                    status   => 'Found',
                     location => ''.$ctx->rebase_url('login'),
                 })->as_psgi($env);
             }
@@ -231,7 +236,8 @@ sub dispatch {
         else {
             warn "ISE: $_";
 
-            $response = http_exception('InternalServerError', {
+            $response = http_exception($_, {
+                status           => 'InternalServerError', 
                 show_stack_trace => 0,
             })->as_psgi($env);
         }
