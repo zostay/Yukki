@@ -68,8 +68,7 @@ shell template. If not set, the defaults are:
   scripts:
       - script/lib/jquery/jquery.js
       - script/lib/jquery/jquery-ui.js
-      - script/lib/plupload/gears_init.js
-      - script/lib/plupload/plupload.full.min.js
+      - script/lib/plupload/plupload.full.js
       - script/lib/sha1/sha1.js
       - script/yukki.js
 
@@ -91,8 +90,7 @@ has scripts => (
         [ qw(
             script/lib/jquery/jquery.js
             script/lib/jquery/jquery-ui.js
-            script/lib/plupload/gears_init.js
-            script/lib/plupload/plupload.full.min.js
+            script/lib/plupload/plupload.full.js
             script/lib/sha1/sha1.js
             script/yukki.js
         ) ]
