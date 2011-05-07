@@ -1,21 +1,16 @@
 package Yukki::Error;
 use Moose;
 
-extends 'Throwable::Error';
+with qw( Throwable HTTP::Throwable MooseX::Traits );
 
-with 'HTTP::Throwable';
-
-use Sub::Exporter::Util;
 use Sub::Exporter -setup => {
-    exports => [
-        http_throw     => Sub::Exporter::Util::curry_method('throw'),
-        http_exception => Sub::Exporter::Util::curry_method('new'),
-    ],
+    exports => {
+        http_throw     => \&throw_exception,
+        http_exception => \&new_exception,
+    },
 };
 
 use Yukki::Web::View;
-
-use Moose::Util qw( apply_all_roles );
 
 # ABSTRACT: Yukki's exception class
 
@@ -30,12 +25,56 @@ name.
 
 =cut
 
+{
+    package Yukki::Error::Fixup;
+    use Moose::Role;
+
+    around as_psgi => sub {
+        my $next = shift; # not used
+        my ($self, $env) = @_;
+        my $body    = $self->body($env);
+        my $headers = $self->build_headers($body, $env);
+        [ $self->status_code, $headers, [ defined $body ? $body : () ] ];
+    };
+}
+
+sub new_exception {
+    my ($class, $name, $args) = @_;
+
+    return sub {
+        my ($message, $params) = @_;
+        $params //= {};
+
+        my $status = 'InternalServerError';
+           $status = $params->{status} if defined $params->{status};
+
+        return $class->with_traits(
+            "HTTP::Throwable::Role::Status::$status",
+            'Yukki::Error::Fixup',
+        )->new($message, $params);
+    };
+}
+
+sub throw_exception {
+    my ($class, $name, $args) = @_;
+
+    my $new_exception = new_exception($class, $name, $args);
+
+    return sub {
+        my $self = $new_exception->(@_);
+        $self->throw;
+    };
+}
+
 has status => (
     is          => 'ro',
     isa         => 'Str',
     required    => 1,
     default     => 'InternalServerError',
 );
+
+has '+status_code' => ( lazy => 1 );
+has '+reason'      => ( lazy => 1 );
 
 sub default_status_code { 500 }
 sub default_reason { 'Internal Server Error' }
@@ -48,16 +87,6 @@ sub BUILDARGS {
         %$args,
         message => $message,
     };
-}
-
-sub BUILD {
-    my $self = shift;
-
-    my $status = $self->status;
-    apply_all_roles($self, 
-        "HTTP::Throwable::Role::Status::$status",
-        'Yukki::Error::PSGI',
-    );
 }
 
 sub body {
