@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+0.111280  2011-05-07 20:45:11 America/Chicago
+
     * Bugfix: Fixing a few more places that were not being rebased on the base
       URL, particularly in redirects and JavaScript.
     * Bugfix: The dropzone was showing even when drag-and-drop was unavailabel
