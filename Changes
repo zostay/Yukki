@@ -1,5 +1,13 @@
 {{$NEXT}}
 
+    * Bugfix: Fixing a few more places that were not being rebased on the base
+      URL, particularly in redirects and JavaScript.
+    * Bugfix: The dropzone was showing even when drag-and-drop was unavailabel
+      for file upload.
+    * Upgraded Plupload to 1.4.3.2
+    * Now showing a file list on blank pages.
+    * App errors now look like part of the app instead of being ugly plaintext.
+
 0.111160  2011-04-25 22:11:07 America/Chicago
 
     * Bugfix: There was a random "HERE" warning that was being output that
