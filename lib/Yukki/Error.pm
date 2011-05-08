@@ -5,8 +5,8 @@ with qw( Throwable HTTP::Throwable MooseX::Traits );
 
 use Sub::Exporter -setup => {
     exports => {
-        http_throw     => \&throw_exception,
-        http_exception => \&new_exception,
+        http_throw     => \&http_throw,
+        http_exception => \&http_exception,
     },
 };
 
@@ -38,7 +38,20 @@ name.
     };
 }
 
-sub new_exception {
+=head1 EXPORTS
+
+=head2 http_exception
+
+  my $error = http_exception('message', {
+      status           => 'InternalServerError',
+      show_stask_trace => 0,
+  });
+
+Creates a new exception object. Calls the constructor for L<Yukki:Error> and applied the L<HTTP::Throwable> status role needed (prior to construction actually).
+
+=cut
+
+sub http_exception {
     my ($class, $name, $args) = @_;
 
     return sub {
@@ -55,16 +68,36 @@ sub new_exception {
     };
 }
 
-sub throw_exception {
+=head2 http_throw
+
+  http_throw('message', {
+      status           => 'InternalServerError',
+      show_stask_trace => 0,
+  });
+
+Constructs the exception (via L</http_exception>) and throws it.
+
+=cut
+
+sub http_throw {
     my ($class, $name, $args) = @_;
 
-    my $new_exception = new_exception($class, $name, $args);
+    my $new_exception = http_exception($class, $name, $args);
 
     return sub {
         my $self = $new_exception->(@_);
         $self->throw;
     };
 }
+
+=head1 ATTRIBUTES
+
+=head2 status
+
+This is the name of the status role from L<HTTP::Throwable> that will be applied
+to the exception when it is thrown.
+
+=cut
 
 has status => (
     is          => 'ro',
@@ -73,11 +106,34 @@ has status => (
     default     => 'InternalServerError',
 );
 
+=head2 +status_code
+
+=head2 +reason
+
+These are lazy.
+
+=cut
+
 has '+status_code' => ( lazy => 1 );
 has '+reason'      => ( lazy => 1 );
 
+=begin Pod::Coverage
+
+  default_status_code
+  default_reason
+
+=end Pod::Coverage
+
 sub default_status_code { 500 }
 sub default_reason { 'Internal Server Error' }
+
+=head1 METHODS
+
+=head2 BUILDARGS
+
+Sets it up so that the constructor will take the message as the first argument.
+
+=cut
 
 sub BUILDARGS {
     my ($class, $message, $args) = @_;
@@ -88,6 +144,12 @@ sub BUILDARGS {
         message => $message,
     };
 }
+
+=head2 body
+
+Renders the HTML body for the error.
+
+=cut
 
 sub body {
     my ($self, $env) = @_;
@@ -107,6 +169,12 @@ sub body {
     );
 }
 
+=head2 body_headers
+
+Setup the HTTP headers.
+
+=cut
+
 sub body_headers {
     my ($self, $body) = @_;
 
@@ -115,6 +183,12 @@ sub body_headers {
         'Content-length' => length $body,
     ];
 }
+
+=head2 as_string
+
+Returns the message.
+
+=cut
 
 sub as_string {
     my $self = shift;

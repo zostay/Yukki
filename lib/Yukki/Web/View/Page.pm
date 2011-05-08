@@ -276,7 +276,7 @@ sub attachment_links {
     return @links;
 }
 
-=head2 attachment_links
+=head2 render_attachment_links
 
 Renders the links listed in the action column of the attachments table.
 
