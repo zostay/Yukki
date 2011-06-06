@@ -1,14 +1,8 @@
 ;(function(){
 
-var periodic_tasks = [];
-
 // TODO Naive
 function rebase_url(url) {
     return yukki_base_url + url;
-}
-
-function add_periodic_task(code) {
-    periodic_tasks[periodic_tasks.length] = code;
 }
 
 var templates = {};
@@ -29,16 +23,14 @@ function fetch_template(name, code) {
 }
 
 setInterval(function() {
-    for (var i in periodic_tasks) {
-        periodic_tasks[i]();
-    }
+    $(window).trigger('every_10s');
 }, 10000);
 
 $(document).ready(function() {
     $(':button').button();
 
     if ($('#preview-yukkitext').length > 0) {
-        add_periodic_task(function() {
+        $(window).bind('every_10s', function() {
             var url = String(window.location).replace(/\/edit\//, '/preview/');
             $.post(url, { 'yukkitext': $('#yukkitext').val() }, 
                 function(data) {
@@ -82,7 +74,7 @@ $(document).ready(function() {
             e.preventDefault();
         });
 
-        add_periodic_task(function() { uploader.start(); });
+        $(window).bind('every_10s', function() { uploader.start(); });
 
         uploader.init();
 
