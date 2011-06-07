@@ -194,8 +194,12 @@ sub yukkitext {
     my ($self, $params) = @_;
 
     my $file       = $params->{file};
+    my $position   = 0 + ($params->{position} // -1);
     my $repository = $file->repository_name;
     my $yukkitext  = $file->fetch;
+
+    $yukkitext =~ s[(.{$position}.*?)$][$1<span id="yukkitext-caret">&nbsp;</span>]sm
+        if $position >= 0;
 
     # Yukki Links
     $yukkitext =~ s{ 
@@ -266,7 +270,13 @@ sub yukkitext {
         \}\})                   # }} to end
     }{$1}xg;
 
-    return '<div>' . $self->format_markdown($yukkitext) . '</div>';
+    my $formatted = '<div>' . $self->format_markdown($yukkitext) . '</div>';
+
+    # Just in case markdown mangled the caret marker:
+    $formatted =~ s[&lt;span id="yukkitext-caret"&gt;&amp;nbsp;&lt;/span&gt;]
+                   [<span id="yukkitext-caret">&nbsp</span>];
+
+    return $formatted;
 }
 
 1;

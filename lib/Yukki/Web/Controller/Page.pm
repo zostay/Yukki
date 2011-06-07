@@ -142,6 +142,7 @@ sub edit_page {
 
     if ($ctx->request->method eq 'POST') {
         my $new_content = $ctx->request->parameters->{yukkitext};
+        my $position    = $ctx->request->parameters->{yukkitext_position};
         my $comment     = $ctx->request->parameters->{comment};
 
         if (my $user = $ctx->session->{user}) {
@@ -154,11 +155,12 @@ sub edit_page {
             comment => $comment,
         });
 
-        $ctx->response->redirect(join '/', '/page/edit', $repo_name, $page->full_path);
+        $ctx->response->redirect(join '/', '/page/edit', $repo_name, $page->full_path, '?yukkitext_position='.$position);
         return;
     }
 
     my @attachments = grep { $_->filetype ne 'yukki' } $page->list_files;
+    my $position = $ctx->request->parameters->{yukkitext_position} // -1;
 
     $ctx->response->body( 
         $self->view('Page')->edit($ctx, { 
@@ -166,6 +168,7 @@ sub edit_page {
             breadcrumb  => $breadcrumb,
             repository  => $repo_name,
             page        => $page->full_path, 
+            position    => $position,
             file        => $page,
             attachments => \@attachments,
         }) 
@@ -242,8 +245,12 @@ sub preview_page {
 
     my $breadcrumb = $self->breadcrumb($page->repository, $path);
 
-    my $content = $ctx->request->body_parameters->{yukkitext};
-    my $file_preview = $page->file_preview(content => $content);
+    my $content      = $ctx->request->body_parameters->{yukkitext};
+    my $position     = $ctx->request->parameters->{yukkitext_position};
+    my $file_preview = $page->file_preview(
+        content  => $content,
+        position => $position,
+    );
 
     $ctx->response->body(
         $self->view('Page')->preview($ctx, { 

@@ -22,19 +22,44 @@ function fetch_template(name, code) {
     }
 }
 
-setInterval(function() {
-    $(window).trigger('every_10s');
-}, 10000);
+setInterval(function() { $(window).trigger('every_10s'); }, 10000);
+
+function updatePosition() {
+    $('#yukkitext_position').val(
+        $('#yukkitext').getSelection().end
+    );
+}
 
 $(document).ready(function() {
     $(':button').button();
 
+    $('#preview-yukkitext').scrollTop('#yukkitext-caret');
+
+    $('every_10s', updatePosition);
+    $('form.edit-page').submit(updatePosition);
+
     if ($('#preview-yukkitext').length > 0) {
         $(window).bind('every_10s', function() {
             var url = String(window.location).replace(/\/edit\//, '/preview/');
-            $.post(url, { 'yukkitext': $('#yukkitext').val() }, 
+            $.post(url, { 
+                    'yukkitext'          : $('#yukkitext').val(),
+                    'yukkitext_position' : $('#yukkitext').getSelection().end
+                }, 
                 function(data) {
                     $('#preview-yukkitext').html(data);
+                    setTimeout(function() {
+                        try {
+                            var offset = ($('#yukkitext-caret').offset().top
+                                       + $('#preview-yukkitext').scrollTop())
+                                       - $('#preview-yukkitext').offset().top
+                                       - 100;
+
+                            if (offset < 0) offset = 0;
+
+                            $('#preview-yukkitext').scrollTop(offset);
+                        }
+                        catch(e) {}
+                    }, 10);
                 }
             );
         });

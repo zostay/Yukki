@@ -71,7 +71,7 @@ sub view {
     $ctx->response->page_title($vars->{title});
     $ctx->response->breadcrumb($vars->{breadcrumb});
 
-    my $html = $file->fetch_formatted($ctx);
+    my $html = $file->fetch_formatted($ctx, -1);
 
     $self->page_navigation($ctx->response, 'view', $vars);
 
@@ -180,7 +180,7 @@ sub edit {
     $ctx->response->page_title($vars->{title});
     $ctx->response->breadcrumb($vars->{breadcrumb});
 
-    my $html = $file->fetch_formatted($ctx);
+    my $html = $file->fetch_formatted($ctx, $vars->{position});
 
     $self->page_navigation($ctx->response, 'edit', $vars);
 
@@ -196,9 +196,10 @@ sub edit {
         template => 'page/edit.html',
         context  => $ctx,
         vars     => {
-            '#yukkiname'              => $vars->{page},
-            '#yukkitext'              => scalar $vars->{file}->fetch // '',
-            '#preview-yukkitext'      => \$html,
+            '#yukkiname'                => $vars->{page},
+            '#yukkitext'                => scalar $vars->{file}->fetch // '',
+            '#yukkitext_position@value' => $vars->{position},
+            '#preview-yukkitext'        => \$html,
             %attachments,
         },
     );

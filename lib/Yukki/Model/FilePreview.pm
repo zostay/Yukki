@@ -24,6 +24,19 @@ has content => (
     required    => 1,
 );
 
+=head2 position
+
+The position in the text for the caret.
+
+=cut
+
+has position => (
+    is          => 'rw',
+    isa         => 'Int',
+    required    => 1,
+    default     => -1,
+);
+
 =head1 METHODS
 
 =head2 fetch
@@ -35,6 +48,18 @@ Returns the value of L</content>.
 override fetch => sub {
     my $self = shift;
     return $self->content;
+};
+
+=head2 fetch_formatted
+
+Same as in L<Yukki::Model::File>, except that the default position is L</position>.
+
+=cut
+
+override fetch_formatted => sub {
+    my ($self, $ctx, $position) = @_;
+    $position //= $self->position;
+    return $self->SUPER::fetch_formatted($ctx, $position);
 };
 
 1;

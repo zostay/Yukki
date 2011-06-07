@@ -339,7 +339,8 @@ Returns the contents of the file. If there are any configured formatter plugins 
 =cut
 
 sub fetch_formatted {
-    my ($self, $ctx) = @_;
+    my ($self, $ctx, $position) = @_;
+    $position //= 0;
 
     my $media_type = $self->media_type;
 
@@ -348,6 +349,7 @@ sub fetch_formatted {
         return $plugin->format({
             context    => $ctx,
             file       => $self,
+            position   => $position,
         }) if $plugin->has_format($media_type);
     }
 
