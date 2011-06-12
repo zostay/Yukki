@@ -101,8 +101,6 @@ $(document).ready(function() {
 
         $(window).bind('every_10s', function() { uploader.start(); });
 
-        uploader.init();
-
         var file_id_memo = {};
         function file_id(file) {
             if (file_id_memo[file.name]) {
@@ -171,11 +169,16 @@ $(document).ready(function() {
             $starter.hide();
         });
 
-        if (uploader.features.dragdrop) {
-            $drop_zone.show();
-            $picker.hide();
-            $starter.hide();
-        }
+        uploader.bind('Init', function(up, params) {
+            if (up.features.dragdrop) {
+                $drop_zone.show();
+                $picker.hide();
+                $starter.hide();
+            }
+        });
+
+        uploader.init();
+
     });
 });
 })();
