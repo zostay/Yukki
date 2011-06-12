@@ -28,7 +28,7 @@
 
     * Bugfix: Corrected a problem with the navigation menu on edit pages
     * There is now a "scripts" and "styles" section for listing JavaScript and
-      CSS fiels (respectively) for inclusion in the shell template. If not
+      CSS files (respectively) for inclusion in the shell template. If not
       present, a default list is provided. (See the man page for
       Yukki::Web::Settings for details.)
     * The yukki-setup script does a better job validating parameters.
