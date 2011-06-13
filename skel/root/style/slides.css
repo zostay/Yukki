@@ -1,0 +1,117 @@
+* { margin: 0; padding: 0 }
+
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #111;
+    color: #eee;
+    font-family: Optima, Georgia, serif;
+}
+
+p {
+    margin: 0.5em 2em;
+}
+
+pre {
+    margin: 1em 8em;
+    padding: 1em;
+    font-size: 0.5em;
+}
+
+pre {
+    border: 1px solid #222;
+    background-color: #000;
+}
+
+ul, ol {
+    margin-left: 4em;
+    margin-right: 2em;
+}
+
+ul ul, ol ol, ul ol, ol ul {
+    margin-left: 1em;
+    margin-right: 0;
+}
+
+li {
+    margin-top: 0.4em;
+}
+
+li li { margin: 0; }
+
+h1 {
+    text-align: center;
+    width: 100%;
+    margin-top: 0.25em;
+    margin-bottom: 0.6em;
+}
+
+b, strong {
+    color: #00ff00;
+}
+
+i, em {
+    color: #99ff99;
+}
+
+code {
+    color: #ffbb99;
+}
+
+.highlight.current {
+    font-weight: bold;
+    background-color: #333;
+    border-radius: 4px;
+    color: #33ff33;
+}
+
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 3em;
+}
+
+.title {
+    margin: 1.5em;
+    width: auto;
+}
+
+.subtitle {
+    font-size: 1.5em;
+    margin: 2em;
+    text-align: center;
+}
+
+.vcentered {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 90%;
+}
+
+.two-column {
+    position: relative;
+}
+
+.two-column .column1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 35%;
+}
+
+.two-column .column2 {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 35%;
+}
+
+.code {
+    margin: 0 100px;
+    font-size: 0.5em;
+}

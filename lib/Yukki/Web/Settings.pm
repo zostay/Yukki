@@ -119,6 +119,51 @@ has styles => (
     },
 );
 
+=head2 page_views
+
+This is the list of page views to provide. By default, this is
+
+  page_views:
+      default:
+          label: View
+          sort: 10
+          template: shell.html
+      slides:
+          label: Slides
+          sort: 11
+          template: slides.html
+          hide: 1
+          vars:
+              "head link.local":
+                  - style/slides.css
+              "head script.local": 
+                  - script/slides.js
+
+=cut
+
+has page_views => (
+    is          => 'ro',
+    isa         => 'HashRef[HashRef]',
+    required    => 1,
+    default     => sub { +{
+        default => {
+            label    => 'View',
+            sort     => 10,
+            template => 'shell.html',
+        },
+        slides => {
+            label    => 'Slides',
+            sort     => 11,
+            template => 'slides.html',
+            hide     => 1,
+            vars     => {
+                "head link.local"   => [ qw( style/slides.css ) ],
+                "head script.local" => [ qw( script/slides.js ) ],
+            },
+        },
+    } },
+);
+
 =head2 plugins
 
 This is the list of plugins to use. This is an array of hashes. The hashes must have a C<module> key naming the class defining the plugin. The rest of the keys will be passed to the plugin constructor.

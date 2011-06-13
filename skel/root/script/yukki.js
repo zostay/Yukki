@@ -25,9 +25,11 @@ function fetch_template(name, code) {
 setInterval(function() { $(window).trigger('every_10s'); }, 10000);
 
 function updatePosition() {
-    $('#yukkitext_position').val(
-        $('#yukkitext').getSelection().end
-    );
+    if ($('textarea@yukkitext').length > 0) {
+        $('#yukkitext_position').val(
+            $('textarea#yukkitext').getSelection().end
+        );
+    }
 }
 
 $(document).ready(function() {

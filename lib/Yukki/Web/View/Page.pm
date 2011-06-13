@@ -47,13 +47,29 @@ Sets up the page navigation menu.
 sub page_navigation {
     my ($self, $response, $this_action, $vars) = @_;
 
-    for my $action (qw( view edit history )) {
+    for my $action (qw( edit history )) {
         next if $action eq $this_action;
 
         $response->add_navigation_item({
             label => ucfirst $action,
             href  => join('/', 'page', $action, $vars->{repository}, $vars->{page}),
-            sort  => undef,
+            sort  => 20,
+        });
+    }
+
+    for my $view_name (keys %{ $self->app->settings->page_views }) {
+        my $view_info = $self->app->settings->page_views->{$view_name};
+
+        next if $view_info->{hide};
+
+        my $args = "?view=$view_name";
+           $args = '' if $view_name eq 'default';
+
+        $response->add_navigation_item({
+            label => $view_info->{label},
+            href  => join('/', 'page/view', $vars->{repository}, $vars->{page})
+                   . $args,
+            sort  => $view_info->{sort},
         });
     }
 }

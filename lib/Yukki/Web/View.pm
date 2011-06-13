@@ -128,7 +128,9 @@ sub render_page {
     }
     
     my @nav_menu = grep { 
-        my $match = $self->app->router->match($_->{href});
+        my $url = $_->{href}; $url =~ s{\?.*$}{};
+
+        my $match = $self->app->router->match($url);
         my $access_level_needed = $match->access_level;
         $self->check_access(
             user       => $ctx->session->{user},
@@ -142,11 +144,21 @@ sub render_page {
 
     my $b = sub { $ctx->rebase_url($_[0]) };
 
+    my $view      = $ctx->request->parameters->{view} // 'default';
+    my $view_args = $self->app->settings->page_views->{ $view }
+                 // { template => 'shell.html' };
+    $view_args->{vars} //= {};
+
     return $self->render(
-        template   => 'shell.html',
-        vars       => {
-            'head script.local' => [ map { { '@src'  => $b->($_) } } @scripts ],
-            'head link.local'   => [ map { { '@href' => $b->($_) } } @styles ],
+        template => $view_args->{template},
+        vars     => {
+            %{ $view_args->{vars} },
+            'head script.local' => [ 
+                map { { '@src'  => $b->($_) } } 
+                    (@scripts, @{ $view_args->{vars}{'head script.local'} }) ],
+            'head link.local'   => [ 
+                map { { '@href' => $b->($_) } } 
+                    (@styles, @{ $view_args->{vars}{'head link.local'} }) ],
             '#messages'   => $messages,
             '.main-title' => $main_title,
             '#navigation .navigation' => [ map { 
