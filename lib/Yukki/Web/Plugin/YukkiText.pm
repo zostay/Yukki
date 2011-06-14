@@ -75,6 +75,7 @@ sub _build_markdown {
     Text::MultiMarkdown->new(
         markdown_in_html_blocks => 1,
         heading_ids             => 0,
+        strip_metadata          => 1,
     );
 }
 
