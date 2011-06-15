@@ -25,7 +25,7 @@ function fetch_template(name, code) {
 setInterval(function() { $(window).trigger('every_10s'); }, 10000);
 
 function updatePosition() {
-    if ($('textarea@yukkitext').length > 0) {
+    if ($('textarea#yukkitext').length > 0) {
         $('#yukkitext_position').val(
             $('textarea#yukkitext').getSelection().end
         );
