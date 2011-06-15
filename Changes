@@ -1,5 +1,16 @@
 {{$NEXT}}
 
+    * Now uses jQuery events for periodic actions.
+    * Moved the title on the edit template to a better location.
+    * The edit preview now shows the part of the preview that is currently being
+      edited when it refreshes.
+    * Adding support for making slide presentations from Yukki documents.
+    * In the process of adding slide support, added a way to add other similar
+      kinds of views by creating a template and modifying the configuration
+      file.
+    * MultiMarkdown metadata is no longer shown at the top of the rendered HTML
+      text.
+
 0.111280  2011-05-07 20:45:11 America/Chicago
 
     * Bugfix: Fixing a few more places that were not being rebased on the base
