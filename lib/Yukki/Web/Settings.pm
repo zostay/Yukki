@@ -119,6 +119,32 @@ has styles => (
     },
 );
 
+=head2 menu_names
+
+In case your templates have custom menus on them, you may need to set this. The default is:
+
+  menu_names:
+      - repository
+      - user
+      - page
+      - page_bottom
+
+This will insure that those menus are empty when they should be empty.
+
+=cut
+
+has menu_names => (
+    is          => 'ro',
+    isa         => 'ArrayRef[Str]',
+    required    => 1,
+    default     => sub { [ qw(
+        repository
+        user
+        page
+        page_bottom
+    ) ] },
+);
+
 =head2 page_views
 
 This is the list of page views to provide. By default, this is

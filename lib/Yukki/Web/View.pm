@@ -135,6 +135,9 @@ sub render_page {
         } $self->available_menu_items($ctx, $_) ])
     } $ctx->response->navigation_menu_names;
 
+    $menu_vars{"#nav-$_ .navigation"} //= [] 
+        for (@{ $self->app->settings->menu_names });
+
     my @scripts = $self->app->settings->all_scripts;
     my @styles  = $self->app->settings->all_styles;
 
