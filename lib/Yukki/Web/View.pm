@@ -119,12 +119,13 @@ sub render_page {
         },
     );
 
-    my $main_title;
+    my ($main_title, $title);
     if ($ctx->response->has_page_title) {
-        $main_title = 'Yukki - ' . $ctx->response->page_title;
+        $title      = $ctx->response->page_title;
+        $main_title = $ctx->response->page_title . ' - Yukki';
     }
     else {
-        $main_title = 'Yukki';
+        $title = $main_title = 'Yukki';
     }
 
     my $b = sub { $ctx->rebase_url($_[0]) };
@@ -153,7 +154,8 @@ sub render_page {
                 map { { '@href' => $b->($_) } } 
                     (@styles, @{ $view_args->{vars}{'head link.local'} }) ],
             '#messages'   => $messages,
-            '.main-title' => $main_title,
+            'title'       => $main_title,
+            '.masthead-title' => $title,
             %menu_vars,
             '#breadcrumb li' => [ map {
                 { 'a' => $_->{label}, 'a@href' => $b->($_->{href}) },
