@@ -126,23 +126,16 @@ sub render_page {
     else {
         $main_title = 'Yukki';
     }
-    
-    my @nav_menu = grep { 
-        my $url = $_->{href}; $url =~ s{\?.*$}{};
 
-        my $match = $self->app->router->match($url);
-        my $access_level_needed = $match->access_level;
-        $self->check_access(
-            user       => $ctx->session->{user},
-            repository => $match->mapping->{repository} // '-',
-            needs      => $access_level_needed,
-        );
-    } $ctx->response->navigation_menu;
+    my $b = sub { $ctx->rebase_url($_[0]) };
+    my %menu_vars = map {
+        ("#nav-$_ .navigation" => [ map {
+            { 'a' => $_->{label}, 'a@href' => $b->($_->{href}) },
+        } $self->available_menu_items($ctx, $_) ])
+    } $ctx->response->navigation_menu_names;
 
     my @scripts = $self->app->settings->all_scripts;
     my @styles  = $self->app->settings->all_styles;
-
-    my $b = sub { $ctx->rebase_url($_[0]) };
 
     my $view      = $ctx->request->parameters->{view} // 'default';
     my $view_args = $self->app->settings->page_views->{ $view }
@@ -161,18 +154,37 @@ sub render_page {
                     (@styles, @{ $view_args->{vars}{'head link.local'} }) ],
             '#messages'   => $messages,
             '.main-title' => $main_title,
-            '#navigation .navigation' => [ map { 
-                { 'a' => $_->{label}, 'a@href' => $b->($_->{href}) },
-            } @nav_menu ],
-            '#bottom-navigation .navigation' => [ map { 
-                { 'a' => $_->{label}, 'a@href' => $b->($_->{href}) },
-            } @nav_menu ],
+            %menu_vars,
             '#breadcrumb li' => [ map {
                 { 'a' => $_->{label}, 'a@href' => $b->($_->{href}) },
             } $ctx->response->breadcrumb_links ],
             '#content'    => $self->render(template => $template, vars => $vars),
         },
     )->{dom}->toStringHTML;
+}
+
+=head2 available_menu_items
+
+  my @items = $self->available_menu_items($ctx, 'menu_name');
+
+Retrieves the navigation menu from the L<Yukki::Web::Response> and purges any links that the current user does not have access to.
+
+=cut
+
+sub available_menu_items {
+    my ($self, $ctx, $name) = @_;
+
+    return grep { 
+        my $url = $_->{href}; $url =~ s{\?.*$}{};
+
+        my $match = $self->app->router->match($url);
+        my $access_level_needed = $match->access_level;
+        $self->check_access(
+            user       => $ctx->session->{user},
+            repository => $match->mapping->{repository} // '-',
+            needs      => $access_level_needed,
+        );
+    } $ctx->response->navigation_menu($name);
 }
 
 =head2 render_links

@@ -183,7 +183,7 @@ sub dispatch {
             );
 
         if ($ctx->session->{user}) {
-            $ctx->response->add_navigation_item({
+            $ctx->response->add_navigation_item(user => {
                 label => 'Sign out',
                 href  => 'logout',
                 sort  => 100,
@@ -191,7 +191,7 @@ sub dispatch {
         }
         
         else {
-            $ctx->response->add_navigation_item({
+            $ctx->response->add_navigation_item(user => {
                 label => 'Sign in',
                 href  => 'login',
                 sort  => 100,
@@ -202,7 +202,7 @@ sub dispatch {
             my $config = $self->settings->repositories->{$repository};
 
             my $name = $config->name;
-            $ctx->response->add_navigation_item({
+            $ctx->response->add_navigation_item(repository => {
                 label => $name,
                 href  => join('/', 'page/view',  $repository),
                 sort  => 90,

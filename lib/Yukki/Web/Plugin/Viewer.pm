@@ -63,7 +63,7 @@ sub show_view_link {
     my $args = "?view=$view";
        $args = '' if $view eq 'default';
 
-    $ctx->response->add_navigation_item({
+    $ctx->response->add_navigation_item([ qw( page page_bottom ) ] => {
         label => $view_info->{label},
         href  => join('/', 'page/view', $repo, $page)
                 . $args,

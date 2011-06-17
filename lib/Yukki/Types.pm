@@ -3,7 +3,8 @@ use 5.12.1;
 use Moose;
 
 use MooseX::Types -declare => [ qw(
-    LoginName AccessLevel NavigationLinks
+    LoginName AccessLevel 
+    NavigationLinks NavigationMenuMap
     BaseURL BaseURLEnum BreadcrumbLinks RepositoryMap
     PluginConfig PluginList
 ) ];
@@ -56,7 +57,7 @@ enum AccessLevel, qw( read write none );
 
 =head2 NavigationLinks
 
-THis is an array of hashes formatted like:
+This is an array of hashes formatted like:
 
   {
       label => 'Label',
@@ -74,6 +75,15 @@ subtype NavigationLinks,
             sort  => Maybe[Int],
         ],
     ];
+
+=head2 NavigationMenuMap
+
+This is a hash of L</NavigationLinks>.
+
+=cut
+
+subtype NavigationMenuMap,
+    as HashRef[ NavigationLinks ];
 
 =head2 BaseURL
 

@@ -20,15 +20,19 @@ blockquote, pre { margin: 1em 1em; padding: 1em; border: 1px solid #ddf; backgro
 del, del * { background-color: #fdd; text-decoration: none }
 ins, ins * { background-color: #dfd; text-decoration: none }
 
-#masthead { padding: 2em 1em; background: #ddf; }
+#topnav { padding: 4px 1em; background-color: #eef; height: 22px }
+#nav-repository .navigation { margin: 0 3px; list-style: none; float: left }
+#nav-user .navigation { margin: 0 3px; list-style: none; float: right }
+#masthead { padding: 1em 1em 2em 1em; background: #ddf; }
 #masthead .main-title { color: #339; }
-#navigation .navigation, #bottom-navigation .navigation { margin: 0 3px; list-style: none; float: left }
-
-#bottom-navigation { padding: 2em 1em; background: #ddf; }
+#nav-page .navigation, #nav-page_bottom .navigation { margin: 0 3px; list-style: none; float: left }
+#nav-page_bottom { padding: 1em 1em }
 
 #main { padding: 1em; background: #fff; }
 #main h1, #main h2, #main h3 { margin: 0.5em 0; border-bottom: 1px solid #ccf; color: #225; }
 #breadcrumb li { list-style: none; display: inline-block; margin: 0; }
+
+#copyright { margin: 1em; font-size: 0.8em; float: right; text-align: right; width: 300px; padding-bottom: 1em }
 
 div.field { margin: 1em; }
 div.field label { display: inline-block; width: 10em; text-align: right }

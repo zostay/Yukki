@@ -50,7 +50,7 @@ sub page_navigation {
     for my $action (qw( edit history )) {
         next if $action eq $this_action;
 
-        $response->add_navigation_item({
+        $response->add_navigation_item([ qw( page page_bottom ) ] => {
             label => ucfirst $action,
             href  => join('/', 'page', $action, $vars->{repository}, $vars->{page}),
             sort  => 20,
@@ -65,7 +65,7 @@ sub page_navigation {
         my $args = "?view=$view_name";
            $args = '' if $view_name eq 'default';
 
-        $response->add_navigation_item({
+        $response->add_navigation_item([ qw( page page_bottom ) ] => {
             label => $view_info->{label},
             href  => join('/', 'page/view', $vars->{repository}, $vars->{page})
                    . $args,
