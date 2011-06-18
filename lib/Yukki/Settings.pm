@@ -201,6 +201,13 @@ has repositories => (
         default     => 'home.yukki',
     );
 
+    has sort => (
+        is          => 'ro',
+        isa         => 'Int',
+        required    => 1,
+        default     => 50,
+    );
+
     has anonymous_access_level => (
         is          => 'ro',
         isa         => Yukki::Types::AccessLevel,

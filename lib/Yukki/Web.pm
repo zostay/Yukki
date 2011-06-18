@@ -205,7 +205,7 @@ sub dispatch {
             $ctx->response->add_navigation_item(repository => {
                 label => $name,
                 href  => join('/', 'page/view',  $repository),
-                sort  => 90,
+                sort  => $config->sort,
             });
         }
 
