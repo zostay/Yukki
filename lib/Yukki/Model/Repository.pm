@@ -4,7 +4,7 @@ use Moose;
 
 extends 'Yukki::Model';
 
-use Yukki::Error;
+use Yukki::Error qw( http_throw );
 use Yukki::Model::File;
 
 use DateTime::Format::Mail;
@@ -500,7 +500,7 @@ sub log {
             }
 
             default {
-                Yukki::Error->throw("invalid parse mode '$mode'");
+                http_throw("invalid parse mode '$mode'");
             }
         }
     }

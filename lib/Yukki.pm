@@ -4,6 +4,7 @@ use Moose;
 
 use Yukki::Settings;
 use Yukki::Types qw( AccessLevel );
+use Yukki::Error qw( http_throw );
 
 use Crypt::SaltedHash;
 use MooseX::Params::Validate;
@@ -135,7 +136,7 @@ sub _locate {
 
     my $path_class = $type eq 'file' ? 'Path::Class::File'
                    : $type eq 'dir'  ? 'Path::Class::Dir'
-                   : Yukki::Error->throw("unkonwn location type $type");
+                   : http_throw("unkonwn location type $type");
 
     my $base_path = $self->settings->$base;
     if ($base_path !~ m{^/}) {

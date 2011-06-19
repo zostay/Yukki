@@ -4,6 +4,7 @@ use Moose;
 extends 'Path::Router::Route::Match';
 
 use List::MoreUtils qw( all );
+use Yukki::Error qw( http_throw );
 
 # ABSTRACT: Matching with access controls
 
@@ -37,7 +38,7 @@ sub access_level {
         }
     }
 
-    Yukki::Error->throw("no ACL found to match " . $self->path);
+    http_throw("no ACL found to match " . $self->path);
 }
 
 1;

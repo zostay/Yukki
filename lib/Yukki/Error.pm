@@ -1,7 +1,7 @@
 package Yukki::Error;
 use Moose;
 
-with qw( Throwable HTTP::Throwable MooseX::Traits );
+with qw( Throwable StackTrace::Auto HTTP::Throwable MooseX::Traits );
 
 use Sub::Exporter -setup => {
     exports => {

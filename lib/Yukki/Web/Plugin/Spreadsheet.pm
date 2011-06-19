@@ -8,7 +8,7 @@ extends 'Yukki::Web::Plugin';
 
 use Scalar::Util qw( blessed );
 use Try::Tiny;
-use Yukki::Error;
+use Yukki::Error qw( http_throw );
 
 =head1 SYNOPSIS
 
@@ -158,7 +158,7 @@ sub lookup_name {
 
     my $cell = $self->cell($ctx, $file, $name);
 
-    Yukki::Error->throw('unknown name') if not defined $cell;
+    http_throw('unknown name') if not defined $cell;
 
     return $cell;
 }
@@ -230,7 +230,7 @@ Used to load spreadsheet variables from an externally referenced wiki page. Do n
 
 sub load_spreadsheet {
     my ($self, $ctx, $file) = @_;
-    Yukki::Error->throw('no such spreadsheet exists') unless $file->exists;
+    http_throw('no such spreadsheet exists') unless $file->exists;
     $file->fetch_formatted($ctx);
 }
 

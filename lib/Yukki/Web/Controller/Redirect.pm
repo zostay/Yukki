@@ -23,7 +23,7 @@ sub fire {
 
     my $redirect = $ctx->request->path_parameters->{redirect};
 
-    Yukki::Error->throw("no redirect URL named") unless $redirect;
+    http_throw("no redirect URL named") unless $redirect;
  
     http_throw("Go to $redirect.", {
         status   => 'MovedPermanently', 

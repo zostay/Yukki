@@ -8,6 +8,7 @@ use Digest::SHA1 qw( sha1_hex );
 use Number::Bytes::Human qw( format_bytes );
 use LWP::MediaTypes qw( guess_media_type );
 use Path::Class;
+use Yukki::Error qw( http_throw );
 
 # ABSTRACT: the model for loading and saving files in the wiki
 
@@ -260,18 +261,18 @@ sub store {
     elsif ($params->{filename}) {
         $object_id = $self->make_blob_from_file($blob_name, $params->{filename});
     }
-    Yukki::Error->throw("unable to create blob for $path") unless $object_id;
+    http_throw("unable to create blob for $path") unless $object_id;
 
     my $old_tree_id = $self->find_root;
-    Yukki::Error->throw("unable to locate original tree ID for ".$self->branch)
+    http_throw("unable to locate original tree ID for ".$self->branch)
         unless $old_tree_id;
 
     my $new_tree_id = $self->make_tree($old_tree_id, \@parts, $object_id);
-    Yukki::Error->throw("unable to create the new tree containing $path\n")
+    http_throw("unable to create the new tree containing $path\n")
         unless $new_tree_id;
 
     my $commit_id = $self->commit_tree($old_tree_id, $new_tree_id, $params->{comment});
-    Yukki::Error->throw("unable to commit the new tree containing $path\n")
+    http_throw("unable to commit the new tree containing $path\n")
         unless $commit_id;
 
     $self->update_root($old_tree_id, $commit_id);
