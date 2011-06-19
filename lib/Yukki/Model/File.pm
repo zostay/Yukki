@@ -278,6 +278,78 @@ sub store {
     $self->update_root($old_tree_id, $commit_id);
 }
 
+=head2 rename
+
+  my $new_file = $file->rename({
+      full_path => 'renamed/to/path.yukki',
+      comment   => 'renamed the file',
+  });
+
+Renames the file within the repository. When complete, this method returns a reference to the L<Yukki::Model::File> object representing the new path.
+
+=cut
+
+sub rename {
+    my ($self, $params) = @_;
+    my $old_path = $self->full_path;
+
+    my (@new_parts) = split m{/}, $params->{full_path};
+    my (@old_parts) = split m{/}, $old_path;
+    my $blob_name = $old_parts[-1];
+
+    my $object_id = $self->object_id;
+
+    my $old_tree_id = $self->find_root;
+    http_throw("unable to locate original tree ID for ".$self->branch)
+        unless $old_tree_id;
+
+    my $new_tree_id = $self->make_tree(
+        $old_tree_id, \@old_parts, \@new_parts, $object_id);
+    http_throw("unable to create the new tree renaming $old_path to $params->{full_path}\n")
+        unless $new_tree_id;
+
+    my $commit_id = $self->commit_tree($old_tree_id, $new_tree_id, $params->{comment});
+    http_throw("unable to commit the new tree renaming $old_path to $params->{full_path}\n")
+        unless $commit_id;
+
+    $self->update_root($old_tree_id, $commit_id);
+
+    return Yukki::Model::File->new(
+        app        => $self->app,
+        repository => $self->repository,
+        full_path  => $params->{full_path},
+    );
+}
+
+=head2 remove
+
+  $self->remove({ comment => 'removed the file' });
+
+Removes the file from the repostory. The file is not permanently deleted as it still exists in the version history. However, as of this writing, the API here does not provide any means for getting at a deleted file.
+
+=cut
+
+sub remove {
+    my ($self, $params) = @_;
+    my $old_path = $self->full_path;
+
+    my (@old_parts) = split m{/}, $old_path;
+
+    my $old_tree_id = $self->find_root;
+    http_throw("unable to locate original tree ID for ".$self->branch)
+        unless $old_tree_id;
+
+    my $new_tree_id = $self->make_tree($old_tree_id, \@old_parts);
+    http_throw("unable to create the new tree removing $old_path\n")
+        unless $new_tree_id;
+
+    my $commit_id = $self->commit_tree($old_tree_id, $new_tree_id, $params->{comment});
+    http_throw("unable to commit the new tree removing $old_path\n")
+        unless $commit_id;
+
+    $self->update_root($old_tree_id, $commit_id);
+}
+
 =head2 exists
 
 Returns true if the file exists in the repository already.

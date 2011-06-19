@@ -47,7 +47,7 @@ Sets up the page navigation menu.
 sub page_navigation {
     my ($self, $response, $this_action, $vars) = @_;
 
-    for my $action (qw( edit history )) {
+    for my $action (qw( edit history rename )) {
         next if $action eq $this_action;
 
         $response->add_navigation_item([ qw( page page_bottom ) ] => {
@@ -221,6 +221,32 @@ sub edit {
     );
 }
 
+=head2 rename
+
+Renders the rename form for a page.
+
+=cut
+
+sub rename {
+    my ($self, $ctx, $vars) = @_;
+    my $file = $vars->{file};
+
+    $ctx->response->page_title($vars->{title});
+    $ctx->response->breadcrumb($vars->{breadcrumb});
+
+    $self->page_navigation($ctx->response, 'rename', $vars)
+        unless $ctx->request->path_parameters->{file};
+
+    return $self->render_page(
+        template => 'page/rename.html',
+        context  => $ctx,
+        vars     => {
+            '#yukkiname'                => $vars->{page},
+            '#yukkiname_new@value'      => $vars->{page},
+        },
+    );
+}
+
 =head2 attachments
 
 Renders the attachments table.
@@ -285,6 +311,13 @@ sub attachment_links {
         push @links, {
             label => 'Download',
             href  => join('/', 'attachment', 'download',
+                    $attachment->repository_name,
+                    $attachment->full_path),
+        };
+
+        push @links, {
+            label => 'Rename',
+            href  => join('/', 'attachment', 'rename',
                     $attachment->repository_name,
                     $attachment->full_path),
         };

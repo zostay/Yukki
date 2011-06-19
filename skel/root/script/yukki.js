@@ -168,6 +168,10 @@ $(document).ready(function() {
                 '<li><a href="' + rebase_url('attachment/download/' + json.repository_path) + '">Download</a></li>'
             );
 
+            $('#' + file_id(file) + ' .links').append(
+                '<li><a href="' + rebase_url('attachment/rename/' + json.repository_path) + '">Rename</a></li>'
+            );
+
             $starter.hide();
         });
 

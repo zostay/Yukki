@@ -183,6 +183,7 @@ sub available_menu_items {
         my $url = $_->{href}; $url =~ s{\?.*$}{};
 
         my $match = $self->app->router->match($url);
+        return unless $match;
         my $access_level_needed = $match->access_level;
         $self->check_access(
             user       => $ctx->session->{user},

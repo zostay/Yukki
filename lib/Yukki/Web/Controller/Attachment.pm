@@ -28,6 +28,7 @@ sub fire {
         when ('download') { $self->download_file($ctx) }
         when ('upload')   { $self->upload_file($ctx) }
         when ('view')     { $self->view_file($ctx) }
+        when ('rename')   { $self->rename_file($ctx) }
         default {
             http_throw('That attachment action does not exist.', {
                 status => 'NotFound',
@@ -96,6 +97,21 @@ sub view_file {
 
     $ctx->response->content_type($file->media_type);
     $ctx->response->body([ scalar $file->fetch ]);
+}
+
+=head2 rename_file
+
+Handles attachment renaming via the page rename controller.
+
+=cut
+
+sub rename_file {
+    my ($self, $ctx) = @_;
+
+    my $file = $ctx->request->path_parameters->{file};
+    $ctx->request->path_parameters->{page} = $file;
+
+    $self->controller('Page')->fire($ctx);
 }
 
 =head2 upload_file

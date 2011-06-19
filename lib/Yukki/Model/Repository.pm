@@ -134,38 +134,98 @@ sub author_email { shift->app->settings->anonymous->author_email }
 =head2 make_tree
 
   my $tree_id = $repository->make_tree($old_tree_id, \@parts, $object_id);
+  my $tree_id = $repository->make_tree($old_tree_id, \@parts);
+  my $tree_id = $repository->make_tree(
+      $old_tree_id, \@old_parts, \@new_parts, $object_id); 
 
-This will construct one or more trees in the git repository to place the
-C<$object_id> into the deepest tree. This starts by reading the tree found using
-the object ID in C<$old_tree_id>. The first path part in C<@parts> is shifted
-off. If an existing path is found there, that path will be replaced. If not, a
-new path will be added. A tree object will be constructed for all byt he final
-path part in C<@parts>.
+In any case described here, the method returns the object ID of the top level
+tree created.
+
+=head3 Insert/Update
+
+When C<$object_id> is given, this will construct one or more trees in the git
+repository to place the C<$object_id> into the deepest tree. This starts by
+reading the tree found using the object ID in C<$old_tree_id>. The first path
+part in C<@parts> is shifted off. If an existing path is found there, that
+path will be replaced. If not, a new path will be added. A tree object will be
+constructed for all byt he final path part in C<@parts>.
 
 When the final part is reached, that path will be placed into the final tree
 as a blob using the given C<$object_id>.
 
-This method will fail if it runs into a situation where a blob would be replaced
-by a tree or a tree would be replaced by a blob. 
+This method will fail if it runs into a situation where a blob would be
+replaced by a tree or a tree would be replaced by a blob. 
 
-The method returns the object ID of the top level tree created.
+=head3 Remove
+
+When C<$object_id> is not passed or C<undef>, this will cause the final tree or blob found to be removed. This works essentially the same as the case for storing a blob, but when it gets to the last tree or blob found, it will elide that name from the final tree constructed.
+
+This method will fail if you attempt to remove something that does not exist.
+
+=head3 Rename
+
+When a second array reference is passed with the C<$object_id>, this method will perform a rename. In this case, the method will remove the path named in the L<@old_parts> and add the path named in <@new_parts> using the given C<$object_id> at that new location.
+
+This method will fail if a failure condition that would occur during either the insert/update or remove operation that is being performed simultaneously.
 
 =cut
 
 sub make_tree {
-    my ($self, $base, $tree, $blob) = @_;
-    my @tree = @$tree;
+    my $self = shift;
+    use Data::Dumper;
+    warn Dumper([ caller ], \@_);
+    my $base = shift;
+    my $path = shift;
 
-    my ($mode, $type, $name);
-    if (@$tree == 1) {
-        $mode = '100644';
-        $type = 'blob';
+    my (@new_path, @old_path, $blob);
+
+    # This is a rename
+    if (ref $_[0]) {
+        my $new_path = shift;
+        $blob        = shift;
+        @new_path    = @$new_path;
+        @old_path    = @$path;
     }
+
+    # Otherwise it's a store or delete
     else {
-        $mode = '040000';
-        $type = 'tree';
+        $blob = shift;
+
+        # Defined $blob -> Store
+        if (defined $blob) {
+            @new_path = @$path;
+        }
+
+        # Undefined $blob -> delete
+        else {
+            @old_path = @$path;
+        }
     }
-    $name = shift @tree;
+
+    my ($new_mode, $new_type, $new_name, $old_name, $remove_here);
+
+    # Parts to add or update
+    if (@new_path) {
+        $new_name = shift @new_path;
+
+        # Create the file here? 
+        if (@new_path == 0) {
+            $new_mode = '100644';
+            $new_type = 'blob';
+        }
+
+        # Or we're still hunting down the tree
+        else {
+            $new_mode = '040000';
+            $new_type = 'tree';
+        }
+    }
+
+    # Parts to remove
+    if (@old_path) {
+        $old_name    = shift @old_path;
+        $remove_here = (@old_path == 0);
+    }
 
     my $git = $self->git;
 
@@ -176,36 +236,64 @@ sub make_tree {
         for my $line (@old_tree) {
             my ($old_mode, $old_type, $old_object_id, $old_file) = split /\s+/, $line, 4;
 
-            if ($old_file eq $name) {
+            if (defined $new_name and $old_file eq $new_name) {
+
+                # The file already exists, we are doing an update
                 $overwrite++;
 
-                Yukki::Error->throw("cannot replace $old_type $name with $type")
-                    if $old_type ne $type;
+                # Cannot overwrite a file with a dir or a dir with a file
+                http_throw("cannot replace $old_type $new_name with $new_type")
+                    if $old_type ne $new_type;
 
-                if ($type eq 'blob') {
-                    push @new_tree, "$mode $type $blob\t$name";
+
+                # Add the updated file to the tree
+                if ($new_type eq 'blob') {
+                    push @new_tree, "$new_mode $new_type $blob\t$new_name";
                 }
+
+                # Add the updated tree to the tree
                 else {
-                    my $tree_id = $self->make_tree($old_object_id, \@tree, $blob);
-                    push @new_tree, "$mode $type $tree_id\t$name";
+                    my $tree_id = $self->make_tree($old_object_id, \@new_path, $blob);
+                    push @new_tree, "$new_mode $new_type $tree_id\t$new_name";
                 }
             }
+
+            # If $old_name != $new_name and it matches this file
+            elsif (defined $old_name and $old_file eq $old_name) {
+
+                # if ($remove_here) { ... do nothing ... }. The file will be
+                # omitted. \o/
+
+                # Not yet removed, but we need to hunt it down and remove it
+                unless ($remove_here) {
+                    my $tree_id = $self->make_tree($old_object_id, \@old_path);
+                    push @new_tree, "040000 tree $tree_id\t$old_name";
+                }
+            }
+
+            # It's something else, leave it be.
             else {
                 push @new_tree, $line;
             }
         }
     }
     
-    unless ($overwrite) {
-        if ($type eq 'blob') {
-            push @new_tree, "$mode $type $blob\t$name";
+    # If the file or tree we want to create was never encountered, add it
+    if ($new_name and not $overwrite) {
+
+        # ...as a file
+        if ($new_type eq 'blob') {
+            push @new_tree, "$new_mode $new_type $blob\t$new_name";
         }
+
+        # ...as a tree
         else {
-            my $tree_id = $self->make_tree(undef, \@tree, $blob);
-            push @new_tree, "$mode $type $tree_id\t$name";
+            my $tree_id = $self->make_tree(undef, \@new_path, $blob);
+            push @new_tree, "$new_mode $new_type $tree_id\t$new_name";
         }
     }
 
+    # Now, build this new tree from the input we've generated
     return $git->run('mktree', { input => join "\n", @new_tree });
 }
 
