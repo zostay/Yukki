@@ -527,4 +527,34 @@ sub list_files {
     return $self->repository->list_files($self->path);
 }
 
+=head2 parent
+
+  my $parent = $self->parent;
+
+Return a L<Yukki::Model::File> representing the parent path of the current file within the current repository. For example, if the current L<path> is:
+
+  foo/bar/baz.pdf
+
+the parent of it will be:
+
+  foo/bar.yukki
+
+This returns C<undef> if the current file is at the root of the repository.
+
+=cut
+
+sub parent {
+    my $self = shift;
+
+    my @parts = split m{/}, $self->path;
+    return if @parts == 1;
+
+    pop @parts;
+    return Yukki::Model::File->new(
+        app        => $self->app,
+        repository => $self->repository,
+        path       => join('/', @parts),
+    );
+}
+
 1;

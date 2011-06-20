@@ -251,7 +251,13 @@ sub make_tree {
                     push @new_tree, "$new_mode $new_type $blob\t$new_name";
                 }
 
-                # Add the updated tree to the tree
+                # The child tree contains both sides of the rename
+                elsif ($old_name eq $new_name) {
+                    my $tree_id = $self->make_tree($old_object_id, \@old_path, \@new_path, $blob);
+                    push @new_tree, "$new_mode $new_type $tree_id\t$new_name";
+                }
+
+                # Add the updated tree contains only the rename/add
                 else {
                     my $tree_id = $self->make_tree($old_object_id, \@new_path, $blob);
                     push @new_tree, "$new_mode $new_type $tree_id\t$new_name";
@@ -496,6 +502,24 @@ sub file {
 
     Yukki::Model::File->new(
         %$params,
+        app        => $self->app,
+        repository => $self,
+    );
+}
+
+=head2 default_file
+
+  my $file = $repository->default_file;
+
+Return the default L<Yukki::Model::File> configured for this repository.
+
+=cut
+
+sub root_file {
+    my $self = shift;
+
+    return Yukki::Model::File->new(
+        full_path  => $self->repository_settings->default_page,
         app        => $self->app,
         repository => $self,
     );

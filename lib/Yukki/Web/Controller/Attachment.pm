@@ -108,10 +108,39 @@ Handles attachment renaming via the page rename controller.
 sub rename_file {
     my ($self, $ctx) = @_;
 
-    my $file = $ctx->request->path_parameters->{file};
-    $ctx->request->path_parameters->{page} = $file;
+    my $repo_name = $ctx->request->path_parameters->{repository};
+    my $path      = $ctx->request->path_parameters->{file};
 
-    $self->controller('Page')->fire($ctx);
+    my $file      = $self->lookup_file($repo_name, $path);
+
+    if ($ctx->request->method eq 'POST') {
+        my $new_name = $ctx->request->parameters->{yukkiname_new};
+
+        if (my $user = $ctx->session->{user}) {
+            $file->author_name($user->{name});
+            $file->author_email($user->{email});
+        }
+
+        my $new_file = $file->rename({
+            full_path => $new_name,
+            comment   => 'Renamed ' . $file->full_path . ' to ' . $new_name,
+        });
+
+        my $parent = $new_file->parent // $file->repository->default_file;
+
+        $ctx->response->redirect(join '/', 
+            '/page/edit', $repo_name, $parent->full_path);
+        return;
+    }
+
+    $ctx->response->body( 
+        $self->view('Attachment')->rename($ctx, { 
+            title       => $file->title,
+            repository  => $repo_name,
+            page        => $file->full_path, 
+            file        => $file,
+        }) 
+    );
 }
 
 =head2 upload_file
