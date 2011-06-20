@@ -1,5 +1,18 @@
 {{$NEXT}}
 
+    * Bugfix: Certain errors that fellback to Plack's error handling are now
+      handled correctly within Yukki now.
+    * Bugfix: Hitting enter in the comment box on the page edit screen now
+      causes a Save, rather than opening the Choose Files list on browsers that
+      do not support drag-and-drop uploads.
+    * Added a Rename function so that pages and attachments may be renamed.
+    * The navigation menu is now split up into 3 different menus (repository,
+    * page, and user), which are much easier to use.
+    * Repositories are now listed in a specific order that can be set inside the
+      configuration file.
+    * Added a copyright notice for the software.
+    * "Yukki" does not appear quite so prominently anymore.
+
 0.111660  2011-06-14 20:50:32 America/Chicago
 
     * Now uses jQuery events for periodic actions.
