@@ -515,7 +515,7 @@ Return the default L<Yukki::Model::File> configured for this repository.
 
 =cut
 
-sub root_file {
+sub default_file {
     my $self = shift;
 
     return Yukki::Model::File->new(
