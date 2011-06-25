@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+0.111720  2011-06-20 22:18:01 America/Chicago
+
     * Bugfix: Certain errors that fellback to Plack's error handling are now
       handled correctly within Yukki now.
     * Bugfix: Hitting enter in the comment box on the page edit screen now
