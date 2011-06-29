@@ -172,8 +172,6 @@ This method will fail if a failure condition that would occur during either the 
 
 sub make_tree {
     my $self = shift;
-    use Data::Dumper;
-    warn Dumper([ caller ], \@_);
     my $base = shift;
     my $path = shift;
 
