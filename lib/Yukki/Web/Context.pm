@@ -183,7 +183,7 @@ for my $message_type (qw( errors warnings info )) {
         default     => sub { [] },
         traits      => [ 'Array' ],
         handles     => {
-            "list_$message_type" => 'elements',
+            "list_$message_type" => [ 'map', sub { ucfirst "$_." } ],
             "add_$message_type"  => 'push',
             "has_$message_type"  => 'count',
         },

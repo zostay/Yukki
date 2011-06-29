@@ -44,6 +44,11 @@ div.progress { height: 15px }
 
 .links li { display: inline-block; margin: 0 3px; list-style: none }
 
+li.error, li.warning, li.info { list-style: none }
+.error { padding: 3px; margin: 3px; border: 1px solid #CD0A0A; color: #CD0A0A; background-color: #FEF1EC }
+.warning { padding: 3px; margin: 3px; border: 1px solid #CDCD0A; color: #CDCD0A; background-color: #FEFEEC }
+.info { padding: 3px; margin: 3px; border: 1px solid #0A0ACD; color: #0A0ACD; background-color: #ECF1FE }
+
 /*** Login ***/
 
 #login-page { width: 30em; margin: 8em auto }

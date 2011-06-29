@@ -194,18 +194,26 @@ sub rename_page {
     if ($ctx->request->method eq 'POST') {
         my $new_name = $ctx->request->parameters->{yukkiname_new};
 
-        if (my $user = $ctx->session->{user}) {
-            $page->author_name($user->{name});
-            $page->author_email($user->{email});
+        my $part = qr{[_a-z0-9-.]+(?:\.[_a-z0-9-]+)*}i;
+        if ($new_name =~ m{^$part(?:/$part)*$}) {
+
+            if (my $user = $ctx->session->{user}) {
+                $page->author_name($user->{name});
+                $page->author_email($user->{email});
+            }
+
+            $page->rename({
+                full_path => $new_name,
+                comment   => 'Renamed ' . $page->full_path . ' to ' . $new_name,
+            });
+
+            $ctx->response->redirect(join '/', '/page/edit', $repo_name, $new_name);
+            return;
+
         }
-
-        $page->rename({
-            full_path => $new_name,
-            comment   => 'Renamed ' . $page->full_path . ' to ' . $new_name,
-        });
-
-        $ctx->response->redirect(join '/', '/page/edit', $repo_name, $new_name);
-        return;
+        else {
+            $ctx->add_errors('the new name must contain only letters, numbers, underscores, dashes, periods, and slashes');
+        }
     }
 
     $ctx->response->body( 
