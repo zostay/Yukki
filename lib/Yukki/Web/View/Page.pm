@@ -340,21 +340,21 @@ sub attachment_links {
                     $attachment->repository_name,
                     $attachment->full_path),
         };
-
-        push @links, {
-            label => 'Rename',
-            href  => join('/', 'attachment', 'rename',
-                    $attachment->repository_name,
-                    $attachment->full_path),
-        };
-
-        push @links, {
-            label => 'Remove',
-            href  => join('/', 'attachment', 'remove',
-                    $attachment->repository_name,
-                    $attachment->full_path),
-        };
     }
+
+    push @links, {
+        label => 'Rename',
+        href  => join('/', 'attachment', 'rename',
+                $attachment->repository_name,
+                $attachment->full_path),
+    };
+
+    push @links, {
+        label => 'Remove',
+        href  => join('/', 'attachment', 'remove',
+                $attachment->repository_name,
+                $attachment->full_path),
+    };
 
     return @links;
 }
