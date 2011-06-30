@@ -1,5 +1,5 @@
 package Yukki::Web::Controller;
-use Moose;
+use Moose::Role;
 
 # ABSTRACT: Base class for Yukki::Web controllers
 
@@ -35,6 +35,6 @@ L<Yukki::Web::Response> attached to that context or throw an exception.
 
 =cut
 
-sub fire { die 'not implemented here' }
+requires 'fire';
 
 1;

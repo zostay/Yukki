@@ -2,7 +2,7 @@ package Yukki::Web::Controller::Attachment;
 use 5.12.1;
 use Moose;
 
-extends 'Yukki::Web::Controller';
+with 'Yukki::Web::Controller';
 
 use JSON;
 use Yukki::Error qw( http_throw );
