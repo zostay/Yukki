@@ -29,6 +29,7 @@ sub fire {
         when ('upload')   { $self->upload_file($ctx) }
         when ('view')     { $self->view_file($ctx) }
         when ('rename')   { $self->rename_file($ctx) }
+        when ('remove')   { $self->remove_file($ctx) }
         default {
             http_throw('That attachment action does not exist.', {
                 status => 'NotFound',
@@ -146,6 +147,49 @@ sub rename_file {
             page        => $file->full_path, 
             file        => $file,
         }) 
+    );
+}
+
+=head2 remove_file
+
+Displays the remove confirmation.
+
+=cut
+
+sub remove_file {
+    my ($self, $ctx) = @_;
+
+    my $repo_name = $ctx->request->path_parameters->{repository};
+    my $path      = $ctx->request->path_parameters->{file};
+
+    my $file      = $self->lookup_file($repo_name, $path);
+
+    my $return_to = $file->parent // $file->repository->default_file;
+
+    my $confirmed = $ctx->request->body_parameters->{confirmed};
+    if ($ctx->request->method eq 'POST' and $confirmed) {
+
+        if (my $user = $ctx->session->{user}) {
+            $file->author_name($user->{name});
+            $file->author_email($user->{email});
+        }
+
+        $file->remove({
+            comment => 'Removing ' . $file->full_path . ' from repository.',
+        });
+
+        $ctx->response->redirect(join '/', '/page/view', $repo_name, $return_to->full_path);
+        return;
+    }
+
+    $ctx->response->body(
+        $self->view('Attachment')->remove($ctx, {
+            title       => $file->title,
+            repository  => $repo_name,
+            page        => $file->full_path,
+            file        => $file,
+            return_link => join('/', '/page/view', $repo_name, $return_to->full_path),
+        })
     );
 }
 

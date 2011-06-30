@@ -34,4 +34,26 @@ sub rename {
     );
 }
 
+=head2 remove
+
+Show the remove form for attachmensts.
+
+=cut
+
+sub remove {
+    my ($self, $ctx, $vars) = @_;
+    my $file = $vars->{file};
+
+    $ctx->response->page_title($vars->{title});
+
+    return $self->render_page(
+        template => 'attachment/remove.html',
+        context  => $ctx,
+        vars     => {
+            '.yukkiname'          => $vars->{page},
+            '#cancel_remove@href' => $vars->{return_link},
+        },
+    );
+}
+
 

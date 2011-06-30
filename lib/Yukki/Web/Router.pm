@@ -120,7 +120,7 @@ sub BUILD {
             file       => [ 'untitled.txt' ],
         },
         validations => {
-            action     => qr/^(?:view|upload|download|rename)$/,
+            action     => qr/^(?:view|upload|download|rename|remove)$/,
             repository => qr/^[_a-z0-9]+$/i,
             page       => subtype('ArrayRef[Str]' => where {
                 all { /^[_a-z0-9-]+(?:\.[_a-z0-9-]+)*$/i } @$_
@@ -128,7 +128,7 @@ sub BUILD {
         },
         acl => [
             [ read  => { action => [ qw( view download ) ] } ],
-            [ write => { action => [ qw( upload rename ) ] } ],
+            [ write => { action => [ qw( upload rename remove ) ] } ],
         ],  
         target => $self->controller('Attachment'),
     ));
