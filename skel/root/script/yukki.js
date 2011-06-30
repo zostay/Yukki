@@ -33,7 +33,7 @@ function updatePosition() {
 }
 
 $(document).ready(function() {
-    $(':button').button();
+    $(':button,.button').button();
 
     $('#preview-yukkitext').scrollTop('#yukkitext-caret');
 

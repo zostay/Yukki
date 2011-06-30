@@ -47,7 +47,7 @@ Sets up the page navigation menu.
 sub page_navigation {
     my ($self, $response, $this_action, $vars) = @_;
 
-    for my $action (qw( edit history rename )) {
+    for my $action (qw( edit history rename remove )) {
         next if $action eq $this_action;
 
         $response->add_navigation_item([ qw( page page_bottom ) ] => {
@@ -243,6 +243,32 @@ sub rename {
         vars     => {
             '#yukkiname'                => $vars->{page},
             '#yukkiname_new@value'      => $vars->{page},
+        },
+    );
+}
+
+=head2 remove
+
+Renders the remove confirmation page.
+
+=cut
+
+sub remove {
+    my ($self, $ctx, $vars) = @_;
+    my $file = $vars->{file};
+
+    $ctx->response->page_title($vars->{title});
+    $ctx->response->breadcrumb($vars->{breadcrumb});
+
+    $self->page_navigation($ctx->response, 'remove', $vars)
+        unless $ctx->request->path_parameters->{file};
+
+    return $self->render_page(
+        template => 'page/remove.html',
+        context  => $ctx,
+        vars     => {
+            '.yukkiname'          => $vars->{page},
+            '#cancel_remove@href' => $vars->{return_link},
         },
     );
 }

@@ -31,6 +31,7 @@ sub fire {
         when ('preview') { $self->preview_page($ctx) }
         when ('attach')  { $self->upload_attachment($ctx) }
         when ('rename')  { $self->rename_page($ctx) }
+        when ('remove')  { $self->remove_page($ctx) }
         default {
             http_throw('That page action does not exist.', {
                 status => 'NotFound',
@@ -223,6 +224,56 @@ sub rename_page {
             repository  => $repo_name,
             page        => $page->full_path, 
             file        => $page,
+        }) 
+    );
+}
+
+=head2 remove_page
+
+Displays the remove confirmation.
+
+=cut
+
+sub remove_page {
+    my ($self, $ctx) = @_;
+
+    my ($repo_name, $path) = $self->repo_name_and_path($ctx);
+
+    my $page = $self->lookup_page($repo_name, $path);
+
+    my $breadcrumb = $self->breadcrumb($page->repository, $path);
+
+    my $confirmed = $ctx->request->body_parameters->{confirmed};
+    if ($ctx->request->method eq 'POST' and $confirmed) {
+        my $return_to = $page->parent // $page->repository->default_file;
+        if ($return_to->full_path ne $page->full_path) {
+            if (my $user = $ctx->session->{user}) {
+                $page->author_name($user->{name});
+                $page->author_email($user->{email});
+            }
+
+            $page->remove({
+                comment   => 'Removing ' . $page->full_path . ' from repository.',
+            });
+
+            $ctx->response->redirect(join '/', '/page/view', $repo_name, $return_to->full_path);
+            return;
+
+        }
+
+        else {
+            $ctx->add_errors('you may not remove the top-most page of a repository');
+        }
+    }
+
+    $ctx->response->body( 
+        $self->view('Page')->remove($ctx, { 
+            title       => $page->title,
+            breadcrumb  => $breadcrumb,
+            repository  => $repo_name,
+            page        => $page->full_path, 
+            file        => $page,
+            return_link => join('/', '/page/view', $repo_name, $page->full_path),
         }) 
     );
 }

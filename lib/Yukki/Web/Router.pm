@@ -100,7 +100,7 @@ sub BUILD {
             repository => 'main',
         },
         validations => {
-            action     => qr/^(?:view|edit|history|diff|preview|attach|rename)$/,
+            action     => qr/^(?:view|edit|history|diff|preview|attach|rename|remove)$/,
             repository => qr/^[_a-z0-9]+$/i,
             page       => subtype('ArrayRef[Str]' => where {
                 all { /^[_a-z0-9-.]+(?:\.[_a-z0-9-]+)*$/i } @$_
@@ -108,7 +108,7 @@ sub BUILD {
         },
         acl => [
             [ read  => { action => [ qw( view preview history diff ) ] } ],
-            [ write => { action => [ qw( edit attach rename ) ]  } ],
+            [ write => { action => [ qw( edit attach rename remove ) ]  } ],
         ],
         target => $self->controller('Page'),
     ));
