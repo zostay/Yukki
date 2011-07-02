@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.111830  2011-07-02 15:53:44 America/Chicago
     
     * Bugfix: Upload buttons were still submits. Fixed again.
     * Bugfix: New names were not properly validated during renaming.
