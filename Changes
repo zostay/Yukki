@@ -1,4 +1,12 @@
 {{$NEXT}}
+    
+    * Bugfix: Upload buttons were still submits. Fixed again.
+    * Bugfix: New names were not properly validated during renaming.
+    * Bugfix: Removed a Dumper statement that was left in by mistake.
+    * Bugfix: Show the rename link for attachments that have formats..
+    * Adding page and attachment removal actions.
+    * A few enhancements to style, particularly for slide notes.
+    * Small refactoring of Yukki::Web::Controller.
 
 0.111720  2011-06-20 22:18:01 America/Chicago
 
