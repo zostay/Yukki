@@ -162,16 +162,6 @@ sub diff {
 
     $self->page_navigation($ctx->response, 'diff', $vars);
 
-    my $diff = '';
-    for my $chunk (@{ $vars->{diff} }) {
-        given ($chunk->[0]) {
-            when (' ') { $diff .= $chunk->[1] }
-            when ('+') { $diff .= sprintf '<ins markdown="1">%s</ins>', $chunk->[1] }
-            when ('-') { $diff .= sprintf '<del markdown="1">%s</del>', $chunk->[1] }
-            default { warn "unknown chunk type $chunk->[0]" }
-        }
-    }
-
     my $html = $file->fetch_formatted($ctx);
 
     return $self->render_page(

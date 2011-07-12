@@ -322,13 +322,27 @@ sub view_diff {
     my $r1 = $ctx->request->query_parameters->{r1};
     my $r2 = $ctx->request->query_parameters->{r2};
 
+    my $diff = '';
+    for my $chunk ($page->diff($r1, $r2)) {
+        given ($chunk->[0]) {
+            when (' ') { $diff .= $chunk->[1] }
+            when ('+') { $diff .= sprintf '<ins markdown="1">%s</ins>', $chunk->[1] }
+            when ('-') { $diff .= sprintf '<del markdown="1">%s</del>', $chunk->[1] }
+            default { warn "unknown chunk type $chunk->[0]" }
+        }
+    }
+
+    my $file_preview = $page->file_preview(
+        content => $diff,
+    );
+
     $ctx->response->body(
         $self->view('Page')->diff($ctx, {
             title      => $page->title,
             breadcrumb => $breadcrumb,
             repository => $repo_name,
             page       => $page->full_path,
-            diff       => [ $page->diff($r1, $r2) ],
+            file       => $file_preview,
         })
     );
 }
