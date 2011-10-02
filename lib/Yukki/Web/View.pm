@@ -156,6 +156,12 @@ sub render_page {
             'head link.local'   => [ 
                 map { { '@href' => $b->($_) } } 
                     (@styles, @{ $view_args->{vars}{'head link.local'} }) ],
+            'body script.local' => [ 
+                map { { '@src'  => $b->($_) } } 
+                    (@scripts, @{ $view_args->{vars}{'body script.local'} }) ],
+            'body link.local'   => [ 
+                map { { '@href' => $b->($_) } } 
+                    (@styles, @{ $view_args->{vars}{'body link.local'} }) ],
             '#messages'   => $messages,
             'title'       => $main_title,
             '.masthead-title' => $title,
