@@ -146,22 +146,26 @@ sub render_page {
                  // { template => 'shell.html' };
     $view_args->{vars} //= {};
 
+    my (@head_scripts, @head_styles, @body_scripts);
+
+    push @head_scripts, @scripts unless $view_args->{vars}{no_default_head_scripts};
+    push @head_scripts, @{ $view_args->{vars}{'head script.local'} }
+        if defined $view_args->{vars}{'head script.local'};
+
+    push @head_styles, @styles unless $view_args->{vars}{no_default_head_styles};
+    push @head_styles, @{ $view_args->{vars}{'head link.local'} }
+        if defined $view_args->{vars}{'head link.local'};
+
+    push @body_scripts, @{ $view_args->{vars}{'body script.local'} }
+        if defined $view_args->{vars}{'body script.local'};
+
     return $self->render(
         template => $view_args->{template},
         vars     => {
             %{ $view_args->{vars} },
-            'head script.local' => [ 
-                map { { '@src'  => $b->($_) } } 
-                    (@scripts, @{ $view_args->{vars}{'head script.local'} }) ],
-            'head link.local'   => [ 
-                map { { '@href' => $b->($_) } } 
-                    (@styles, @{ $view_args->{vars}{'head link.local'} }) ],
-            'body script.local' => [ 
-                map { { '@src'  => $b->($_) } } 
-                    (@scripts, @{ $view_args->{vars}{'body script.local'} }) ],
-            'body link.local'   => [ 
-                map { { '@href' => $b->($_) } } 
-                    (@styles, @{ $view_args->{vars}{'body link.local'} }) ],
+            'head script.local' => [ map { { '@src'  => $b->($_) } } @head_scripts ],
+            'head link.local'   => [ map { { '@href' => $b->($_) } } @head_styles ],
+            'body script.local' => [ map { { '@src'  => $b->($_) } } @body_scripts ],
             '#messages'   => $messages,
             'title'       => $main_title,
             '.masthead-title' => $title,

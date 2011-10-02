@@ -79,3 +79,6 @@ div.attachment-dropzone { display: none; background: #eef; text-align: center; p
 
 /* silly div that make the browser scroll for pages on long wiki edits */
 /* div.plupload.html5 { display: none; } */
+
+/*** Special in-wiki styles ***/
+.yukki-hide { display: none }
