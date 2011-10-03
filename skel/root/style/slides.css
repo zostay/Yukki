@@ -20,7 +20,7 @@ pre {
     font-size: 0.5em;
 }
 
-pre {
+code, pre {
     border: 1px solid #222;
     background-color: #000;
 }
@@ -89,9 +89,15 @@ code {
 
 .vcentered {
     position: absolute;
+    right: 0;
     left: 0;
-    top: 0;
-    width: 90%;
+    top: 50%;
+    -webkit-transform: translate(0, -50%);
+    -moz-transform: translate(0, -50%);
+    -ms-transform: translate(0, -50%);
+    -o-transform: translate(0, -50%);
+    transform: translate(0, -50%);
+    margin: 0;
 }
 
 .two-column {

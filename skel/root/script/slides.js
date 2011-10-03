@@ -6,6 +6,27 @@ function slide_index(thing) {
     return i;
 }
 
+function show_some_slide(slide, effect, delay) {
+    $(slide)
+        .removeClass('upcoming')
+        .removeClass('erstwhile')
+        .addClass('current');
+
+    if (effect) {
+        if (!delay) { delay = 500; }
+        $(slide).show(effect, {}, delay);
+    }
+    else {
+        $(slide).show();
+    }
+
+    vertical_center();
+
+    if ($(slide).attr('id')) {
+        window.location.hash = '#' + $(slide).attr('id');
+    }
+}
+
 function jump_to_slide(slide) {
     var current_idx = slide_index($('.slide.current')[0]);
     var goto_idx    = slide_index(slide);
@@ -20,8 +41,9 @@ function jump_to_slide(slide) {
             }
 
             if (state == 'jumping' && this == slide) {
-                $(this).removeClass('upcoming').addClass('current').show();
-                vertical_center();
+                show_some_slide(this);
+                // $(this).removeClass('upcoming').addClass('current').show();
+                // vertical_center();
                 return false;
             }
 
@@ -43,8 +65,9 @@ function jump_to_slide(slide) {
 
             if (state == 'jumping' && $(this).hasClass('current')) {
                 $(this).removeClass('current').hide();
-                $(slide).removeClass('erstwhile').addClass('current').show();
-                vertical_center();
+                show_some_slide(slide);
+                // $(slide).removeClass('erstwhile').addClass('current').show();
+                // vertical_center();
                 return false;
             }
 
@@ -58,8 +81,9 @@ function jump_to_slide(slide) {
 function show_next_slide(slide) {
     $('.slide.current').not('.final').removeClass('current').addClass('erstwhile').fadeOut(800);
     $('.highlight').removeClass('current');
-    slide.removeClass('upcoming').addClass('current').fadeIn(800);
-    vertical_center();
+    show_some_slide(slide, 'fade', 800);
+    // slide.removeClass('upcoming').addClass('current').fadeIn(800);
+    // vertical_center();
 }
 
 function show_next_build(build) {
@@ -89,7 +113,8 @@ function show_next() {
 
 function show_previous_slide(slide) {
     $('.slide.current').removeClass('current').addClass('upcoming').fadeOut(200);
-    slide.removeClass('erstwhile').addClass('current').fadeIn(200);
+    show_some_slide(slide, 'fade', 200);
+    // slide.removeClass('erstwhile').addClass('current').fadeIn(200);
 }
 
 function show_previous() {
@@ -99,11 +124,11 @@ function show_previous() {
 }
 
 function vertical_center() {
-    $('.vcentered').position({
-        at: 'center',
-        my: 'center',
-        of: 'body'
-    });
+//    $('.vcentered').position({
+//        at: 'center',
+//        my: 'center',
+//        of: 'body'
+//    });
 }
 
 function start_slides() {
@@ -115,6 +140,10 @@ function start_slides() {
 
     if ($('.here.slide').length > 0) {
         jump_to_slide( $('.here.slide')[0] );
+    }
+
+    if (window.location.hash) {
+        jump_to_slide( $(window.location.hash)[0] );
     }
 
     $(document).keyup(function(evt) {
