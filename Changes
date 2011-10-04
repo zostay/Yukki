@@ -1,5 +1,19 @@
 {{$NEXT}}
 
+    * Bugfix: The diff viewer was broken and has been for a couple versions and
+      I didn't notice. This is fixed.
+    * Bugfix: If you have a version of git before 1.7.2, you will get a warning
+      in the tests and a special error message telling that diffs can't work
+      without an upgrade.
+    * Bugfix: A few visual issues have been cleaned up, particularly in the
+      Slides view.
+    * The Slides view will use any ID attributes set on a slide element to
+      update the page's hash tag, which allows for direct linking to a slide.
+    * The Slides vcentered class works with pure CSS (though, only with modern
+      browsers that support some version of the translate style).
+    * A new SyntaxHighlight plugin is available for syntax highlighting in the
+      yukkitext using {{highlight:<language>:...}}
+
 0.111830  2011-07-02 15:53:44 America/Chicago
     
     * Bugfix: Upload buttons were still submits. Fixed again.
