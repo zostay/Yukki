@@ -257,7 +257,7 @@ sub yukkitext {
             plugin_name => $1,
             arg         => $2,
         });
-    }xeg;
+    }xegms;
 
     # Handle the escaped plugin thing
     $yukkitext =~ s{
@@ -269,7 +269,7 @@ sub yukkitext {
             .*?                 # plugin arguments
 
         \}\})                   # }} to end
-    }{$1}xg;
+    }{$1}xgms;
 
     my $formatted = '<div>' . $self->format_markdown($yukkitext) . '</div>';
 

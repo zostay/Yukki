@@ -14,13 +14,13 @@ p {
     margin: 0.5em 2em;
 }
 
-pre {
+.syntax-highlight, pre {
     margin: 1em 8em;
     padding: 1em;
     font-size: 0.5em;
 }
 
-code, pre {
+.syntax-highlight, code, pre {
     border: 1px solid #222;
     background-color: #000;
 }
@@ -56,13 +56,20 @@ i, em {
     color: #99ff99;
 }
 
-code {
+.syntax-highlight, code {
     color: #ffbb99;
 }
 
-.highlight.current {
+span.highlight.current {
     font-weight: bold;
-    background-color: #333;
+    background-color: #333329;
+    color: #33ff33;
+}
+
+div.highlight.current {
+    font-weight: bold;
+    background-color: #333329;
+    border: 1px solid #ff0;
     border-radius: 4px;
     color: #33ff33;
 }

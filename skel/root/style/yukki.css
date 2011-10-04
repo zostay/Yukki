@@ -17,9 +17,8 @@ td { vertical-align: top; padding: 3px }
 
 blockquote, pre { margin: 1em 1em; padding: 1em; border: 1px solid #ddf; background-color: #eef; font-family: Menlo, monospace; font-size: 0.9em }
 code { border: 1px solid #ddf; background-color: #eef; font-family: Menlo, monospace; font-size: 0.9em }
-code * { font-family: Menlo, monospace }
+code *, pre * { font-family: Menlo, monospace }
 pre code { border: none }
-pre * { font-family: Menlo, monospace }
 
 del, del * { background-color: #fdd; text-decoration: none }
 ins, ins * { background-color: #dfd; text-decoration: none }
@@ -81,3 +80,28 @@ div.attachment-dropzone { display: none; background: #eef; text-align: center; p
 
 /* silly div that make the browser scroll for pages on long wiki edits */
 /* div.plupload.html5 { display: none; } */
+
+/* Syntax Highlight */
+.syntax-highlight { margin: 1em 1em; padding: 1em; border: 1px solid #ddf; background-color: #eef; font-family: Menlo, monospace; font-size: 0.9em }
+.syntax-highlight { border: 1px solid #ddf; background-color: #eef; font-family: Menlo, monospace; font-size: 0.9em }
+.syntax-highlight * { font-family: Menlo, monospace }
+
+.syntax-alert { color: #6060ff }
+.syntax-base-n { color: #60ff60 }
+.syntax-b-string { color: #c9afff }
+.syntax-char { color: #ff60ff }
+.syntax-comment { color: #afafaf }
+.syntax-data-type { color: #6060ff }
+.syntax-dec-val { color: #6060ff }
+.syntax-error { color: #ff6060 }
+.syntax-float { color: #6060ff }
+.syntax-function { color: #60ff60 }
+.syntax-i-string { color: #ff6060 }
+.syntax-keyword { font-weight: bold }
+.syntax-operator { color: #ffa500 }
+.syntax-others { color: #b03060 }
+.syntax-region-marker { color: #96b9ff }
+.syntax-reserved { color: #9b30ff }
+.syntax-string { color: #ff6060 }
+.syntax-variable { color: #6060ff }
+.syntax-warning { color: #6060ff }
