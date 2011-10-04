@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+0.112770  2011-10-04 14:28:52 America/Chicago
+
     * Bugfix: The diff viewer was broken and has been for a couple versions and
       I didn't notice. This is fixed.
     * Bugfix: If you have a version of git before 1.7.2, you will get a warning
