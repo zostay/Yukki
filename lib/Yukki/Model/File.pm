@@ -177,12 +177,12 @@ sub title {
 
     if ($self->filetype eq 'yukki') {
         LINE: for my $line ($self->fetch) {
-            if ($line =~ /:/) {
+            if ($line =~ /^#\s*(.*)$/) {
+                return $1;
+            }
+            elsif ($line =~ /:/) {
                 my ($name, $value) = split m{\s*:\s*}, $line, 2;
                 return $value if lc($name) eq 'title';
-            }
-            elsif ($line =~ /^#\s*(.*)$/) {
-                return $1;
             }
             else {
                 last LINE;
