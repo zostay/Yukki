@@ -151,7 +151,9 @@ sub lookup_name {
             full_path => $path,
         });
 
-        $self->load_spreadsheet($ctx, $other_file);
+        $self->load_spreadsheet($ctx, $other_file)
+            unless $other_file->repository_name eq $file->repository_name
+               and $other_file->full_path       eq $file->full_path;;
 
         return $self->cell($ctx, $other_file, $name);
     }
