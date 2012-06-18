@@ -8,7 +8,7 @@ use Yukki::Error qw( http_throw );
 use Yukki::Model::File;
 
 use DateTime::Format::Mail;
-use Git::Repository;
+use Git::Repository v1.18;
 use MooseX::Types::Path::Class;
 
 # ABSTRACT: model for accessing objects in a git repository

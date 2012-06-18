@@ -3,7 +3,7 @@ use 5.12.1;
 
 use Yukki;
 
-use Git::Repository;
+use Git::Repository v1.18;
 
 my $repo_name   = shift;
 my $remote_repo = shift;
@@ -40,7 +40,8 @@ Cheers.
 
 END_OF_STUB_MAIN
 
-    my $git = Git::Repository->create('init', '--bare', $repo_dir);
+    Git::Repository->run('init', '--bare', $repo_dir);
+    my $git = Git::Repository->new(git_dir => $repo_dir);
 
     my $object_id = $git->run('hash-object', '-t', 'blob', '-w', '--stdin', "--path=$page", { input => $stub_main });
 
