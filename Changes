@@ -1,5 +1,22 @@
 {{$NEXT}}
 
+    * Bugfix: Corrected the "Fork me on Github" banner, which was showing a
+      broken image link.
+    * Bugfix: # Titles containing colons no longer confuse the Yukki page
+      viewer. These should display properly now.
+    * Bugfix: The git-version.t test runs without requiring a git repository
+      now.
+    * Slides show a smaller font for lists and syntax highlighted code, which
+      works better on smaller screens.
+    * Adds a new "plain" view that provides the HTML with only a DIV wrapping
+      it, which is handy for embedding into another page.
+    * Upgrade to Plupload v1.5.4
+    * Upgrade to jQuery 1.7.2 and jQuery UI 1.8.21
+    * Now requires Git::Repository v1.18
+    * Now requires Cache::FastMmap. This is not a strict requirement, but if you
+      use the default configuration, you will need it. Added to make quick setup
+      easier.
+
 0.112770  2011-10-04 14:28:52 America/Chicago
 
     * Bugfix: The diff viewer was broken and has been for a couple versions and
