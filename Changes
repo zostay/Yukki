@@ -7,7 +7,7 @@
     * Bugfix: # Titles containing colons no longer confuse the Yukki page
       viewer. These should display properly now.
     * Bugfix: The git-version.t test runs without requiring a git repository
-      now.
+      now. (H/T: Michael Aquilina)
     * Slides show a smaller font for lists and syntax highlighted code, which
       works better on smaller screens.
     * Adds a new "plain" view that provides the HTML with only a DIV wrapping
