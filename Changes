@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+0.121700  2012-06-17 23:43:56 America/Chicago
+
     * Bugfix: Corrected the "Fork me on Github" banner, which was showing a
       broken image link.
     * Bugfix: # Titles containing colons no longer confuse the Yukki page
