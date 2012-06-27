@@ -75,8 +75,6 @@ sub check_login_submission {
 
     my $user = $self->model('User')->find(login_name => $login_name);
 
-    $ctx->add_errors('no such user or you typed your password incorrectly') unless $user;
-
     if (not ($user and $self->check_password($user, $password))) {
         $ctx->add_errors('no such user or you typed your password incorrectly');
     }
