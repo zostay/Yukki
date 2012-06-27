@@ -43,7 +43,11 @@ sub find {
     );
 
     my $user_file = $self->locate('user_path', $login_name);
-    return LoadFile($user_file);
+    if (-e $user_file) {
+        return LoadFile($user_file);
+    }
+
+    return;
 }
 
 1;
