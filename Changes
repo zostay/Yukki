@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+0.121790  2012-06-26 21:29:22 America/Chicago
+
     * Bugfix: The spreadsheet plugin could get stuck in a loop if a variable in
       a page referred to itself. This problem has been corrected.
     * Bugfix: Entering a non-existent user resulted in an ugly YAML error.
