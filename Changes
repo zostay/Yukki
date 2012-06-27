@@ -1,5 +1,12 @@
 {{$NEXT}}
 
+    * Bugfix: The spreadsheet plugin could get stuck in a loop if a variable in
+      a page referred to itself. This problem has been corrected.
+    * Bugfix: Entering a non-existent user resulted in an ugly YAML error.
+      (Patched by Michael Aquilina)
+    * Bugfix: Entering a non-existent user resulted in a double error message. 
+      (Patched by Michael Aquilina)
+
 0.121700  2012-06-17 23:43:56 America/Chicago
 
     * Bugfix: Corrected the "Fork me on Github" banner, which was showing a
@@ -7,7 +14,7 @@
     * Bugfix: # Titles containing colons no longer confuse the Yukki page
       viewer. These should display properly now.
     * Bugfix: The git-version.t test runs without requiring a git repository
-      now. (H/T: Michael Aquilina)
+      now. (HT: Michael Aquilina)
     * Slides show a smaller font for lists and syntax highlighted code, which
       works better on smaller screens.
     * Adds a new "plain" view that provides the HTML with only a DIV wrapping
