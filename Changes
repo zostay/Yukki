@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+    * Bugfix: Test failure because of a naughty semi-colon.
+
 0.121790  2012-06-26 21:29:22 America/Chicago
 
     * Bugfix: The spreadsheet plugin could get stuck in a loop if a variable in

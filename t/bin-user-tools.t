@@ -37,7 +37,7 @@ some_group
 another_group
 ]);
     pass('ran yukki-add-user');
-};
+}
 catch {
     fail("ran yukki-add-user: $_");
 };
