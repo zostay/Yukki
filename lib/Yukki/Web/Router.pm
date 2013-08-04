@@ -122,7 +122,7 @@ sub BUILD {
         validations => {
             action     => qr/^(?:view|upload|download|rename|remove)$/,
             repository => qr/^[_a-z0-9]+$/i,
-            page       => subtype('ArrayRef[Str]' => where {
+            file       => subtype('ArrayRef[Str]' => where {
                 all { /^[_a-z0-9-]+(?:\.[_a-z0-9-]+)*$/i } @$_
             }),
         },
