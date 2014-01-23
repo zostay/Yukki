@@ -3,6 +3,8 @@ use Moose;
 
 extends qw( Yukki );
 
+use Class::Load;
+
 use Yukki::Error qw( http_throw http_exception );
 use Yukki::Types qw( PluginList );
 use Yukki::Web::Context;
@@ -84,7 +86,7 @@ sub _build_plugins {
         my $class  = $module;
            $class  = "Yukki::Web::Plugin::$class" unless $class =~ s/^\+//;
 
-        Class::MOP::load_class($class);
+        Class::Load::load_class($class);
 
         push @plugins, $class->new(%$plugin_settings, app => $self);
     }
@@ -115,7 +117,7 @@ Helper method used by L</controller> and L</view>.
 sub component {
     my ($self, $type, $name) = @_;
     my $class_name = join '::', 'Yukki::Web', $type, $name;
-    Class::MOP::load_class($class_name);
+    Class::Load::load_class($class_name);
     return $class_name->new(app => $self);
 }
 
