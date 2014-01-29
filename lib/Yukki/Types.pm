@@ -53,7 +53,7 @@ This is a valid access level. This includes any of the following values:
 
 =cut
 
-enum AccessLevel, qw( read write none );
+enum AccessLevel, [qw( read write none )];
 
 =head2 NavigationLinks
 
@@ -91,7 +91,7 @@ This is either an absolute URL or the words C<SCRIPT_NAME> or C<REWRITE>.
 
 =cut
 
-enum BaseURLEnum, qw( SCRIPT_NAME REWRITE );
+enum BaseURLEnum, [qw( SCRIPT_NAME REWRITE )];
 
 subtype BaseURL, as BaseURLEnum|Uri;
 
