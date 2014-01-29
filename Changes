@@ -2,6 +2,12 @@
 
     * Bugfix: Path::Router found a bug. I was validating a :page at one point,
       but needed to be validating a :file. Fixed.
+    * Bugfix: [rt.cpan.org #90688] Correct problems related to changes to the
+      syntax of enums in new versions of Moose. Thanks to Upasana Shukla and
+      Zoffix Znet.
+    * Bugfix: [rt.cpan.org #90921] Correct problems related to the deprecation
+      of Class::MOP::load_class. Now using Class::Load::load_class. Thanks to
+      Upasana Shukla and Zoffix Znet.
 
 0.132160  2013-08-03 21:01:25 America/Chicago
 
