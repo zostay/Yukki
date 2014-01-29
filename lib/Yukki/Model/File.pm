@@ -4,6 +4,7 @@ use Moose;
 
 extends 'Yukki::Model';
 
+use Class::Load;
 use Digest::SHA1 qw( sha1_hex );
 use Number::Bytes::Human qw( format_bytes );
 use LWP::MediaTypes qw( guess_media_type );
@@ -505,7 +506,7 @@ Takes this file and returns a L<Yukki::Model::FilePreview> object, with the file
 sub file_preview {
     my ($self, %params) = @_;
 
-    Class::MOP::load_class('Yukki::Model::FilePreview');
+    Class::Load::load_class('Yukki::Model::FilePreview');
     return Yukki::Model::FilePreview->new(
         %params,
         app        => $self->app,

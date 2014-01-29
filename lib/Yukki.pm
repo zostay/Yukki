@@ -2,6 +2,8 @@ package Yukki;
 use 5.12.1;
 use Moose;
 
+use Class::Load;
+
 use Yukki::Settings;
 use Yukki::Types qw( AccessLevel );
 use Yukki::Error qw( http_throw );
@@ -116,7 +118,7 @@ the instance constructor.
 sub model {
     my ($self, $name, $params) = @_;
     my $class_name = join '::', 'Yukki::Model', $name;
-    Class::MOP::load_class($class_name);
+    Class::Load::load_class($class_name);
     return $class_name->new(app => $self, %{ $params // {} });
 }
 
