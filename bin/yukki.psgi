@@ -14,9 +14,9 @@ my $app = sub {
 };
 
 builder {
-    mount "/style"    => Plack::App::File->new( root => $server->locate_dir('static_path', 'style') );
-    mount "/script"   => Plack::App::File->new( root => $server->locate_dir('static_path', 'script') );
-    mount "/template" => Plack::App::File->new( root => $server->locate_dir('static_path', 'template') );
+    mount "/style"    => Plack::App::File->new( root => $server->locate_dir('static_path', 'style') )->to_app;
+    mount "/script"   => Plack::App::File->new( root => $server->locate_dir('static_path', 'script') )->to_app;
+    mount "/template" => Plack::App::File->new( root => $server->locate_dir('static_path', 'template') )->to_app;
 
     mount "/"       => builder { 
         enable $server->session_middleware;
