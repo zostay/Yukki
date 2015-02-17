@@ -10,6 +10,7 @@ use Yukki::Model::File;
 use DateTime::Format::Mail;
 use Git::Repository v1.18;
 use MooseX::Types::Path::Class;
+use Try::Tiny;
 
 # ABSTRACT: model for accessing objects in a git repository
 
@@ -387,9 +388,9 @@ sub commit_tree {
 
   $self->update_root($old_tree_id, $new_tree_id);
 
-Given a old commit ID and a new commit ID, this moves the HEAD of the L</branch>
-so that it points to the new commit. This is called after L</commit_tree> has
-setup the commit.
+Given an old commit ID and a new commit ID, this moves the HEAD of the
+L</branch> so that it points to the new commit. This is called after
+L</commit_tree> has setup the commit.
 
 =cut
 
@@ -411,7 +412,24 @@ sub find_path {
     my ($self, $path) = @_;
 
     my $object_id;
-    my @files = $self->git->run('ls-tree', $self->branch, $path);
+    my @files;
+    try {
+        @files = $self->git->run('ls-tree', $self->branch, $path);
+    }
+    catch {
+
+        # Looks like an empty repo, try initializing it
+        if ($_ =~ /Not a valid object name/) {
+            $self->initialize_repository;
+            @files = $self->git->run('ls-tree', $self->branch, $path);
+        }
+
+        # I don't know what this is, die die die!
+        else {
+            die $_;
+        }
+    };
+
     FILE: for my $line (@files) {
         my ($mode, $type, $id, $name) = split /\s+/, $line, 4;
 
@@ -668,6 +686,51 @@ sub diff_blobs {
     }
 
     return @chunks;
+}
+
+=head2 initialize_repository
+
+  $self->initialize_repository;
+
+Run on an empty repository to create an empty one.
+
+=cut
+
+sub initialize_repository {
+    my $self = shift;
+
+    my $repository_path = ''.$self->repository_path;
+    Git::Repository->run('init', '--bare', $repository_path);
+
+    # TODO This would be nice to have as a config.
+    my $title  = $self->repository_settings->name // 'Untitled';
+    my $stub_main = <<END_OF_STUB_MAIN;
+# $title
+
+Welcome to your new wiki repository. The first thing you will probably
+want to do is edit this page.
+
+Cheers.
+
+END_OF_STUB_MAIN
+
+    my $page = $self->repository_settings->default_page;
+    my $object_id = $self->git->run('hash-object', '-t', 'blob', '-w', '--stdin', "--path=$page", { input => $stub_main });
+
+    my $stub_tree = "100655 blob $object_id\t$page\n";
+    my $tree_id   = $self->git->run('mktree', { input => $stub_tree });
+    my $commit_id = $self->git->run('commit-tree', $tree_id, {
+        input => 'Initializing empty Yukki repository.',
+        env   => {
+            GIT_AUTHOR_NAME  => 'Yukki::Model::Repository',
+            GIT_AUTHOR_EMAIL => 'hanenkamp@cpan.org',
+        },
+    });
+
+    my $branch = $self->branch;
+    $self->git->run('update-ref', $branch, $commit_id, '0' x 40);
+    
+    return;
 }
 
 1;
