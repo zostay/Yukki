@@ -1,4 +1,5 @@
 package Yukki::Web::View;
+
 use v5.24;
 use Moose;
 

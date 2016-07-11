@@ -1,4 +1,5 @@
 package Yukki::Web::Plugin::SyntaxHighlight;
+
 use v5.24;
 use Moose;
 

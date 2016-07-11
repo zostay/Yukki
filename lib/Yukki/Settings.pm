@@ -1,4 +1,5 @@
 package Yukki::Settings;
+
 use v5.24;
 use Moose;
 
@@ -151,6 +152,7 @@ has repositories => (
 
 {
     package Yukki::Settings::Anonymous;
+
     use Moose;
 
     has author_name => (
@@ -171,6 +173,7 @@ has repositories => (
 
 {
     package Yukki::Settings::Repository;
+
     use Moose;
 
     has repository => (

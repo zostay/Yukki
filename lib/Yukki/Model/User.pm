@@ -1,4 +1,5 @@
 package Yukki::Model::User;
+
 use v5.24;
 use Moose;
 

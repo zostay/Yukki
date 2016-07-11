@@ -1,4 +1,5 @@
 package Yukki::Web::Settings;
+
 use v5.24;
 use Moose;
 

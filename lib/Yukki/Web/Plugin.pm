@@ -1,4 +1,5 @@
 package Yukki::Web::Plugin;
+
 use v5.24;
 use Moose;
 # ABSTRACT:  base class for Yukki plugins

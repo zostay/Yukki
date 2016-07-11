@@ -1,4 +1,5 @@
 package Yukki::Role::App;
+
 use v5.24;
 use Moose::Role;
 

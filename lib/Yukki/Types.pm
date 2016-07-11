@@ -1,4 +1,5 @@
 package Yukki::Types;
+
 use v5.24;
 use Moose;
 

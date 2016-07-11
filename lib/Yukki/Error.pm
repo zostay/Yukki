@@ -1,4 +1,5 @@
 package Yukki::Error;
+
 use v5.24;
 use Moose;
 
@@ -28,6 +29,7 @@ name.
 
 {
     package Yukki::Error::Fixup;
+
     use Moose::Role;
 
     around as_psgi => sub {

@@ -1,4 +1,5 @@
 package Yukki::Web::Plugin::Role::FormatHelper;
+
 use v5.24;
 use Moose::Role;
 # ABSTRACT: interface for quick format helpers
