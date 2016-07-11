@@ -1,5 +1,6 @@
 {{$NEXT}}
 
+    * Major: Now requires Perl v5.24.
     * Major: Templates are now rendered using Template::Pure rather than
       Template::Sematic. This is a better maintained templating system that adds
       an additional abstraction layer, which is very helpful. Templates are
