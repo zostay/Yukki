@@ -208,4 +208,4 @@ coerce 'Yukki::Settings::Anonymous',
     from HashRef,
     via { Yukki::Settings::Anonymous->new($_) };
 
-1;
+__PACKAGE__->meta->make_immutable;

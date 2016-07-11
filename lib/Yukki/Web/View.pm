@@ -379,4 +379,4 @@ sub render {
     return $template->render($vars);
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

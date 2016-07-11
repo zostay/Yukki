@@ -226,4 +226,4 @@ sub upload_file {
     );
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

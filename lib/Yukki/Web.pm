@@ -300,4 +300,4 @@ sub munge_label {
 
 =cut
 
-1;
+__PACKAGE__->meta->make_immutable;

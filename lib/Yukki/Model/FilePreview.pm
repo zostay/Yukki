@@ -62,4 +62,4 @@ override fetch_formatted => sub {
     return $self->SUPER::fetch_formatted($ctx, $position);
 };
 
-1;
+__PACKAGE__->meta->make_immutable;

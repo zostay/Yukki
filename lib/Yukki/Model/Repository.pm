@@ -728,4 +728,4 @@ END_OF_STUB_MAIN
     return;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

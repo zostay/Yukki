@@ -42,4 +42,4 @@ sub access_level {
     http_throw("no ACL found to match " . $self->path);
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

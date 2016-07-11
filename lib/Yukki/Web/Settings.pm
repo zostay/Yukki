@@ -223,4 +223,4 @@ has media_types => (
     } },
 );
 
-1;
+__PACKAGE__->meta->make_immutable;

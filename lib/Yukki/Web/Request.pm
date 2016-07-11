@@ -68,5 +68,4 @@ has path_parameters => (
     default     => sub { +{} },
 );
 
-1;
-
+__PACKAGE__->meta->make_immutable;

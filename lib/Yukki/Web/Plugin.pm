@@ -58,4 +58,4 @@ has app => (
     handles     => 'Yukki::Role::App',
 );
 
-1;
+__PACKAGE__->meta->make_immutable;

@@ -141,4 +141,4 @@ sub add_navigation_items {
     }
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

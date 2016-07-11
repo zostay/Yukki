@@ -459,4 +459,4 @@ sub preview {
     return $html;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

@@ -218,4 +218,4 @@ sub as_string {
     return $self->message;
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

@@ -236,4 +236,4 @@ sub load_spreadsheet {
     $file->fetch_formatted($ctx);
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

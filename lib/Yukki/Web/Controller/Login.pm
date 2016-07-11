@@ -106,4 +106,4 @@ sub logout {
     $ctx->response->redirect($ctx->rebase_url('page/view/main'));
 }
 
-1;
+__PACKAGE__->meta->make_immutable;

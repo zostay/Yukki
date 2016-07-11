@@ -261,4 +261,4 @@ Does it suit your needs? I don't really care, but if I've shared this on the CPA
 
 =cut
 
-1;
+__PACKAGE__->meta->make_immutable;
