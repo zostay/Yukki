@@ -1,5 +1,10 @@
 {{$NEXT}}
 
+    * Major: Templates are now rendered using Template::Pure rather than
+      Template::Sematic. This is a better maintained templating system that adds
+      an additional abstraction layer, which is very helpful. Templates are
+      unchanged, though.
+
 0.140290  2014-01-29 08:28:15 America/Chicago
 
     * Bugfix: Path::Router found a bug. I was validating a :page at one point,
