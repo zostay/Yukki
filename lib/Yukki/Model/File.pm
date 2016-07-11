@@ -1,5 +1,5 @@
 package Yukki::Model::File;
-use 5.12.1;
+use v5.24;
 use Moose;
 
 extends 'Yukki::Model';
@@ -231,13 +231,13 @@ sub media_type {
 
 =head2 store
 
-  $file->store({ 
-      content => 'text to put in file...', 
+  $file->store({
+      content => 'text to put in file...',
       comment => 'comment describing the change',
   });
 
   # OR
-  
+
   $file->store({
       filename => 'file.pdf',
       comment  => 'comment describing the change',

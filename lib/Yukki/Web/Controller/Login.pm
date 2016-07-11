@@ -1,5 +1,5 @@
 package Yukki::Web::Controller::Login;
-use 5.12.1;
+use v5.24;
 use Moose;
 
 with 'Yukki::Web::Controller';
@@ -56,7 +56,7 @@ sub check_password {
     my ($self, $user, $password) = @_;
 
     return scalar $self->app->hasher->validate(
-        $user->{password}, 
+        $user->{password},
         $password,
     );
 }
@@ -69,7 +69,7 @@ Authenticates a user login.
 
 sub check_login_submission {
     my ($self, $ctx) = @_;
-    
+
     my $login_name = $ctx->request->body_parameters->{login_name};
     my $password   = $ctx->request->body_parameters->{password};
 

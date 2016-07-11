@@ -1,5 +1,5 @@
 package Yukki::Settings;
-use 5.12.1;
+use v5.24;
 use Moose;
 
 use MooseX::Types::Path::Class;
@@ -120,7 +120,7 @@ This is a human readable title for the repository.
 
 =item default_page
 
-This is the name of the main repository index. 
+This is the name of the main repository index.
 
 =item anonymous_access_level
 

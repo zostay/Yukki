@@ -1,4 +1,5 @@
 package Yukki::Web::Router;
+use v5.24;
 use Moose;
 
 extends 'Path::Router';
@@ -65,7 +66,7 @@ sub BUILD {
         defaults => {
             redirect => 'page/view/main',
         },
-        acl => [ 
+        acl => [
             [ none => { action => sub { 1 } } ],
         ],
         target => $self->controller('Redirect'),
@@ -78,7 +79,7 @@ sub BUILD {
         validations => {
             action => qr/^(?:page|submit|exit)$/,
         },
-        acl => [ 
+        acl => [
             [ none => { action => sub { 1 } } ],
         ],
         target => $self->controller('Login'),
@@ -88,8 +89,8 @@ sub BUILD {
         defaults => {
             action => 'exit',
         },
-        acl => [ 
-            [ none => { action => 'exit' } ] 
+        acl => [
+            [ none => { action => 'exit' } ]
         ],
         target => $self->controller('Login'),
     ));
@@ -129,7 +130,7 @@ sub BUILD {
         acl => [
             [ read  => { action => [ qw( view download ) ] } ],
             [ write => { action => [ qw( upload rename remove ) ] } ],
-        ],  
+        ],
         target => $self->controller('Attachment'),
     ));
 }

@@ -1,5 +1,5 @@
 package Yukki::Web::Plugin::Spreadsheet;
-use 5.12.1;
+use v5.24;
 use Moose;
 
 extends 'Yukki::Web::Plugin';
@@ -69,7 +69,7 @@ Sets up spreadsheet for the current request context. Do not use.
 
 sub setup_spreadsheet {
     my ($self, $params) = @_;
-    
+
     my $ctx  = $params->{context};
     my $file = $params->{file};
     my $arg  = $params->{arg};
@@ -114,7 +114,7 @@ sub cell {
     my $map = $ctx->stash->{'Spreadsheet.map'};
     $map->{ $file->repository_name }{ $file->full_path }{ $name } = $new_cell
         if defined $new_cell;
-    return $map->{ $file->repository_name }{ $file->full_path }{ $name }; 
+    return $map->{ $file->repository_name }{ $file->full_path }{ $name };
 }
 
 =head2 lookup_name
@@ -143,7 +143,7 @@ sub lookup_name {
 
         $path = $self->app->munge_label($path);
 
-        my $other_repo = $self->model('Repository', { 
+        my $other_repo = $self->model('Repository', {
             name => $repository_name,
         });
 
@@ -180,7 +180,7 @@ sub spreadsheet_eval {
     my $arg         = $params->{arg};
 
     my $sheet = $self->initialize_context($ctx);
-   
+
     my ($new_cell, $name, $formula) = $self->setup_spreadsheet($params);
 
     my $error = 0;
@@ -188,7 +188,7 @@ sub spreadsheet_eval {
     try {
         $formula =~ s/ \[ ([^\]]+) \] /
             $self->lookup_name({
-                %$params, 
+                %$params,
                 name => $1,
             })
         /gex;

@@ -1,5 +1,5 @@
 package Yukki::Web::Plugin::Role::FormatHelper;
-use 5.12.1;
+use v5.24;
 use Moose::Role;
 # ABSTRACT: interface for quick format helpers
 
@@ -21,7 +21,7 @@ use Moose::Role;
 
   with 'Yukki::Web::Plugin::Role::FormatHelper';
 
-  sub lc_helper { 
+  sub lc_helper {
       my ($self, $params) = @_;
       return lc $params->{arg};
   }

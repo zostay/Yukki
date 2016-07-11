@@ -1,5 +1,5 @@
 package Yukki::Web::Plugin::YukkiText;
-use 5.12.1;
+use v5.24;
 use Moose;
 
 extends 'Yukki::Web::Plugin';
@@ -103,7 +103,7 @@ sub yukkilink {
         $repository = $repo_name;
         $link       = $local_link;
     }
-    
+
     # If we did not get a label, make the label into the link
     if (not defined $label) {
         ($label) = $link =~ m{([^/]+)$};
@@ -159,7 +159,7 @@ sub yukkiplugin {
                     arg         => $arg,
                 });
             }
-            
+
             catch {
                 warn "Plugin Error: $_";
             };
@@ -203,7 +203,7 @@ sub yukkitext {
         if $position >= 0;
 
     # Yukki Links
-    $yukkitext =~ s{ 
+    $yukkitext =~ s{
         (?<!\\)                 # \ will escape the link
         \[\[ \s*                # [[ to start it
 
@@ -215,18 +215,18 @@ sub yukkitext {
             )?                  # is optional
 
         \]\]                    # ]] to end
-    }{ 
-        $self->yukkilink({ 
-            %$params, 
-            
-            repository => $1 // $repository, 
-            link       => $2, 
+    }{
+        $self->yukkilink({
+            %$params,
+
+            repository => $1 // $repository,
+            link       => $2,
             label      => $3,
         });
     }xeg;
 
     # Handle escaped links, hide the escape
-    $yukkitext =~ s{ 
+    $yukkitext =~ s{
         \\                      # \ will escape the link
         (\[\[ \s*               # [[ to start it
 

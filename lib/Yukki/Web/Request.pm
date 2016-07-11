@@ -1,4 +1,5 @@
 package Yukki::Web::Request;
+use v5.24;
 use Moose;
 
 use Plack::Request;
@@ -31,7 +32,7 @@ This is the internal L<Plack::Request> object. Do not use. Use one of the method
   secure body input session session_options logger cookies query_parameters
   body_parameters parameters content raw_body uri base user headers uploads
   content_encoding content_length content_type header referer user_agent param
-  upload 
+  upload
 
 =cut
 
@@ -45,7 +46,7 @@ has request => (
         secure body input session session_options logger cookies query_parameters
         body_parameters parameters content raw_body uri base user headers uploads
         content_encoding content_length content_type header referer user_agent param
-        upload 
+        upload
     ) ],
 );
 

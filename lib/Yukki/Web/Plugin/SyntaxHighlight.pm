@@ -1,5 +1,5 @@
 package Yukki::Web::Plugin::SyntaxHighlight;
-use v5.12;
+use v5.24;
 use Moose;
 
 extends 'Yukki::Web::Plugin';
@@ -106,7 +106,7 @@ sub highlight_syntax {
             Normal       => [q[],                                    q[]       ],
             Operator     => [q[<span class="syntax-operator">],      q[</span>]],
             Others       => [q[<span class="syntax-others">],        q[</span>]],
-            RegionMarker => [q[<span class="syntax-region-marker">], q[</span>]], 
+            RegionMarker => [q[<span class="syntax-region-marker">], q[</span>]],
             Reserved     => [q[<span class="syntax-reserved">],      q[</span>]],
             String       => [q[<span class="syntax-string">],        q[</span>]],
             Variable     => [q[<span class="syntax-variable">],      q[</span>]],
@@ -118,7 +118,7 @@ sub highlight_syntax {
 
     if ($params->{helper_name} =~ /highlight-(div|span)/) {
         my $element = $1;
-        $highlighted_text 
+        $highlighted_text
             = qq[<$element class="syntax-highlight language-$language">]
             . $engine->highlightText($text)
             . qq[</$element>];

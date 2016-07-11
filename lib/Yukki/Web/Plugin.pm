@@ -1,5 +1,5 @@
 package Yukki::Web::Plugin;
-use 5.12.1;
+use v5.24;
 use Moose;
 # ABSTRACT:  base class for Yukki plugins
 
@@ -21,7 +21,7 @@ use Moose;
 
   with 'Yukki::Web::Plugin::Role::FormatHelper';
 
-  sub lc_helper { 
+  sub lc_helper {
       my ($params) = @_;
       return lc $params->{arg};
   }

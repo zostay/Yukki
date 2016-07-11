@@ -1,5 +1,5 @@
 package Yukki::Web::Controller::Page;
-use 5.12.1;
+use v5.24;
 use Moose;
 
 with 'Yukki::Web::Controller';
@@ -54,7 +54,7 @@ sub repo_name_and_path {
     my $path       = $ctx->request->path_parameters->{page};
 
     if (not defined $path) {
-        my $repo_config 
+        my $repo_config
             = $self->app->settings->repositories->{$repo_name};
 
         my $path_str = $repo_config->default_page;
@@ -106,21 +106,21 @@ sub view_page {
     if (not $page->exists) {
         my @files = $page->list_files;
 
-        $body = $self->view('Page')->blank($ctx, { 
+        $body = $self->view('Page')->blank($ctx, {
             title      => $page->file_name,
             breadcrumb => $breadcrumb,
-            repository => $repo_name, 
+            repository => $repo_name,
             page       => $page->full_path,
             files      => \@files,
         });
     }
 
     else {
-        $body = $self->view('Page')->view($ctx, { 
+        $body = $self->view('Page')->view($ctx, {
             title      => $page->title,
             breadcrumb => $breadcrumb,
             repository => $repo_name,
-            page       => $page->full_path, 
+            page       => $page->full_path,
             file       => $page,
         });
     }
@@ -153,7 +153,7 @@ sub edit_page {
             $page->author_email($user->{email});
         }
 
-        $page->store({ 
+        $page->store({
             content => $new_content,
             comment => $comment,
         });
@@ -165,16 +165,16 @@ sub edit_page {
     my @attachments = grep { $_->filetype ne 'yukki' } $page->list_files;
     my $position = $ctx->request->parameters->{yukkitext_position} // -1;
 
-    $ctx->response->body( 
-        $self->view('Page')->edit($ctx, { 
+    $ctx->response->body(
+        $self->view('Page')->edit($ctx, {
             title       => $page->title,
             breadcrumb  => $breadcrumb,
             repository  => $repo_name,
-            page        => $page->full_path, 
+            page        => $page->full_path,
             position    => $position,
             file        => $page,
             attachments => \@attachments,
-        }) 
+        })
     );
 }
 
@@ -218,14 +218,14 @@ sub rename_page {
         }
     }
 
-    $ctx->response->body( 
-        $self->view('Page')->rename($ctx, { 
+    $ctx->response->body(
+        $self->view('Page')->rename($ctx, {
             title       => $page->title,
             breadcrumb  => $breadcrumb,
             repository  => $repo_name,
-            page        => $page->full_path, 
+            page        => $page->full_path,
             file        => $page,
-        }) 
+        })
     );
 }
 
@@ -267,15 +267,15 @@ sub remove_page {
         }
     }
 
-    $ctx->response->body( 
-        $self->view('Page')->remove($ctx, { 
+    $ctx->response->body(
+        $self->view('Page')->remove($ctx, {
             title       => $page->title,
             breadcrumb  => $breadcrumb,
             repository  => $repo_name,
-            page        => $page->full_path, 
+            page        => $page->full_path,
             file        => $page,
             return_link => join('/', '/page/view', $repo_name, $page->full_path),
-        }) 
+        })
     );
 }
 
@@ -382,7 +382,7 @@ sub preview_page {
     );
 
     $ctx->response->body(
-        $self->view('Page')->preview($ctx, { 
+        $self->view('Page')->preview($ctx, {
             title      => $page->title,
             breadcrumb => $breadcrumb,
             repository => $repo_name,
@@ -431,7 +431,7 @@ sub breadcrumb {
         label => $repository->title,
         href  => join('/', '/page/view/', $repository->name),
     };
-    
+
     for my $path_part (@$path_parts) {
         push @path_acc, $path_part;
         my $file = $repository->file({

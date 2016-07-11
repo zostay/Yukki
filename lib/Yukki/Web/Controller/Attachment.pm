@@ -1,5 +1,5 @@
 package Yukki::Web::Controller::Attachment;
-use 5.12.1;
+use v5.24;
 use Moose;
 
 with 'Yukki::Web::Controller';
@@ -131,7 +131,7 @@ sub rename_file {
 
             my $parent = $new_file->parent // $file->repository->default_file;
 
-            $ctx->response->redirect(join '/', 
+            $ctx->response->redirect(join '/',
                 '/page/edit', $repo_name, $parent->full_path);
             return;
         }
@@ -140,13 +140,13 @@ sub rename_file {
         }
     }
 
-    $ctx->response->body( 
-        $self->view('Attachment')->rename($ctx, { 
+    $ctx->response->body(
+        $self->view('Attachment')->rename($ctx, {
             title       => $file->title,
             repository  => $repo_name,
-            page        => $file->full_path, 
+            page        => $file->full_path,
             file        => $file,
-        }) 
+        })
     );
 }
 
@@ -206,7 +206,7 @@ sub upload_file {
     my $path      = $ctx->request->path_parameters->{file};
 
     my $file      = $self->lookup_file($repo_name, $path);
-    
+
     if (my $user = $ctx->session->{user}) {
         $file->author_name($user->{name});
         $file->author_email($user->{email});

@@ -1,4 +1,5 @@
 package Yukki::Error;
+use v5.24;
 use Moose;
 
 with qw( Throwable StackTrace::Auto HTTP::Throwable MooseX::Traits );

@@ -1,5 +1,5 @@
 package Yukki::Web::Settings;
-use 5.12.1;
+use v5.24;
 use Moose;
 
 extends 'Yukki::Settings';
@@ -87,7 +87,7 @@ has scripts => (
     is          => 'ro',
     isa         => 'ArrayRef[Str]',
     required    => 1,
-    default     => sub { 
+    default     => sub {
         [ qw(
             script/lib/jquery/jquery.js
             script/lib/jquery/jquery-ui.js
@@ -107,7 +107,7 @@ has styles => (
     is          => 'ro',
     isa         => 'ArrayRef[Str]',
     required    => 1,
-    default     => sub { 
+    default     => sub {
         [ qw(
             style/yukki.css
             style/lib/jquery/jquery.css
@@ -162,7 +162,7 @@ This is the list of page views to provide. By default, this is
           vars:
               "head link.local":
                   - style/slides.css
-              "head script.local": 
+              "head script.local":
                   - script/slides.js
 
 =cut

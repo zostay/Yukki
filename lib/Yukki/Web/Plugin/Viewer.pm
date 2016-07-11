@@ -1,5 +1,5 @@
 package Yukki::Web::Plugin::Viewer;
-use 5.12.1;
+use v5.24;
 use Moose;
 
 extends 'Yukki::Web::Plugin';

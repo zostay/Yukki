@@ -1,5 +1,5 @@
 package Yukki::Web::Controller::Redirect;
-use 5.12.1;
+use v5.24;
 use Moose;
 
 use Yukki::Error qw( http_throw );
@@ -24,9 +24,9 @@ sub fire {
     my $redirect = $ctx->request->path_parameters->{redirect};
 
     http_throw("no redirect URL named") unless $redirect;
- 
+
     http_throw("Go to $redirect.", {
-        status   => 'MovedPermanently', 
+        status   => 'MovedPermanently',
         location => $redirect,
     });
 }

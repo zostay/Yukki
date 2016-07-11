@@ -1,9 +1,9 @@
 package Yukki::Types;
-use 5.12.1;
+use v5.24;
 use Moose;
 
 use MooseX::Types -declare => [ qw(
-    LoginName AccessLevel 
+    LoginName AccessLevel
     NavigationLinks NavigationMenuMap
     BaseURL BaseURLEnum BreadcrumbLinks RepositoryMap
     PluginConfig PluginList
@@ -125,7 +125,7 @@ subtype RepositoryMap,
 
 coerce RepositoryMap,
     from HashRef,
-    via { 
+    via {
         my $source = $_;
         +{
             map { $_ => Yukki::Settings::Repository->new($source->{$_}) }
@@ -152,7 +152,7 @@ A plugin list is a loaded set of plugin objects.
 class_type 'Yukki::Web::Plugin';
 subtype PluginList,
     as ArrayRef['Yukki::Web::Plugin'],
-    message { 
+    message {
         return 'It is not an array of objects.' unless ref $_ eq 'ARRAY';
         my $bad = first { not blessed $_ or not $_->isa('Yukki::Web::Plugin') }
                         @$_;

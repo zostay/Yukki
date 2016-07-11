@@ -1,4 +1,5 @@
 package Yukki::Role::App;
+use v5.24;
 use Moose::Role;
 
 requires qw(
@@ -55,8 +56,8 @@ installation.
 
 =head2 check_access
 
-  my $access_is_ok = $self->check_access({ 
-      user       => $user, 
+  my $access_is_ok = $self->check_access({
+      user       => $user,
       repository => $repository,
       needs      => $needs,
   });

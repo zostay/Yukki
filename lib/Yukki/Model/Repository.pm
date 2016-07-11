@@ -1,5 +1,5 @@
 package Yukki::Model::Repository;
-use 5.12.1;
+use v5.24;
 use Moose;
 
 extends 'Yukki::Model';
@@ -58,7 +58,7 @@ has repository_settings => (
     isa         => 'Yukki::Settings::Repository',
     required    => 1,
     lazy        => 1,
-    default     => sub { 
+    default     => sub {
         my $self = shift;
         $self->app->settings->repositories->{$self->name};
     },
@@ -85,7 +85,7 @@ has repository_path => (
 
 sub _build_repository_path {
     my $self = shift;
-    
+
     my $repo_settings = $self->repository_settings;
     return $self->locate_dir('repository_path', $repo_settings->repository);
 }
@@ -137,7 +137,7 @@ sub author_email { shift->app->settings->anonymous->author_email }
   my $tree_id = $repository->make_tree($old_tree_id, \@parts, $object_id);
   my $tree_id = $repository->make_tree($old_tree_id, \@parts);
   my $tree_id = $repository->make_tree(
-      $old_tree_id, \@old_parts, \@new_parts, $object_id); 
+      $old_tree_id, \@old_parts, \@new_parts, $object_id);
 
 In any case described here, the method returns the object ID of the top level
 tree created.
@@ -155,7 +155,7 @@ When the final part is reached, that path will be placed into the final tree
 as a blob using the given C<$object_id>.
 
 This method will fail if it runs into a situation where a blob would be
-replaced by a tree or a tree would be replaced by a blob. 
+replaced by a tree or a tree would be replaced by a blob.
 
 =head3 Remove
 
@@ -207,7 +207,7 @@ sub make_tree {
     if (@new_path) {
         $new_name = shift @new_path;
 
-        # Create the file here? 
+        # Create the file here?
         if (@new_path == 0) {
             $new_mode = '100644';
             $new_type = 'blob';
@@ -282,7 +282,7 @@ sub make_tree {
             }
         }
     }
-    
+
     # If the file or tree we want to create was never encountered, add it
     if ($new_name and not $overwrite) {
 
@@ -314,7 +314,7 @@ file contents.
 sub make_blob {
     my ($self, $name, $content) = @_;
 
-    return $self->git->run('hash-object', '-t', 'blob', '-w', '--stdin', '--path', $name, 
+    return $self->git->run('hash-object', '-t', 'blob', '-w', '--stdin', '--path', $name,
         { input => $content });
 }
 
@@ -374,7 +374,7 @@ sub commit_tree {
     my ($self, $old_tree_id, $new_tree_id, $comment) = @_;
 
     return $self->git->run(
-        'commit-tree', $new_tree_id, '-p', $old_tree_id, { 
+        'commit-tree', $new_tree_id, '-p', $old_tree_id, {
             input => $comment,
             env   => {
                 GIT_AUTHOR_NAME  => $self->author_name,
@@ -585,7 +585,7 @@ sub log {
     my ($self, $full_path) = @_;
 
     my @lines = $self->git->run(
-        'log', $self->branch, '--pretty=format:%H~%an~%aD~%ar~%s', '--numstat', 
+        'log', $self->branch, '--pretty=format:%H~%an~%aD~%ar~%s', '--numstat',
         '--', $full_path
     );
 
@@ -595,7 +595,7 @@ sub log {
     my $mode = 'log';
     for my $line (@lines) {
         given ($mode) {
-            
+
             # First line is the log line
             when ('log') {
                 $current_revision = {};
@@ -667,7 +667,7 @@ sub diff_blobs {
 
         my ($type, $detail) = $line =~ /^(.)(.*)$/;
         given ($type) {
-            when ([ '~', ' ', '+', '-' ]) { 
+            when ([ '~', ' ', '+', '-' ]) {
                 if ($last_chunk_type eq $type) {
                     $chunks[-1][1] .= $detail;
                 }
@@ -729,7 +729,7 @@ END_OF_STUB_MAIN
 
     my $branch = $self->branch;
     $self->git->run('update-ref', $branch, $commit_id, '0' x 40);
-    
+
     return;
 }
 

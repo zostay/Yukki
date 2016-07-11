@@ -1,5 +1,5 @@
 package Yukki::Web::View::Page;
-use 5.12.1;
+use v5.24;
 use Moose;
 
 extends 'Yukki::Web::View';
@@ -272,14 +272,14 @@ Renders the attachments table.
 sub attachments {
     my ($self, $ctx, $attachments) = @_;
 
-    my @files = map { 
+    my @files = map {
         my @links = $self->attachment_links($ctx, $_);
 
         my %primary_link = %{ $links[0] };
         $primary_link{label} = $_->file_name;
 
         my $file_name = $self->render_links(
-            context => $ctx, 
+            context => $ctx,
             links   => [ \%primary_link ],
         );
 
@@ -309,18 +309,18 @@ sub attachment_links {
     my @links;
 
     if ($attachment->has_format) {
-        push @links, { 
+        push @links, {
             label => 'View',
-            href  => join('/', 'page', 'view', 
-                    $attachment->repository_name, 
+            href  => join('/', 'page', 'view',
+                    $attachment->repository_name,
                     $attachment->full_path),
         };
     }
     else {
-        push @links, { 
+        push @links, {
             label => 'View',
-            href  => join('/', 'attachment', 'view', 
-                    $attachment->repository_name, 
+            href  => join('/', 'attachment', 'view',
+                    $attachment->repository_name,
                     $attachment->full_path),
         } if $attachment->media_type ne 'application/octet';
 

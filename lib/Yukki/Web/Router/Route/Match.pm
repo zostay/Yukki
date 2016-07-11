@@ -1,4 +1,5 @@
 package Yukki::Web::Router::Route::Match;
+use v5.24;
 use Moose;
 
 extends 'Path::Router::Route::Match';
@@ -24,7 +25,7 @@ Evaluates the access control list against a particular path.
 
 =cut
 
-sub access_level { 
+sub access_level {
     my $self = shift;
 
     my $mapping = $self->mapping;

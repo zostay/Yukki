@@ -1,4 +1,5 @@
 package Yukki::Web;
+use v5.24;
 use Moose;
 
 extends qw( Yukki );
@@ -67,10 +68,10 @@ has plugins => (
     traits      => [ 'Array' ],
     handles     => {
         all_plugins              => 'elements',
-        format_helper_plugins => [ grep => sub { 
+        format_helper_plugins => [ grep => sub {
             $_->does('Yukki::Web::Plugin::Role::FormatHelper')
         } ],
-        formatter_plugins => [ grep => sub { 
+        formatter_plugins => [ grep => sub {
             $_->does('Yukki::Web::Plugin::Role::Formatter')
         } ],
     },
@@ -129,7 +130,7 @@ Returns an instance of the named L<Yukki::Web::Controller>.
 
 =cut
 
-sub controller { 
+sub controller {
     my ($self, $name) = @_;
     return $self->component(Controller => $name);
 }
@@ -169,7 +170,7 @@ sub dispatch {
     try {
         my $match = $self->router->match($ctx->request->path);
 
-        http_throw('No action found matching that URL.', { 
+        http_throw('No action found matching that URL.', {
             status => 'NotFound',
         }) unless $match;
 
@@ -191,7 +192,7 @@ sub dispatch {
                 sort  => 100,
             });
         }
-        
+
         else {
             $ctx->response->add_navigation_item(user => {
                 label => 'Sign in',
@@ -221,7 +222,7 @@ sub dispatch {
 
         if (blessed $_ and $_->isa('Moose::Object') and $_->does('HTTP::Throwable')) {
 
-            if ($_->does('HTTP::Throwable::Role::Status::Forbidden') 
+            if ($_->does('HTTP::Throwable::Role::Status::Forbidden')
                     and not $ctx->session->{user}) {
 
                 $response = http_exception('Please login first.', {
@@ -239,7 +240,7 @@ sub dispatch {
             warn "ISE: $_";
 
             $response = http_exception($_, {
-                status           => 'InternalServerError', 
+                status           => 'InternalServerError',
                 show_stack_trace => 0,
             })->as_psgi($env);
         }
@@ -260,7 +261,7 @@ sub session_middleware {
     my $self = shift;
 
     # TODO Make this configurable
-    return ('Session', 
+    return ('Session',
         store => Plack::Session::Store::Cache->new(
             cache => CHI->new(driver => 'FastMmap'),
         ),
@@ -268,7 +269,7 @@ sub session_middleware {
 }
 
 =head2 munge_label
-  
+
   my $link = $app->munch_label("This is a label");
 
 Turns some label into a link slug using the standard means for doing so.

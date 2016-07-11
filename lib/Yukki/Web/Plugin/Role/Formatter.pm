@@ -1,5 +1,5 @@
 package Yukki::Web::Plugin::Role::Formatter;
-use 5.12.1;
+use v5.24;
 use Moose::Role;
 
 # ABSTRACT: interface for HTML formatters
@@ -27,7 +27,7 @@ use Moose::Role;
 
       my $html = $file->fetch;
       $html =~ s/$/<br>/g;
-      
+
       return [ { title => 'Simple' }, $html ];
   }
 

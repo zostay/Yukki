@@ -1,5 +1,5 @@
 package Yukki::Web::Context;
-use 5.12.1;
+use v5.24;
 use Moose;
 
 use Yukki::Web::Request;
@@ -12,7 +12,7 @@ use MooseX::Types::URI qw( Uri );
 =head1 SYNOPSIS
 
   # Many components are handed a Context in $ctx...
-  
+
   my $request = $ctx->request;
   my $session = $ctx->session;
   my $session_options = $ctx->session_options;

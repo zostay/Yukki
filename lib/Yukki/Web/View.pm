@@ -1,5 +1,5 @@
 package Yukki::Web::View;
-use 5.12.1;
+use v5.24;
 use Moose;
 
 use MooseX::Params::Validate;
@@ -179,7 +179,7 @@ Retrieves the navigation menu from the L<Yukki::Web::Response> and purges any li
 sub available_menu_items {
     my ($self, $ctx, $name) = @_;
 
-    return grep { 
+    return grep {
         my $url = $_->{href}; $url =~ s{\?.*$}{};
 
         my $match = $self->app->router->match($url);

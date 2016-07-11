@@ -1,5 +1,5 @@
 package Yukki::Web::View::Attachment;
-use 5.12.1;
+use v5.24;
 use Moose;
 
 extends 'Yukki::Web::View';

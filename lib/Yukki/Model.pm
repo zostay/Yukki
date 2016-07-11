@@ -1,4 +1,5 @@
 package Yukki::Model;
+use v5.24;
 use Moose;
 
 # ABSTRACT: Base class for model objects

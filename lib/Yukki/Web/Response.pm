@@ -1,4 +1,5 @@
 package Yukki::Web::Response;
+use v5.24;
 use Moose;
 
 use Yukki::Types qw( BreadcrumbLinks NavigationMenuMap );
@@ -52,7 +53,7 @@ has page_title => (
     predicate   => 'has_page_title',
 );
 
-=head2 navigation 
+=head2 navigation
 
 This is the navigation menu to place in the page. This is an array of hashes. Each entry should look like:
 
@@ -106,7 +107,7 @@ Returns a sorted list of navigation items  for the named menu.
 
 sub navigation_menu {
     my ($self, $name) = @_;
-    return sort { ($a->{sort}//50) <=> ($b->{sort}//50) } 
+    return sort { ($a->{sort}//50) <=> ($b->{sort}//50) }
                @{ $self->navigation->{$name} // [] };
 }
 

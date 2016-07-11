@@ -1,5 +1,5 @@
 package Yukki;
-use 5.12.1;
+use v5.24;
 use Moose;
 
 use Class::Load;
@@ -171,7 +171,7 @@ sub locate_dir {
 =head2 check_access
 
   my $access_is_ok = $app->check_access({
-      user       => $user, 
+      user       => $user,
       repository => 'main',
       needs      => 'read',
   });
@@ -207,7 +207,7 @@ sub check_access {
         $access_level{$_[0] // 'none'} >= $access_level{$needs}
     };
 
-    # Deal with anonymous users first. 
+    # Deal with anonymous users first.
     return 1 if $has_access->($config->anonymous_access_level);
     return '' unless $user;
 
@@ -219,7 +219,7 @@ sub check_access {
 
             my $groups = "${level}_groups";
 
-            return 1 if $config->$groups ~~ 'ANY';
+            return 1 if $config->$groups eq 'ANY';
 
             if (ref $config->$groups eq 'ARRAY') {
                 my @level_groups = @{ $config->$groups };
@@ -229,11 +229,11 @@ sub check_access {
                 }
             }
             elsif ($config->$groups ne 'NONE') {
-                warn "weird value ", $config->$groups, 
+                warn "weird value ", $config->$groups,
                     " in $groups config for $repository settings";
             }
         }
-    } 
+    }
 
     return '';
 }
