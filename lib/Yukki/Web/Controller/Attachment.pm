@@ -24,17 +24,16 @@ Maps download requests to L</download_file>, upload requests to L</upload_file>,
 sub fire {
     my ($self, $ctx) = @_;
 
-    given ($ctx->request->path_parameters->{action}) {
-        when ('download') { $self->download_file($ctx) }
-        when ('upload')   { $self->upload_file($ctx) }
-        when ('view')     { $self->view_file($ctx) }
-        when ('rename')   { $self->rename_file($ctx) }
-        when ('remove')   { $self->remove_file($ctx) }
-        default {
-            http_throw('That attachment action does not exist.', {
-                status => 'NotFound',
-            });
-        }
+    my $action = $ctx->request->path_parameters->{action};
+    if    ($action eq 'download') { $self->download_file($ctx) }
+    elsif ($action eq 'upload')   { $self->upload_file($ctx) }
+    elsif ($action eq 'view')     { $self->view_file($ctx) }
+    elsif ($action eq 'rename')   { $self->rename_file($ctx) }
+    elsif ($action eq 'remove')   { $self->remove_file($ctx) }
+    else {
+        http_throw('That attachment action does not exist.', {
+            status => 'NotFound',
+        });
     }
 }
 

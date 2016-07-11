@@ -9,6 +9,7 @@ use Yukki::Types qw( AccessLevel );
 use Yukki::Error qw( http_throw );
 
 use Crypt::SaltedHash;
+use List::MoreUtils qw( any );
 use MooseX::Params::Validate;
 use MooseX::Types::Path::Class;
 use Path::Class;
@@ -225,7 +226,7 @@ sub check_access {
                 my @level_groups = @{ $config->$groups };
 
                 for my $level_group (@level_groups) {
-                    return 1 if $level_group ~~ @user_groups;
+                    return 1 if any { $_ eq $level_group } @user_groups;
                 }
             }
             elsif ($config->$groups ne 'NONE') {

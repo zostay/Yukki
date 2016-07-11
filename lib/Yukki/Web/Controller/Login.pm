@@ -24,13 +24,14 @@ sub fire {
     my ($self, $ctx) = @_;
 
     my $res;
-    given ($ctx->request->path_parameters->{action}) {
-        when ('page')   { $self->show_login_page($ctx) }
-        when ('submit') { $self->check_login_submission($ctx) }
-        when ('exit')   { $self->logout($ctx) }
-        default         { http_throw('That login action does not exist.', {
+    my $action = $ctx->request->path_parameters->{action};
+    if    ($action eq 'page')   { $self->show_login_page($ctx) }
+    elsif ($action eq 'submit') { $self->check_login_submission($ctx) }
+    elsif ($action eq 'exit')   { $self->logout($ctx) }
+    else {
+        http_throw('That login action does not exist.', {
             status => 'NotFound',
-        }) }
+        })
     }
 }
 

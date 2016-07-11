@@ -58,6 +58,12 @@ sub _build_markdown {
     );
 }
 
+=head2 messages_template
+
+This is the template used to render info, warning, and error messages to the page.
+
+=cut
+
 has messages_template => (
     is          => 'ro',
     isa         => 'Template::Pure',
@@ -92,6 +98,45 @@ has _page_templates => (
     is          => 'ro',
     isa         => 'HashRef',
 );
+
+=head2 links_template
+
+This is the template object used to render links.
+
+=cut
+
+has links_template => (
+    is          => 'ro',
+    isa         => 'Template::Pure',
+    lazy        => 1,
+    builder     => '_build_links_template',
+);
+
+sub _build_links_template {
+    Yukki::Web::View->prepare_template(
+        template   => 'links.html',
+        directives => [
+            'link<-links' => {
+                'a'      => 'link.label',
+                'a@href' => 'link.href | rebase_url',
+                sub {
+                    my ($t, $a, $vars) = @_;
+                    $vars->{ctx}->rebase_url($vars->{link}{href});
+                },
+            },
+        ],
+    );
+}
+
+=head1 METHODS
+
+=head2 page_template
+
+  my $template = $self->page_template('default');
+
+Returns the template used to render pages for the given style name.
+
+=cut
 
 sub page_template {
     my ($self, $which) = @_;
@@ -142,31 +187,6 @@ sub page_template {
         ],
     );
 }
-
-has links_template => (
-    is          => 'ro',
-    isa         => 'Template::Pure',
-    lazy        => 1,
-    builder     => '_build_links_template',
-);
-
-sub _build_links_template {
-    Yukki::Web::View->prepare_template(
-        template   => 'links.html',
-        directives => [
-            'link<-links' => {
-                'a'      => 'link.label',
-                'a@href' => 'link.href | rebase_url',
-                sub {
-                    my ($t, $a, $vars) = @_;
-                    $vars->{ctx}->rebase_url($vars->{link}{href});
-                },
-            },
-        ],
-    );
-}
-
-=head1 METHODS
 
 =head2 prepare_template
 

@@ -131,27 +131,26 @@ has base_url => (
 sub _build_base_url {
     my $self = shift;
 
-    given ($self->env->{'yukki.settings'}->base_url) {
-        when ('SCRIPT_NAME') {
-            return $self->request->base;
+    my $base_url = $self->env->{'yukki.settings'}->base_url;
+    if ($base_url eq 'SCRIPT_NAME') {
+        return $self->request->base;
+    }
+
+    elsif ($base_url eq 'REWRITE') {
+        my $path_info   = $self->env->{PATH_INFO};
+        my $request_uri = $self->env->{REQUEST_URI};
+
+        if ($request_uri =~ s/$path_info$//) {
+            my $base_url = $self->request->uri;
+            $base_url->path($request_uri);
+            return $base_url->canonical;
         }
 
-        when ('REWRITE') {
-            my $path_info   = $self->env->{PATH_INFO};
-            my $request_uri = $self->env->{REQUEST_URI};
+        return $self->request->base;
+    }
 
-            if ($request_uri =~ s/$path_info$//) {
-                my $base_url = $self->request->uri;
-                $base_url->path($request_uri);
-                return $base_url->canonical;
-            }
-
-            return $self->request->base;
-        }
-
-        default {
-            return $_;
-        }
+    else {
+        return $_;
     }
 }
 

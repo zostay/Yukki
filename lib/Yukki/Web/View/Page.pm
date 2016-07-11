@@ -42,7 +42,7 @@ sub _build_view_template {
         template   => 'page/view.html',
         directives => [
             '#yukkitext' => 'html | encoded_string',
-        },
+        ],
     );
 }
 

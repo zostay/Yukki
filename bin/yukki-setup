@@ -29,10 +29,8 @@ rename $yaml, "$yaml~";
 open my $out_config, '>', $yaml;
 open my $in_config, '<', "$yaml~";
 while (my $line = <$in_config>) {
-    given ($line) {
-        when (/^root:/) {
-            $line = "root: $root\n";
-        }
+    if ($line =~ /^root:/) {
+        $line = "root: $root\n";
     }
     print $out_config $line;
 }
@@ -52,8 +50,8 @@ say "\tcd $site_dir\n";
 
 say "You probably want to setup your repositories by running:\n";
 for (sort keys %{ $config->{repositories} }) {
-    when ('yukki') { say "\tyukki-git-init $_ git://github.com/zostay/yukki-help.git" }
-    default        { say "\tyukki-git-init $_" }
+    if (/^yukki$/) { say "\tyukki-git-init $_ git://github.com/zostay/yukki-help.git" }
+    else           { say "\tyukki-git-init $_" }
 }
 print "\n";
 

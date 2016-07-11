@@ -124,9 +124,11 @@ sub full_path {
     my $self = shift;
 
     my $full_path;
-    given ($self->filetype) {
-        when (defined) { $full_path = join '.', $self->path, $self->filetype }
-        default        { $full_path = $self->path }
+    if (defined $self->filetype) {
+        $full_path = join '.', $self->path, $self->filetype;
+    }
+    else {
+        $full_path = $self->path;
     }
 
     return $full_path;

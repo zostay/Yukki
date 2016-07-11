@@ -24,20 +24,19 @@ On a view request routes to L</view_page>, edit request to L</edit_page>, previe
 sub fire {
     my ($self, $ctx) = @_;
 
-    given ($ctx->request->path_parameters->{action}) {
-        when ('view')    { $self->view_page($ctx) }
-        when ('edit')    { $self->edit_page($ctx) }
-        when ('history') { $self->view_history($ctx) }
-        when ('diff')    { $self->view_diff($ctx) }
-        when ('preview') { $self->preview_page($ctx) }
-        when ('attach')  { $self->upload_attachment($ctx) }
-        when ('rename')  { $self->rename_page($ctx) }
-        when ('remove')  { $self->remove_page($ctx) }
-        default {
-            http_throw('That page action does not exist.', {
-                status => 'NotFound',
-            });
-        }
+    my $action = $ctx->request->path_parameters->{action};
+    if    ($action eq 'view')    { $self->view_page($ctx) }
+    elsif ($action eq 'edit')    { $self->edit_page($ctx) }
+    elsif ($action eq 'history') { $self->view_history($ctx) }
+    elsif ($action eq 'diff')    { $self->view_diff($ctx) }
+    elsif ($action eq 'preview') { $self->preview_page($ctx) }
+    elsif ($action eq 'attach')  { $self->upload_attachment($ctx) }
+    elsif ($action eq 'rename')  { $self->rename_page($ctx) }
+    elsif ($action eq 'remove')  { $self->remove_page($ctx) }
+    else {
+        http_throw('That page action does not exist.', {
+            status => 'NotFound',
+        });
     }
 }
 
@@ -327,12 +326,10 @@ sub view_diff {
 
         my $diff = '';
         for my $chunk ($page->diff($r1, $r2)) {
-            given ($chunk->[0]) {
-                when (' ') { $diff .= $chunk->[1] }
-                when ('+') { $diff .= sprintf '<ins markdown="1">%s</ins>', $chunk->[1] }
-                when ('-') { $diff .= sprintf '<del markdown="1">%s</del>', $chunk->[1] }
-                default { warn "unknown chunk type $chunk->[0]" }
-            }
+            if    ($chunk->[0] eq ' ') { $diff .= $chunk->[1] }
+            elsif ($chunk->[0] eq '+') { $diff .= sprintf '<ins markdown="1">%s</ins>', $chunk->[1] }
+            elsif ($chunk->[0] eq '-') { $diff .= sprintf '<del markdown="1">%s</del>', $chunk->[1] }
+            else { warn "unknown chunk type $chunk->[0]" }
         }
 
         my $file_preview = $page->file_preview(

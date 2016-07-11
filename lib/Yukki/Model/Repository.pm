@@ -594,42 +594,40 @@ sub log {
 
     my $mode = 'log';
     for my $line (@lines) {
-        given ($mode) {
 
-            # First line is the log line
-            when ('log') {
-                $current_revision = {};
+        # First line is the log line
+        if ($mode eq 'log') {
+            $current_revision = {};
 
-                @{ $current_revision }{qw( object_id author_name date time_ago comment )}
-                    = split /~/, $line, 5;
+            @{ $current_revision }{qw( object_id author_name date time_ago comment )}
+                = split /~/, $line, 5;
 
-                $current_revision->{date} = DateTime::Format::Mail->parse_datetime(
-                    $current_revision->{date}
-                );
+            $current_revision->{date} = DateTime::Format::Mail->parse_datetime(
+                $current_revision->{date}
+            );
 
-                $mode = 'stat';
+            $mode = 'stat';
+        }
+
+        # Remaining lines are the numstat
+        elsif ($mode eq 'stat') {
+            my ($added, $removed, $path) = split /\s+/, $line, 3;
+            if ($path eq $full_path) {
+                $current_revision->{lines_added}   = $added;
+                $current_revision->{lines_removed} = $removed;
             }
 
-            # Remaining lines are the numstat
-            when ('stat') {
-                my ($added, $removed, $path) = split /\s+/, $line, 3;
-                if ($path eq $full_path) {
-                    $current_revision->{lines_added}   = $added;
-                    $current_revision->{lines_removed} = $removed;
-                }
+            $mode = 'skip';
+        }
 
-                $mode = 'skip';
-            }
+        # Once we know the numstat, search for the blank and start over
+        elsif ($mode eq 'skip') {
+            push @revisions, $current_revision;
+            $mode = 'log' if $line !~ /\S/;
+        }
 
-            # Once we know the numstat, search for the blank and start over
-            when ('skip') {
-                push @revisions, $current_revision;
-                $mode = 'log' if $line !~ /\S/;
-            }
-
-            default {
-                http_throw("invalid parse mode '$mode'");
-            }
+        else {
+            http_throw("invalid parse mode '$mode'");
         }
     }
 
@@ -666,23 +664,20 @@ sub diff_blobs {
         next if $i++ < 5;
 
         my ($type, $detail) = $line =~ /^(.)(.*)$/;
-        given ($type) {
-            when ([ '~', ' ', '+', '-' ]) {
-                if ($last_chunk_type eq $type) {
-                    $chunks[-1][1] .= $detail;
-                }
-                elsif ($type eq '~') {
-                    $chunks[-1][1] .= "\n";
-                }
-                else {
-                    push @chunks, [ $type, $detail ];
-                    $last_chunk_type = $type;
-                }
+        if ($type =~ /^(?:~| |\+|-)$/) {
+            if ($last_chunk_type eq $type) {
+                $chunks[-1][1] .= $detail;
             }
-
-            when ('\\') { }
-            default { warn "unknown diff line type $type" }
+            elsif ($type eq '~') {
+                $chunks[-1][1] .= "\n";
+            }
+            else {
+                push @chunks, [ $type, $detail ];
+                $last_chunk_type = $type;
+            }
         }
+        elsif ($type eq '\\') { }
+        else { warn "unknown diff line type $type" }
     }
 
     return @chunks;
