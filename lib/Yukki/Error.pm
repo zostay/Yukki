@@ -118,6 +118,28 @@ These are lazy.
 has '+status_code' => ( lazy => 1 );
 has '+reason'      => ( lazy => 1 );
 
+=head2 error_template
+
+This is the prepared template for the error page.
+
+=cut
+
+has error_template => (
+    is          => 'ro',
+    isa         => 'Template::Pure',
+    lazy        => 1,
+    builder     => '_build_error_template',
+);
+
+sub _build_error_template {
+    Yukki::Web::View->prepare_template(
+        template   => 'error.html',
+        directives => {
+            '#error-page' => 'error_message',
+        },
+    );
+}
+
 =begin Pod::Coverage
 
   default_status_code
@@ -162,10 +184,10 @@ sub body {
     $ctx->response->page_title($self->reason);
 
     return $view->render_page(
-        template => 'error.html',
+        template => $self->error_template,
         context  => $ctx,
         vars     => {
-            '#error-page' => $self->message,
+            'error_message' => $self->message,
         },
     );
 }

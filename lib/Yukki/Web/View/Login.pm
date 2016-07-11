@@ -10,6 +10,24 @@ extends 'Yukki::Web::View';
 
 Renders the login form.
 
+=cut
+
+has login_template => (
+    is          => 'ro',
+    isa         => 'Template::Pure',
+    lazy        => 1,
+    builder     => '_build_login_template',
+);
+
+sub _build_login_template {
+    Yukki::Web::View->prepare_template(
+        template   => 'login/page.html',
+        directives => [
+            'form@action' => 'login_submit_url',
+        ],
+    );
+}
+
 =head1 METHODS
 
 =head2 page
@@ -22,10 +40,10 @@ sub page {
     my ($self, $ctx) = @_;
 
     return $self->render_page(
-        template   => 'login/page.html', 
+        template   => $self->login_template,
         context    => $ctx,
         vars       => {
-            'form@action' => $ctx->rebase_url('login/submit'),
+            'login_submit_url' => $ctx->rebase_url('login/submit'),
         },
     );
 }

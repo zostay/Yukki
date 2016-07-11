@@ -10,6 +10,120 @@ extends 'Yukki::Web::View';
 
 Renders wiki pages.
 
+=cut
+
+has blank_template => (
+    is          => 'ro',
+    isa         => 'Template::Pure',
+    lazy        => 1,
+    builder     => '_build_blank_template',
+);
+
+sub _build_blank_template {
+    Yukki::Web::View->prepare_template(
+        template   => 'page/blank.html',
+        directives => [
+            '#yukkiname'        => 'page',
+            '#create-page@href' => 'link',
+            '#file-list'        => 'attachments',
+        ],
+    );
+}
+
+has view_template => (
+    is          => 'ro',
+    isa         => 'Template::Pure',
+    lazy        => 1,
+    builder     => '_build_view_template',
+);
+
+sub _build_view_template {
+    Yukki::Web::View->prepare_template(
+        template   => 'page/view.html',
+        directives => [
+            '#yukkitext' => 'html | encoded_string',
+        },
+    );
+}
+
+has history_template => (
+    is          => 'ro',
+    isa         => 'Template::Pure',
+    lazy        => 1,
+    builder     => '_build_history_template',
+);
+
+sub _build_history_template {
+    Yukki::Web::View->prepare_template(
+        template   => 'page/history.html',
+        directives => [
+            'form@action' => 'form_action',
+            '.revision'   => {
+                'rev<-revisions' => [
+                    '.first-revision input@value'  => 'rev.object_id',
+                    '.second-revision input@value' => 'rev.object_id',
+                    '.date'                        => 'rev.time_ago',
+                    '.author'                      => 'rev.author_name',
+                    '.diffstat'                    => '+={rev.lines_added}/-={rev.lines_removed}',
+                    '.comment'                     => 'rev.comment | default("(no comment)")',
+                    '.first-revision input'        => sub {
+                        my ($t, $input, $vars) = @_;
+                        $input->attr(checked => 'checked')
+                            if $vars->{index} = 2;
+                    },
+                    '.second-revision input'       => sub {
+                        my ($t, $input, $vars) = @_;
+                        $input->attr(checked => 'checked')
+                            if $vars->{index} = 1;
+                    },
+                ],
+            },
+        ],
+    );
+}
+
+has diff_template => (
+    is          => 'ro',
+    isa         => 'Template::Pure',
+    lazy        => 1,
+    builder     => '_build_diff_template',
+);
+
+sub _build_diff_template {
+    Yukki::Web::View->prepare_template(
+        template   => 'page/diff.html',
+        directives => [
+            '#diff' => 'html | encoded_string',
+        ],
+    );
+}
+
+has edit_template => (
+    is          => 'ro',
+    isa         => 'Template::Pure',
+    lazy        => 1,
+    builder     => '_build_edit_template',
+);
+
+sub _build_edit_template {
+    Yukki::Web::View->prepare_template(
+        template   => 'page/edit.html',
+        directives => [
+            '#yukkiname'                => 'page',
+            '#yukkitext'                => 'source',
+            '#yukkitext_position@value' => 'position',
+            '#preview-yukkitext'        => 'html | encoded_string',
+            '#attachments-list'         => sub {
+                my ($t, $el, $data) = @_;
+                if ($data->{attachments}) {
+                    $el->attr(class => 'attachment-list');
+                }
+            },
+            '#attachments-list'         => 'attachments',
+        ],
+    );
+}
+
 =head1 METHODS
 
 =head2 blank
@@ -28,12 +142,12 @@ sub blank {
     $ctx->response->breadcrumb($vars->{breadcrumb});
 
     return $self->render_page(
-        template => 'page/blank.html',
+        template => $self->blank_template,
         context  => $ctx,
         vars     => {
-            '#yukkiname'        => $vars->{page},
-            '#create-page@href' => $link,
-            '#file-list'        => $self->attachments($ctx, $vars->{files}),
+            page        => $vars->{page},
+            link        => $link,
+            attachments => $self->attachments($ctx, $vars->{files}),
         },
     );
 }
@@ -92,10 +206,10 @@ sub view {
     $self->page_navigation($ctx->response, 'view', $vars);
 
     return $self->render_page(
-        template => 'page/view.html',
+        template => $self->view_template,
         context  => $ctx,
         vars     => {
-            '#yukkitext' => \$html,
+            'html' => $html,
         },
     );
 }
@@ -119,30 +233,8 @@ sub history {
         template => 'page/history.html',
         context  => $ctx,
         vars     => {
-            'form@action' => join('/', '/page/diff', $vars->{repository}, $vars->{page}),
-            '.revision'   => [
-                map { 
-                    my $r = {
-                        '.first-revision input@value'  => $_->{object_id},
-                        '.second-revision input@value' => $_->{object_id},
-                        '.date'                        => $_->{time_ago},
-                        '.author'                      => $_->{author_name},
-                        '.diffstat'                    => sprintf('+%d/-%d', 
-                            $_->{lines_added}, $_->{lines_removed},
-                        ),
-                        '.comment'                     => $_->{comment} || '(no comment)',
-                    }; 
-
-                    my $checked = sub { shift->setAttribute(checked => 'checked'); \$_ };
-
-                    $r->{'.first-revision  input'} = $checked if $i == 1;
-                    $r->{'.second-revision input'} = $checked if $i == 0;
-
-                    $i++;
-
-                    $r;
-                } @{ $vars->{revisions} }
-            ],
+            'form_action' => join('/', '/page/diff', $vars->{repository}, $vars->{page}),
+            'revisions'   => $vars->{revisions},
         },
     );
 }
@@ -165,10 +257,10 @@ sub diff {
     my $html = $file->fetch_formatted($ctx);
 
     return $self->render_page(
-        template => 'page/diff.html',
+        template => $self->diff_template,
         context  => $ctx,
         vars     => {
-            '#diff' => \$html,
+            html => $html,
         },
     );
 }
@@ -190,23 +282,15 @@ sub edit {
 
     $self->page_navigation($ctx->response, 'edit', $vars);
 
-    my %attachments;
-    if (@{ $vars->{attachments} }) {
-        %attachments = (
-            '#attachments-list@class' => 'attachment-list',
-            '#attachments-list'       => $self->attachments($ctx, $vars->{attachments}),
-        );
-    }
-
     return $self->render_page(
         template => 'page/edit.html',
         context  => $ctx,
         vars     => {
-            '#yukkiname'                => $vars->{page},
-            '#yukkitext'                => scalar $vars->{file}->fetch // '',
-            '#yukkitext_position@value' => $vars->{position},
-            '#preview-yukkitext'        => \$html,
-            %attachments,
+            page        => $vars->{page},
+            source      => scalar $vars->{file}->fetch // '',
+            position    => $vars->{position},
+            html        => $html,
+            attachments => $vars->{attachments},
         },
     );
 }

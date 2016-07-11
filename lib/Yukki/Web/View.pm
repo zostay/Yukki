@@ -6,10 +6,9 @@ use MooseX::Params::Validate;
 use Path::Class;
 use Scalar::Util qw( blessed reftype );
 use Spreadsheet::Engine;
-use Template::Semantic;
+use Template::Pure;
 use Text::MultiMarkdown;
 use Try::Tiny;
-use XML::Twig;
 
 # ABSTRACT: base class for Yukki::Web views
 
@@ -59,32 +58,150 @@ sub _build_markdown {
     );
 }
 
-=head2 semantic
-
-This is the L<Template::Semantic> object that transforms the templates. Do not use.
-
-=cut
-
-has semantic => (
+has messages_template => (
     is          => 'ro',
-    isa         => 'Template::Semantic',
-    required    => 1,
-    lazy_build  => 1,
+    isa         => 'Template::Pure',
+    lazy        => 1,
+    builder     => '_build_messages_template',
 );
 
-sub _build_semantic { 
-    my $self = shift;
+sub _build_messages_template {
+    return Yukki::Web::View->prepare_template(
+        template   => 'messages.html',
+        directives => [
+            '.error'   => {
+                'error<-errors' => [
+                    '.' => 'error',
+                ],
+            },
+            '.warning' => {
+                'warning<-warnings' => [
+                    '.' => 'warning',
+                ],
+            },
+            '.info'    => {
+                'one_info<-info' => [
+                    '.' => 'one_info',
+                ],
+            },
+        ],
+    );
+}
 
-    my $semantic = Template::Semantic->new;
+has _page_templates => (
+    is          => 'ro',
+    isa         => 'HashRef',
+);
 
-    # TODO Maybe nice to have?
-    # $semantic->define_filter(markdown => sub { \ $self->format_markdown($_) });
-    # $semantic->define_filter(yukkitext => sub { \ $self->yukkitext($_) });
+sub page_template {
+    my ($self, $which) = @_;
 
-    return $semantic;
+    return $self->_page_templates->{ $which }
+        if $self->_page_templates->{ $which };
+
+    my $view = $which // 'default';
+    my $view_args = $self->app->settings->page_views->{ $view }
+                 // { template => 'shell.html' };
+    $view_args->{directives} //= [];
+
+    my %menu_vars = map {
+        my $menu_name = $_;
+        "#nav-$menu_name .navigation" => {
+            "menu_item<-$menu_name.menu_items" => [
+                'a'      => 'menu_item.label',
+                'a@href' => 'menu_item.href | rebase_url',
+            ],
+        },
+    } @{ $self->app->settings->menu_names };
+
+    return $self->_page_templates->{ $which } = Yukki::Web::View->prepare_template(
+        template   => $view_args->{template},
+        directives => [
+            $view_args->{directives}->@*,
+            'head script.local' => {
+                'script<-scripts' => [
+                    '@src' => 'script | base_url',
+                ],
+            },
+            'head link.local'   => {
+                'link<-links' => [
+                    '@href' => 'link | base_url',
+                ],
+            },
+            '#messages'   => 'messages',
+            'title'       => 'main_title',
+            '.masthead-title' => 'title',
+            %menu_vars,
+            '#breadcrumb li' => {
+                'crumb<-breadcrumb' => [
+                    'a'      => 'crumb.label',
+                    'a@href' => 'crumb.href | rebase_url',
+                ],
+            },
+            '#content'    => 'content',
+        ],
+    );
+}
+
+has links_template => (
+    is          => 'ro',
+    isa         => 'Template::Pure',
+    lazy        => 1,
+    builder     => '_build_links_template',
+);
+
+sub _build_links_template {
+    Yukki::Web::View->prepare_template(
+        template   => 'links.html',
+        directives => [
+            'link<-links' => {
+                'a'      => 'link.label',
+                'a@href' => 'link.href | rebase_url',
+                sub {
+                    my ($t, $a, $vars) = @_;
+                    $vars->{ctx}->rebase_url($vars->{link}{href});
+                },
+            },
+        ],
+    );
 }
 
 =head1 METHODS
+
+=head2 prepare_template
+
+  my $template = $self->prepare_template({
+      template   => 'foo.html',
+      directives => { ... },
+  });
+
+This prepares a template for later rendering.
+
+The C<template> is the name of the template file to use.
+
+The C<directives> are the L<Template::Pure> directives to apply data given at render time to modify the template to create the output.
+
+=cut
+
+sub prepare_template {
+    my ($self, $template, $directives) = validated_list(\@_,
+        template   => { isa => 'Str', coerce => 1 },
+        directives => { isa => 'HashRef' },
+    );
+
+    return Template::Pure->new(
+        template      => $template,
+        directives    => $directives,
+        custom_filter => {
+            rebase_url => sub {
+                my ($t, $data) = @_;
+                $t->data_at_path('ctx')->rebase_url($data);
+            },
+
+            # TODO Maybe nice to have plugin filters too in here...
+        },
+    );
+}
 
 =head2 render_page
 
@@ -99,23 +216,23 @@ F<shell.html> template.
 
 The C<context> is used to render parts of the shell template.
 
-The C<vars> are processed against the given template with L<Template::Semantic>.
+The C<vars> are processed against the given template with L<Template::Pure>.
 
 =cut
 
 sub render_page {
     my ($self, $template, $ctx, $vars) = validated_list(\@_,
-        template   => { isa => 'Str', coerce => 1 },
+        template   => { isa => 'Template::Pure' },
         context    => { isa => 'Yukki::Web::Context' },
         vars       => { isa => 'HashRef', default => {} },
     );
 
     my $messages = $self->render(
-        template => 'messages.html', 
+        template => $self->messages_template,
         vars     => {
-            '.error'   => [ map { +{ '.' => $_ } } $ctx->list_errors   ],
-            '.warning' => [ map { +{ '.' => $_ } } $ctx->list_warnings ],
-            '.info'    => [ map { +{ '.' => $_ } } $ctx->list_info     ],
+            errors   => [ $ctx->list_errors   ],
+            warnings => [ $ctx->list_warnings ],
+            info     => [ $ctx->list_info     ],
         },
     );
 
@@ -128,44 +245,38 @@ sub render_page {
         $title = $main_title = 'Yukki';
     }
 
-    my $b = sub { $ctx->rebase_url($_[0]) };
     my %menu_vars = map {
-        ("#nav-$_ .navigation" => [ map {
-            { 'a' => $_->{label}, 'a@href' => $b->($_->{href}) },
-        } $self->available_menu_items($ctx, $_) ])
+        $_ => [ $self->available_menu_items($ctx, $_) ]
     } $ctx->response->navigation_menu_names;
-
-    $menu_vars{"#nav-$_ .navigation"} //= [] 
-        for (@{ $self->app->settings->menu_names });
 
     my @scripts = $self->app->settings->all_scripts;
     my @styles  = $self->app->settings->all_styles;
 
     my $view      = $ctx->request->parameters->{view} // 'default';
-    my $view_args = $self->app->settings->page_views->{ $view }
-                 // { template => 'shell.html' };
-    $view_args->{vars} //= {};
+
+    $vars->{'head script.local'} //= [];
+    $vars->{'head link.local'}   //= [];
 
     return $self->render(
-        template => $view_args->{template},
+        template => $self->page_template($view),
         vars     => {
-            %{ $view_args->{vars} },
-            'head script.local' => [ 
-                map { { '@src'  => $b->($_) } } 
-                    (@scripts, @{ $view_args->{vars}{'head script.local'} }) ],
-            'head link.local'   => [ 
-                map { { '@href' => $b->($_) } } 
-                    (@styles, @{ $view_args->{vars}{'head link.local'} }) ],
-            '#messages'   => $messages,
-            'title'       => $main_title,
-            '.masthead-title' => $title,
+            $vars->%*,
+            scripts      => [
+                @scripts,
+                $vars->{'head script.local'}->@*,
+            ],
+            links        => [
+                @styles,
+                $vars->{'head link.local'}->@*,
+            ],
+            'messages'   => $messages,
+            'main_title' => $main_title,
+            'title'      => $title,
             %menu_vars,
-            '#breadcrumb li' => [ map {
-                { 'a' => $_->{label}, 'a@href' => $b->($_->{href}) },
-            } $ctx->response->breadcrumb_links ],
-            '#content'    => $self->render(template => $template, vars => $vars),
+            'breadcrumb' => [ $ctx->response->breadcrumb_links ],
+            'content'    => $self->render(template => $template, vars => $vars),
         },
-    )->{dom}->toStringHTML;
+    );
 }
 
 =head2 available_menu_items
@@ -195,7 +306,7 @@ sub available_menu_items {
 
 =head2 render_links
 
-  my $document = $self->render_links(\@navigation_links);
+  my $document = $self->render_links($ctx, \@navigation_links);
 
 This renders a set of links using the F<links.html> template.
 
@@ -207,26 +318,29 @@ sub render_links {
         links    => { isa => 'ArrayRef[HashRef]' },
     );
 
-    my $b = sub { $ctx->rebase_url($_[0]) };
-
     return $self->render(
-        template => 'links.html',
+        template => $self->links_template,
         vars     => {
-            'li' => [ map {
-                { 'a' => $_->{label}, 'a@href' => $b->($_->{href}) },
-            } @$links ],
-        },        
+            ctx   => $ctx,
+            links => [
+                map {
+                    {
+                        'a'      => $_->{label},
+                        'a@href' => $_->{href},
+                    },
+                } @$links ],
+        },
     );
 }
 
 =head2 render
 
   my $document = $self->render({
-      template => 'foo.html',
+      template => $template,
       vars     => { ... },
   });
 
-This renders the named template using L<Template::Semantic>. The C<vars> are
+This renders the given L<Template::Pure>. The C<vars> are
 used as the ones passed to the C<process> method.
 
 =cut
@@ -236,10 +350,13 @@ sub render {
         template   => { isa => 'Str', coerce => 1 },
         vars       => { isa => 'HashRef', default => {} },
     );
-    
-    my $template_file = $self->locate('template_path', $template);
-    
-    return $self->semantic->process($template_file, $vars);
+
+    my %vars = (
+        %$vars,
+        view => $self,
+    );
+
+    return $template->render($vars);
 }
 
 1;

@@ -10,6 +10,42 @@ extends 'Yukki::Web::View';
 
 Handles the display of attachment forms.
 
+=cut
+
+has rename_template => (
+    is          => 'ro',
+    isa         => 'Template::Pure',
+    lazy        => 1,
+    builder     => '_build_rename_template',
+);
+
+sub _build_rename_template {
+    Yukki::Web::View->prepare_template(
+        template   => 'attachment/rename.html',
+        directives => [
+            '#yukkiname'           => 'page',
+            '#yukkiname_new@value' => 'page',
+        ],
+    );
+}
+
+has remove_template => (
+    is          => 'ro',
+    isa         => 'Template::Pure',
+    lazy        => 1,
+    builder     => '_build_remove_template',
+);
+
+sub _build_remove_template {
+    Yukki::Web::View->prepare_template(
+        template   => 'attachment/remove.html',
+        directives => [
+            '.yukkiname'          => 'page',
+            '#cancel_remove@href' => 'return_link',
+        ],
+    );
+}
+
 =head1 METHODS
 
 =head2 rename
@@ -25,12 +61,9 @@ sub rename {
     $ctx->response->page_title($vars->{title});
 
     return $self->render_page(
-        template => 'attachment/rename.html',
+        template => $self->rename_template,
         context  => $ctx,
-        vars     => {
-            '#yukkiname'           => $vars->{page},
-            '#yukkiname_new@value' => $vars->{page},
-        },
+        vars     => $vars,
     );
 }
 
@@ -47,12 +80,9 @@ sub remove {
     $ctx->response->page_title($vars->{title});
 
     return $self->render_page(
-        template => 'attachment/remove.html',
+        template => $self->remove_template,
         context  => $ctx,
-        vars     => {
-            '.yukkiname'          => $vars->{page},
-            '#cancel_remove@href' => $vars->{return_link},
-        },
+        vars     => $vars,
     );
 }
 
