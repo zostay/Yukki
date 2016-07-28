@@ -4,7 +4,7 @@ use v5.24;
 use Moose;
 
 use MooseX::Types::Path::Class;
-use Yukki::Types qw( RepositoryMap );
+use Yukki::Types qw( RepositoryMap YukkiSettingsAnonymous );
 
 # ABSTRACT: provides structure and validation to settings in yukki.conf
 
@@ -93,7 +93,7 @@ This is the email address to use when an anonymous user makes a change to a wiki
 
 has anonymous => (
     is          => 'ro',
-    isa         => 'Yukki::Settings::Anonymous',
+    isa         => YukkiSettingsAnonymous,
     required    => 1,
     coerce      => 1,
     default     => sub { Yukki::Settings::Anonymous->new },
@@ -154,6 +154,7 @@ has repositories => (
     package Yukki::Settings::Anonymous;
 
     use Moose;
+    use Yukki::Types qw( EmailAddress );
 
     has author_name => (
         is          => 'ro',
@@ -164,7 +165,7 @@ has repositories => (
 
     has author_email => (
         is          => 'ro',
-        isa         => 'Email::Address',
+        isa         => EmailAddress,
         required    => 1,
         coerce      => 1,
         default     => 'anonymous@localhost',

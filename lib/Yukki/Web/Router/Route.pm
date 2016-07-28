@@ -8,8 +8,7 @@ extends 'Path::Router::Route';
 use Yukki::Types qw( AccessLevel );
 use Yukki::Web::Router::Route::Match;
 
-use MooseX::Types::Moose qw( ArrayRef HashRef );
-use MooseX::Types::Structured qw( Tuple );
+use Types::Standard qw( ArrayRef HashRef Tuple );
 use List::MoreUtils qw( any );
 
 # ABSTRACT: Adds ACLs to routes

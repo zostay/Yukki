@@ -1,18 +1,19 @@
 package Yukki::Types;
 
 use v5.24;
-use Moose;
 
-use MooseX::Types -declare => [ qw(
+use Type::Library -base, -declare => qw(
     LoginName AccessLevel
     NavigationLinks NavigationMenuMap
     BaseURL BaseURLEnum BreadcrumbLinks RepositoryMap
     PluginConfig PluginList
-) ];
+    EmailAddress YukkiSettings
+    YukkiWebSettings YukkiSettingsAnonymous
+);
+use Type::Utils qw( declare as where message coerce enum from via class_type );
 
-use MooseX::Types::Moose qw( Str Int ArrayRef Maybe HashRef );
-use MooseX::Types::Structured qw( Dict );
-use MooseX::Types::URI qw( Uri );
+use Types::Standard qw( Str Int ArrayRef Maybe HashRef Dict );
+use Types::URI qw( Uri );
 
 use Email::Address;
 use List::Util qw( first );
@@ -39,7 +40,7 @@ This is a valid login name. Login names may only contain letters and numbers, as
 
 =cut
 
-subtype LoginName,
+declare LoginName,
     as Str,
     where { /^[a-z0-9]+$/ },
     message { "login name $_ must only contain letters and numbers" };
@@ -68,7 +69,7 @@ This is an array of hashes formatted like:
 
 =cut
 
-subtype NavigationLinks,
+declare NavigationLinks,
     as ArrayRef[
         Dict[
             label => Str,
@@ -83,7 +84,7 @@ This is a hash of L</NavigationLinks>.
 
 =cut
 
-subtype NavigationMenuMap,
+declare NavigationMenuMap,
     as HashRef[ NavigationLinks ];
 
 =head2 BaseURL
@@ -94,7 +95,14 @@ This is either an absolute URL or the words C<SCRIPT_NAME> or C<REWRITE>.
 
 enum BaseURLEnum, [qw( SCRIPT_NAME REWRITE )];
 
-subtype BaseURL, as BaseURLEnum|Uri;
+declare BaseURL, as BaseURLEnum|Uri;
+
+coerce BaseURL,
+    from Str,
+    via {
+        $_ !~ /^(?:SCRIPT_NAME|REWRITE)$/
+            && URI->new($_)
+    };
 
 =head2 BreadcrumbLinks
 
@@ -107,7 +115,7 @@ This is an array of hashes formatted like:
 
 =cut
 
-subtype BreadcrumbLinks,
+declare BreadcrumbLinks,
     as ArrayRef[
         Dict[
             label => Str,
@@ -121,8 +129,9 @@ This is a hash of L<Yukki::Settings::Repository> objects.
 
 =cut
 
-subtype RepositoryMap,
-    as HashRef['Yukki::Settings::Repository'];
+my $Repository = class_type 'Yukki::Settings::Repository';
+declare RepositoryMap,
+    as HashRef[$Repository];
 
 coerce RepositoryMap,
     from HashRef,
@@ -140,7 +149,7 @@ A plugin configuration is an array of hashes. Each hash must have at least one k
 
 =cut
 
-subtype PluginConfig,
+declare PluginConfig,
     as ArrayRef[HashRef],
     where { all { defined $_->{module} } @$_ };
 
@@ -150,9 +159,9 @@ A plugin list is a loaded set of plugin objects.
 
 =cut
 
-class_type 'Yukki::Web::Plugin';
-subtype PluginList,
-    as ArrayRef['Yukki::Web::Plugin'],
+my $Plugin = class_type 'Yukki::Web::Plugin';
+declare PluginList,
+    as ArrayRef[$Plugin],
     message {
         return 'It is not an array of objects.' unless ref $_ eq 'ARRAY';
         my $bad = first { not blessed $_ or not $_->isa('Yukki::Web::Plugin') }
@@ -165,48 +174,48 @@ subtype PluginList,
 
 In addition to the types above, these coercions are provided for other types.
 
-=head2 Email::Address
+=head2 EmailAddress
 
 Coerces a C<Str> into an L<Email::Address>.
 
 =cut
 
-class_type 'Email::Address';
-coerce 'Email::Address',
+class_type EmailAddress, { class => 'Email::Address' };
+coerce EmailAddress,
     from Str,
     via { (Email::Address->parse($_))[0] };
 
-=head2 Yukki::Settings
+=head2 YukkiSettings
 
 Coerces a C<HashRef> into this object by passing the value to the constructor.
 
 =cut
 
-class_type 'Yukki::Settings';
-coerce 'Yukki::Settings',
+class_type YukkiSettings, { class => 'Yukki::Settings' };
+coerce YukkiSettings,
     from HashRef,
     via { Yukki::Settings->new($_) };
 
-=head2 Yukki::Web::Settings
+=head2 YukkiWebSettings
 
 Coerces a C<HashRef> into a L<Yukki::Web::Settings>.
 
 =cut
 
-class_type 'Yukki::Web::Settings';
-coerce 'Yukki::Web::Settings',
+class_type YukkiWebSettings, { class => 'Yukki::Web::Settings' };
+coerce YukkiWebSettings,
     from HashRef,
     via { Yukki::Web::Settings->new($_) };
 
-=head2 Yukki::Settings::Anonymous
+=head2 YukkiSettingsAnonymous
 
 Coerces a C<HashRef> into this object by passing the value to the constructor.
 
 =cut
 
-class_type 'Yukki::Settings::Anonymous';
-coerce 'Yukki::Settings::Anonymous',
+class_type YukkiSettingsAnonymous, { class => 'Yukki::Settings::Anonymous' };
+coerce YukkiSettingsAnonymous,
     from HashRef,
     via { Yukki::Settings::Anonymous->new($_) };
 
-__PACKAGE__->meta->make_immutable;
+1;

@@ -6,7 +6,7 @@ use Moose;
 use Class::Load;
 
 use Yukki::Settings;
-use Yukki::Types qw( AccessLevel );
+use Yukki::Types qw( AccessLevel YukkiSettings );
 use Yukki::Error qw( http_throw );
 
 use Crypt::SaltedHash;
@@ -75,7 +75,7 @@ This is the configuration loaded from the L</config_file>.
 
 has settings => (
     is          => 'ro',
-    isa         => 'Yukki::Settings',
+    isa         => YukkiSettings,
     required    => 1,
     coerce      => 1,
     lazy_build  => 1,
@@ -140,7 +140,7 @@ sub _locate {
 
     my $path_class = $type eq 'file' ? 'Path::Class::File'
                    : $type eq 'dir'  ? 'Path::Class::Dir'
-                   : http_throw("unkonwn location type $type");
+                   : http_throw("unknown location type $type");
 
     my $base_path = $self->settings->$base;
     if ($base_path !~ m{^/}) {

@@ -8,7 +8,7 @@ extends qw( Yukki );
 use Class::Load;
 
 use Yukki::Error qw( http_throw http_exception );
-use Yukki::Types qw( PluginList );
+use Yukki::Types qw( PluginList YukkiWebSettings );
 use Yukki::Web::Context;
 use Yukki::Web::Router;
 use Yukki::Web::Settings;
@@ -30,7 +30,7 @@ controllers.
 
 =cut
 
-has '+settings' => ( isa => 'Yukki::Web::Settings' );
+has '+settings' => ( isa => YukkiWebSettings );
 
 =head2 router
 

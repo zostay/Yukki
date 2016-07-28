@@ -7,7 +7,8 @@ extends 'Path::Router';
 
 use Yukki::Web::Router::Route;
 
-use Moose::Util::TypeConstraints qw( subtype where );
+use Types::Standard qw( ArrayRef Str );
+use Type::Utils qw( declare as where );
 use List::MoreUtils qw( all );
 
 # ABSTRACT: send requests to the correct controllers, yo
@@ -104,9 +105,9 @@ sub BUILD {
         validations => {
             action     => qr/^(?:view|edit|history|diff|preview|attach|rename|remove)$/,
             repository => qr/^[_a-z0-9]+$/i,
-            page       => subtype('ArrayRef[Str]' => where {
+            page       => declare as ArrayRef[Str], where {
                 all { /^[_a-z0-9-.]+(?:\.[_a-z0-9-]+)*$/i } @$_
-            }),
+            },
         },
         acl => [
             [ read  => { action => [ qw( view preview history diff ) ] } ],
@@ -124,9 +125,9 @@ sub BUILD {
         validations => {
             action     => qr/^(?:view|upload|download|rename|remove)$/,
             repository => qr/^[_a-z0-9]+$/i,
-            file       => subtype('ArrayRef[Str]' => where {
+            file       => declare as ArrayRef[Str], where {
                 all { /^[_a-z0-9-]+(?:\.[_a-z0-9-]+)*$/i } @$_
-            }),
+            },
         },
         acl => [
             [ read  => { action => [ qw( view download ) ] } ],

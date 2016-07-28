@@ -3,13 +3,10 @@ package Yukki::Error;
 use v5.24;
 use Moose;
 
-with qw( Throwable StackTrace::Auto HTTP::Throwable MooseX::Traits );
+extends qw( HTTP::Throwable::Factory );
 
 use Sub::Exporter -setup => {
-    exports => {
-        http_throw     => \&http_throw,
-        http_exception => \&http_exception,
-    },
+    exports => [ qw< http_throw http_exception > ],
 };
 
 use Yukki::Web::View;
@@ -22,24 +19,44 @@ use Yukki::Web::View;
 
 =head1 DESCRIPTION
 
-If you look at L<Throwable::Error>, you know what this is. Same thing, different
-name.
+If you are familiar with L<HTTP::Throwable::Factory>, this is similar to that (and is based on that).
+
+However, there are two differences. First, the error message is given primacy rather than exception type, so you can just use this to throw an exception:
+
+    use Yukki::Error qw( http_throw );
+    http_throw('something went wrong');
+
+Since you almost always want your exception to be an internal server error of some kind, this makes more sense to me than having to write:
+
+    use HTTP::Throwable::Factory qw( http_throw );
+    http_throw(InternalServerError => {
+        message => 'something went wrong',
+    });
+
+To specify the type of exception, us C<status>:
+
+    use Yukki::Error qw( http_throw );
+    http_throw('something was not found', {
+        status => 'NotFound',
+    });
+
+The second difference is that all exceptions thrown by this factory inherit from L<Yukki::Error>, so this works:
+
+    use Scalar::Util qw( blessed );
+    use Try::Tiny;
+    try { ... }
+    catch {
+        if (blassed $_ && $_->isa("Yukki::Error") {
+            # we now this is an application error from Yukki
+        }
+    };
+
+This makes it easy to know whether Yukki generated the exception or something else did.
 
 =cut
 
-{
-    package Yukki::Error::Fixup;
-
-    use Moose::Role;
-
-    around as_psgi => sub {
-        my $next = shift; # not used
-        my ($self, $env) = @_;
-        my $body    = $self->body($env);
-        my $headers = $self->build_headers($body, $env);
-        [ $self->status_code, $headers, [ defined $body ? $body : () ] ];
-    };
-}
+sub base_class { 'Yukki::Error' }
+sub extra_rowls { 'Yukki::Error::Body' }
 
 =head1 EXPORTS
 
@@ -55,20 +72,15 @@ Creates a new exception object. Calls the constructor for L<Yukki:Error> and app
 =cut
 
 sub http_exception {
-    my ($class, $name, $args) = @_;
+    my ($name, $args) = @_;
 
-    return sub {
-        my ($message, $params) = @_;
-        $params //= {};
+    my %args = %{ $args // {} };
+    my $status = delete $args{status} // 'InternalServerError';
 
-        my $status = 'InternalServerError';
-           $status = $params->{status} if defined $params->{status};
-
-        return $class->with_traits(
-            "HTTP::Throwable::Role::Status::$status",
-            'Yukki::Error::Fixup',
-        )->new($message, $params);
-    };
+    Yukki::Error->new_exception($status => {
+        %args,
+        message => "$name",
+    });
 }
 
 =head2 http_throw
@@ -83,42 +95,22 @@ Constructs the exception (via L</http_exception>) and throws it.
 =cut
 
 sub http_throw {
-    my ($class, $name, $args) = @_;
+    my ($name, $args) = @_;
 
-    my $new_exception = http_exception($class, $name, $args);
-
-    return sub {
-        my $self = $new_exception->(@_);
-        $self->throw;
-    };
+    http_exception($name, $args)->throw;
 }
 
+sub BUILDARGS {
+    my ($class, $args) = @_;
+    $args;
+}
+
+{
+    package Yukki::Error::Body;
+
+    use Moose::Role;
+
 =head1 ATTRIBUTES
-
-=head2 status
-
-This is the name of the status role from L<HTTP::Throwable> that will be applied
-to the exception when it is thrown.
-
-=cut
-
-has status => (
-    is          => 'ro',
-    isa         => 'Str',
-    required    => 1,
-    default     => 'InternalServerError',
-);
-
-=head2 +status_code
-
-=head2 +reason
-
-These are lazy.
-
-=cut
-
-has '+status_code' => ( lazy => 1 );
-has '+reason'      => ( lazy => 1 );
 
 =head2 error_template
 
@@ -126,49 +118,23 @@ This is the prepared template for the error page.
 
 =cut
 
-has error_template => (
-    is          => 'ro',
-    isa         => 'Template::Pure',
-    lazy        => 1,
-    builder     => '_build_error_template',
-);
-
-sub _build_error_template {
-    Yukki::Web::View->prepare_template(
-        template   => 'error.html',
-        directives => {
-            '#error-page' => 'error_message',
-        },
+    has error_template => (
+        is          => 'ro',
+        isa         => 'Template::Pure',
+        lazy        => 1,
+        builder     => '_build_error_template',
     );
-}
 
-=begin Pod::Coverage
-
-  default_status_code
-  default_reason
-
-=end Pod::Coverage
-
-sub default_status_code { 500 }
-sub default_reason { 'Internal Server Error' }
+    sub _build_error_template {
+        Yukki::Web::View->prepare_template(
+            template   => 'error.html',
+            directives => {
+                '#error-page' => 'error_message',
+            },
+        );
+    }
 
 =head1 METHODS
-
-=head2 BUILDARGS
-
-Sets it up so that the constructor will take the message as the first argument.
-
-=cut
-
-sub BUILDARGS {
-    my ($class, $message, $args) = @_;
-    $args //= {};
-
-    return {
-        %$args,
-        message => $message,
-    };
-}
 
 =head2 body
 
@@ -176,23 +142,23 @@ Renders the HTML body for the error.
 
 =cut
 
-sub body {
-    my ($self, $env) = @_;
+    sub body {
+        my ($self, $env) = @_;
 
-    my $app  = $env->{'yukki.app'};
-    my $view = Yukki::Web::View->new(app => $app);
-    my $ctx  = Yukki::Web::Context->new(env => $env);
+        my $app  = $env->{'yukki.app'};
+        my $view = Yukki::Web::View->new(app => $app);
+        my $ctx  = Yukki::Web::Context->new(env => $env);
 
-    $ctx->response->page_title($self->reason);
+        $ctx->response->page_title($self->reason);
 
-    return $view->render_page(
-        template => $self->error_template,
-        context  => $ctx,
-        vars     => {
-            'error_message' => $self->message,
-        },
-    );
-}
+        return $view->render_page(
+            template => $self->error_template,
+            context  => $ctx,
+            vars     => {
+                'error_message' => $self->message,
+            },
+        );
+    }
 
 =head2 body_headers
 
@@ -200,24 +166,16 @@ Setup the HTTP headers.
 
 =cut
 
-sub body_headers {
-    my ($self, $body) = @_;
+    sub body_headers {
+        my ($self, $body) = @_;
 
-    return [
-        'Content-type'   => 'text/html',
-        'Content-length' => length $body,
-    ];
-}
+        return [
+            'Content-type'   => 'text/html',
+            'Content-length' => length $body,
+        ];
+    }
 
-=head2 as_string
-
-Returns the message.
-
-=cut
-
-sub as_string {
-    my $self = shift;
-    return $self->message;
 }
 
 __PACKAGE__->meta->make_immutable;
+
