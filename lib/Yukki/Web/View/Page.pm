@@ -21,7 +21,7 @@ has blank_template => (
 );
 
 sub _build_blank_template {
-    Yukki::Web::View->prepare_template(
+    shift->prepare_template(
         template   => 'page/blank.html',
         directives => [
             '#yukkiname'        => 'page',
@@ -39,7 +39,7 @@ has view_template => (
 );
 
 sub _build_view_template {
-    Yukki::Web::View->prepare_template(
+    shift->prepare_template(
         template   => 'page/view.html',
         directives => [
             '#yukkitext' => 'html | encoded_string',
@@ -55,7 +55,7 @@ has history_template => (
 );
 
 sub _build_history_template {
-    Yukki::Web::View->prepare_template(
+    shift->prepare_template(
         template   => 'page/history.html',
         directives => [
             'form@action' => 'form_action',
@@ -91,7 +91,7 @@ has diff_template => (
 );
 
 sub _build_diff_template {
-    Yukki::Web::View->prepare_template(
+    shift->prepare_template(
         template   => 'page/diff.html',
         directives => [
             '#diff' => 'html | encoded_string',
@@ -107,7 +107,7 @@ has edit_template => (
 );
 
 sub _build_edit_template {
-    Yukki::Web::View->prepare_template(
+    shift->prepare_template(
         template   => 'page/edit.html',
         directives => [
             '#yukkiname'                => 'page',

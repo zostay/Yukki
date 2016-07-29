@@ -21,7 +21,7 @@ has login_template => (
 );
 
 sub _build_login_template {
-    Yukki::Web::View->prepare_template(
+    shift->prepare_template(
         template   => 'login/page.html',
         directives => [
             'form@action' => 'login_submit_url',

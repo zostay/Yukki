@@ -110,30 +110,6 @@ sub BUILDARGS {
 
     use Moose::Role;
 
-=head1 ATTRIBUTES
-
-=head2 error_template
-
-This is the prepared template for the error page.
-
-=cut
-
-    has error_template => (
-        is          => 'ro',
-        isa         => 'Template::Pure',
-        lazy        => 1,
-        builder     => '_build_error_template',
-    );
-
-    sub _build_error_template {
-        Yukki::Web::View->prepare_template(
-            template   => 'error.html',
-            directives => {
-                '#error-page' => 'error_message',
-            },
-        );
-    }
-
 =head1 METHODS
 
 =head2 body
@@ -149,10 +125,17 @@ Renders the HTML body for the error.
         my $view = Yukki::Web::View->new(app => $app);
         my $ctx  = Yukki::Web::Context->new(env => $env);
 
+        my $template = $view->prepare_template(
+            template   => 'error.html',
+            directives => {
+                '#error-page' => 'error_message',
+            },
+        );
+
         $ctx->response->page_title($self->reason);
 
         return $view->render_page(
-            template => $self->error_template,
+            template => $template,
             context  => $ctx,
             vars     => {
                 'error_message' => $self->message,

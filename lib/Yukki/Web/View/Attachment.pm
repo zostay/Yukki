@@ -21,7 +21,7 @@ has rename_template => (
 );
 
 sub _build_rename_template {
-    Yukki::Web::View->prepare_template(
+    shift->prepare_template(
         template   => 'attachment/rename.html',
         directives => [
             '#yukkiname'           => 'page',
@@ -38,7 +38,7 @@ has remove_template => (
 );
 
 sub _build_remove_template {
-    Yukki::Web::View->prepare_template(
+    shift->prepare_template(
         template   => 'attachment/remove.html',
         directives => [
             '.yukkiname'          => 'page',

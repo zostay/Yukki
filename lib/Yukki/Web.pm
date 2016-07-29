@@ -221,7 +221,7 @@ sub dispatch {
 
     catch {
 
-        if (blessed $_ and $_->isa('Moose::Object') and $_->does('HTTP::Throwable')) {
+        if (blessed $_ and $_->isa('Yukki::Error')) {
 
             if ($_->does('HTTP::Throwable::Role::Status::Forbidden')
                     and not $ctx->session->{user}) {

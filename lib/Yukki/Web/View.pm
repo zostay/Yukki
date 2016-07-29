@@ -3,6 +3,7 @@ package Yukki::Web::View;
 use v5.24;
 use Moose;
 
+use File::Slurp qw( read_file );
 use MooseX::Params::Validate;
 use Path::Class;
 use Scalar::Util qw( blessed reftype );
@@ -73,7 +74,8 @@ has messages_template => (
 );
 
 sub _build_messages_template {
-    return Yukki::Web::View->prepare_template(
+    my $self = shift;
+    return $self->prepare_template(
         template   => 'messages.html',
         directives => [
             '.error'   => {
@@ -98,6 +100,8 @@ sub _build_messages_template {
 has _page_templates => (
     is          => 'ro',
     isa         => 'HashRef',
+    required    => 1,
+    default     => sub { +{} },
 );
 
 =head2 links_template
@@ -114,7 +118,8 @@ has links_template => (
 );
 
 sub _build_links_template {
-    Yukki::Web::View->prepare_template(
+    my $self = shift;
+    $self->prepare_template(
         template   => 'links.html',
         directives => [
             'link<-links' => {
@@ -153,25 +158,25 @@ sub page_template {
     my %menu_vars = map {
         my $menu_name = $_;
         "#nav-$menu_name .navigation" => {
-            "menu_item<-$menu_name.menu_items" => [
+            "menu_item<-$menu_name" => [
                 'a'      => 'menu_item.label',
                 'a@href' => 'menu_item.href | rebase_url',
             ],
         },
     } @{ $self->app->settings->menu_names };
 
-    return $self->_page_templates->{ $which } = Yukki::Web::View->prepare_template(
+    return $self->_page_templates->{ $which } = $self->prepare_template(
         template   => $view_args->{template},
         directives => [
             $view_args->{directives}->@*,
             'head script.local' => {
                 'script<-scripts' => [
-                    '@src' => 'script | base_url',
+                    '@src' => 'script | rebase_url',
                 ],
             },
             'head link.local'   => {
                 'link<-links' => [
-                    '@href' => 'link | base_url',
+                    '@href' => 'link | rebase_url',
                 ],
             },
             '#messages'   => 'messages',
@@ -207,13 +212,17 @@ The C<directives> are the L<Template::Pure> directives to apply data given at re
 sub prepare_template {
     my ($self, $template, $directives) = validated_list(\@_,
         template   => { isa => 'Str', coerce => 1 },
-        directives => { isa => 'HashRef' },
+        directives => { isa => 'ArrayRef' },
+    );
+
+    my $template_content = read_file(
+        $self->app->locate_dir('template_path', $template)
     );
 
     return Template::Pure->new(
-        template      => $template,
-        directives    => $directives,
-        custom_filter => {
+        template   => $template_content,
+        directives => $directives,
+        filters    => {
             rebase_url => sub {
                 my ($t, $data) = @_;
                 $t->data_at_path('ctx')->rebase_url($data);
@@ -268,7 +277,7 @@ sub render_page {
 
     my %menu_vars = map {
         $_ => [ $self->available_menu_items($ctx, $_) ]
-    } $ctx->response->navigation_menu_names;
+    } @{ $self->app->settings->menu_names };#$ctx->response->navigation_menu_names;
 
     my @scripts = $self->app->settings->all_scripts;
     my @styles  = $self->app->settings->all_styles;
@@ -368,7 +377,7 @@ used as the ones passed to the C<process> method.
 
 sub render {
     my ($self, $template, $vars) = validated_list(\@_,
-        template   => { isa => 'Str', coerce => 1 },
+        template   => { isa => 'Template::Pure' },
         vars       => { isa => 'HashRef', default => {} },
     );
 
