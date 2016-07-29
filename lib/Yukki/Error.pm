@@ -56,7 +56,7 @@ This makes it easy to know whether Yukki generated the exception or something el
 =cut
 
 sub base_class { 'Yukki::Error' }
-sub extra_rowls { 'Yukki::Error::Body' }
+sub extra_roles { 'Yukki::Error::Body' }
 
 =head1 EXPORTS
 
@@ -104,6 +104,16 @@ sub BUILDARGS {
     my ($class, $args) = @_;
     $args;
 }
+
+=begin Pod::Coverage
+
+    BUILDARGS
+    base_class
+    extra_roles
+
+=end Pod::Coverage
+
+=cut
 
 {
     package Yukki::Error::Body;
