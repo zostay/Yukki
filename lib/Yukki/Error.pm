@@ -179,6 +179,14 @@ Returns the message.
         return $self->message;
     }
 
+    around as_psgi => sub {
+        shift; # original method is ignored
+        my ($self, $env) = @_;
+        my $body    = $self->body( $env );
+        my $headers = $self->build_headers( $body );
+        [ $self->status_code, $headers, [ defined $body ? $body : () ] ];
+    };
+
 }
 
 __PACKAGE__->meta->make_immutable;
