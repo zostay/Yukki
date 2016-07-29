@@ -10,6 +10,10 @@ before_install:
   - cpanm --notest --quiet Dist::Zilla
   - dzil authordeps | cpanm --notest --quiet
   - cpanm --notest --quiet Pod::Coverage::TrustPod
+
+  # Git always asks me to run this... :-p
+  - git config --global user.name 'you@example.com'
+  - git config --global user.name 'Your Name'
 install:
   - dzil listdeps | cpanm --notest --quiet
 script:
