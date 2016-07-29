@@ -168,6 +168,17 @@ Setup the HTTP headers.
         ];
     }
 
+=head2 as_string
+
+Returns the message.
+
+=cut
+
+    sub as_string {
+        my $self = shift;
+        return $self->message;
+    }
+
 }
 
 __PACKAGE__->meta->make_immutable;
