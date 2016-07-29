@@ -5,7 +5,7 @@ use Moose;
 
 extends 'Path::Router::Route::Match';
 
-use List::MoreUtils qw( all );
+use List::MoreUtils qw( all any );
 use Yukki::Error qw( http_throw );
 
 # ABSTRACT: Matching with access controls
@@ -35,7 +35,25 @@ sub access_level {
     for my $rule (@$acl) {
         my ($access_level, $match) = @$rule;
 
-        if (all { $mapping->{$_} ~~ $match->{$_} } keys %$match) {
+        my $accepts = sub {
+            my $key = shift;
+
+            if (!ref $match->{$key}) {
+                return $mapping->{$key} eq $match->{$key};
+            }
+            elsif (ref $match->{$key} eq 'CODE') {
+                local $_ = $mapping->{$key};
+                return $match->{$key}->($mapping->{$key});
+            }
+            elsif (ref $match->{$key} eq 'ARRAY') {
+                return any { $mapping->{$key} eq $_ } $match->{$key}->@*;
+            }
+            else {
+                die "unknown ACL authorization check type";
+            }
+        };
+
+        if (all { $accepts->($_) } keys %$match) {
             return $access_level;
         }
     }
