@@ -9,10 +9,10 @@ use File::Temp qw( tempdir );
 
 my $tmp = tempdir( CLEANUP => 1 );
 
-system(qw( perl bin/yukki-setup ), $tmp) == 0
+system(qw( perl bin/yukki-setup ), "$tmp/yukki") == 0
     or die "cannot run yukki-setup: $!";
 
-$ENV{YUKKI_CONFIG} = "$tmp/etc/yukki.conf";
+$ENV{YUKKI_CONFIG} = "$tmp/yukki/etc/yukki.conf";
 
 #system(qw( bin/yukki-git-init
 
