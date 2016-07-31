@@ -122,14 +122,14 @@ sub _build_links_template {
     $self->prepare_template(
         template   => 'links.html',
         directives => [
-            'link<-links' => {
+            'link<-links' => [
                 'a'      => 'link.label',
-                'a@href' => 'link.href | rebase_url',
+                'a@href' => 'link.href',
                 sub {
                     my ($t, $a, $vars) = @_;
                     $vars->{ctx}->rebase_url($vars->{link}{href});
                 },
-            },
+            ],
         ],
     );
 }
@@ -160,7 +160,7 @@ sub page_template {
         "#nav-$menu_name .navigation" => {
             "menu_item<-$menu_name" => [
                 'a'      => 'menu_item.label',
-                'a@href' => 'menu_item.href | rebase_url',
+                'a@href' => 'menu_item.href',
             ],
         },
     } @{ $self->app->settings->menu_names };
@@ -171,25 +171,25 @@ sub page_template {
             $view_args->{directives}->@*,
             'head script.local' => {
                 'script<-scripts' => [
-                    '@src' => 'script | rebase_url',
+                    '@src' => 'script',
                 ],
             },
             'head link.local'   => {
                 'link<-links' => [
-                    '@href' => 'link | rebase_url',
+                    '@href' => 'link',
                 ],
             },
-            '#messages'   => 'messages',
+            '#messages'   => 'messages | encoded_string',
             'title'       => 'main_title',
             '.masthead-title' => 'title',
             %menu_vars,
             '#breadcrumb li' => {
                 'crumb<-breadcrumb' => [
                     'a'      => 'crumb.label',
-                    'a@href' => 'crumb.href | rebase_url',
+                    'a@href' => 'crumb.href',
                 ],
             },
-            '#content'    => 'content',
+            '#content'    => 'content | encoded_string',
         ],
     );
 }
@@ -222,14 +222,6 @@ sub prepare_template {
     return Template::Pure->new(
         template   => $template_content,
         directives => $directives,
-        filters    => {
-            rebase_url => sub {
-                my ($t, $data) = @_;
-                $t->data_at_path('ctx')->rebase_url($data);
-            },
-
-            # TODO Maybe nice to have plugin filters too in here...
-        },
     );
 }
 
@@ -259,10 +251,11 @@ sub render_page {
 
     my $messages = $self->render(
         template => $self->messages_template,
+        context  => $ctx,
         vars     => {
-            errors   => [ $ctx->list_errors   ],
-            warnings => [ $ctx->list_warnings ],
-            info     => [ $ctx->list_info     ],
+            errors   => $ctx->has_errors   ? [ $ctx->list_errors   ] : undef,
+            warnings => $ctx->has_warnings ? [ $ctx->list_warnings ] : undef,
+            info     => $ctx->has_info     ? [ $ctx->list_info     ] : undef,
         },
     );
 
@@ -276,8 +269,8 @@ sub render_page {
     }
 
     my %menu_vars = map {
-        $_ => [ $self->available_menu_items($ctx, $_) ]
-    } @{ $self->app->settings->menu_names };#$ctx->response->navigation_menu_names;
+        $_ => $self->available_menu_items($ctx, $_)
+    } @{ $self->app->settings->menu_names };
 
     my @scripts = $self->app->settings->all_scripts;
     my @styles  = $self->app->settings->all_styles;
@@ -289,22 +282,32 @@ sub render_page {
 
     return $self->render(
         template => $self->page_template($view),
+        context  => $ctx,
         vars     => {
             $vars->%*,
             scripts      => [
-                @scripts,
-                $vars->{'head script.local'}->@*,
+                map { $ctx->rebase_url($_) }
+                    @scripts,
+                    $vars->{'head script.local'}->@*,
             ],
             links        => [
-                @styles,
-                $vars->{'head link.local'}->@*,
+                map { $ctx->rebase_url($_) }
+                    @styles,
+                    $vars->{'head link.local'}->@*,
             ],
             'messages'   => $messages,
             'main_title' => $main_title,
             'title'      => $title,
             %menu_vars,
-            'breadcrumb' => [ $ctx->response->breadcrumb_links ],
-            'content'    => $self->render(template => $template, vars => $vars),
+            'breadcrumb' => $ctx->response->has_breadcrumb ? [
+                map { $ctx->rebase_url($_) }
+                    $ctx->response->breadcrumb_links
+            ] : undef,
+            'content'    => $self->render(
+                template => $template,
+                context  => $ctx,
+                vars     => $vars,
+            ),
         },
     );
 }
@@ -320,7 +323,7 @@ Retrieves the navigation menu from the L<Yukki::Web::Response> and purges any li
 sub available_menu_items {
     my ($self, $ctx, $name) = @_;
 
-    return grep {
+    my @items = grep {
         my $url = $_->{href}; $url =~ s{\?.*$}{};
 
         my $match = $self->app->router->match($url);
@@ -332,6 +335,8 @@ sub available_menu_items {
             needs      => $access_level_needed,
         );
     } $ctx->response->navigation_menu($name);
+
+    return @items ? \@items : undef;
 }
 
 =head2 render_links
@@ -350,8 +355,8 @@ sub render_links {
 
     return $self->render(
         template => $self->links_template,
+        context  => $ctx,
         vars     => {
-            ctx   => $ctx,
             links => [
                 map {
                     {
@@ -376,13 +381,15 @@ used as the ones passed to the C<process> method.
 =cut
 
 sub render {
-    my ($self, $template, $vars) = validated_list(\@_,
+    my ($self, $template, $ctx, $vars) = validated_list(\@_,
         template   => { isa => 'Template::Pure' },
+        context    => { isa => 'Yukki::Web::Context' },
         vars       => { isa => 'HashRef', default => {} },
     );
 
     my %vars = (
         %$vars,
+        ctx  => $ctx,
         view => $self,
     );
 

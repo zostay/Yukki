@@ -137,9 +137,9 @@ Renders the HTML body for the error.
 
         my $template = $view->prepare_template(
             template   => 'error.html',
-            directives => {
+            directives => [
                 '#error-page' => 'error_message',
-            },
+            ],
         );
 
         $ctx->response->page_title($self->reason);

@@ -16,7 +16,7 @@ use Yukki::Web::Settings;
 use CHI;
 use LWP::MediaTypes qw( add_type );
 use Plack::Session::Store::Cache;
-use Scalar::Util qw( blessed );
+use Scalar::Util qw( blessed weaken );
 use Try::Tiny;
 
 # ABSTRACT: the Yukki web server
@@ -162,10 +162,13 @@ it returns a PSGI response.
 sub dispatch {
     my ($self, $env) = @_;
 
+    my $ctx = Yukki::Web::Context->new(env => $env);
+
     $env->{'yukki.app'}      = $self;
     $env->{'yukki.settings'} = $self->settings;
+    $env->{'yukki.ctx'}      = $ctx;
+    weaken $env->{'yukki.ctx'};
 
-    my $ctx = Yukki::Web::Context->new(env => $env);
     my $response;
 
     try {

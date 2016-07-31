@@ -70,12 +70,12 @@ sub _build_history_template {
                     '.first-revision input'        => sub {
                         my ($t, $input, $vars) = @_;
                         $input->attr(checked => 'checked')
-                            if $vars->{index} = 2;
+                            if $vars->{index} == 2;
                     },
                     '.second-revision input'       => sub {
                         my ($t, $input, $vars) = @_;
                         $input->attr(checked => 'checked')
-                            if $vars->{index} = 1;
+                            if $vars->{index} == 1;
                     },
                 ],
             },

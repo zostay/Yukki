@@ -93,6 +93,7 @@ has breadcrumb => (
     traits      => [ 'Array' ],
     handles     => {
         breadcrumb_links => 'elements',
+        has_breadcrumb   => 'count',
     },
 );
 
