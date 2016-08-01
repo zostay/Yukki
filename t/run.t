@@ -18,7 +18,7 @@ $ENV{YUKKI_CONFIG} = "$tmp/yukki/etc/yukki.conf";
 
 my $app = require "bin/yukki.psgi";
 ok $app, 'got an app';
-cmp_ok ref $app, 'CODE', 'got a code';
+is ref $app, 'CODE', 'got a code';
 
 test_psgi
     app => $app,
