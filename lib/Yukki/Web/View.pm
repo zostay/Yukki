@@ -327,7 +327,12 @@ Retrieves the navigation menu from the L<Yukki::Web::Response> and purges any li
 sub available_menu_items {
     my ($self, $ctx, $name) = @_;
 
-    my @items = grep {
+    my @items = map {
+        +{
+            %$_,
+            href => $ctx->rebase_url($_->{href}),
+        },
+    } grep {
         my $url = $_->{href}; $url =~ s{\?.*$}{};
 
         my $match = $self->app->router->match($url);
