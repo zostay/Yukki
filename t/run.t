@@ -45,7 +45,7 @@ test_psgi
 
         $res = $cb->(GET "/page/view/main");
 
-        like $res->content, qr{<title class="main-title">Main</title>}, 'got to the main wiki page';
+        like $res->content, qr{<title class="main-title">Main - Yukki</title>}, 'got to the main wiki page';
     };
 
 done_testing;

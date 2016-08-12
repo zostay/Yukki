@@ -300,8 +300,12 @@ sub render_page {
             'title'      => $title,
             %menu_vars,
             'breadcrumb' => $ctx->response->has_breadcrumb ? [
-                map { $ctx->rebase_url($_) }
-                    $ctx->response->breadcrumb_links
+                map {
+                    +{
+                        %$_,
+                        href => $ctx->rebase_url($_->{href}),
+                    }
+                } $ctx->response->breadcrumb_links
             ] : undef,
             'content'    => $self->render(
                 template => $template,
