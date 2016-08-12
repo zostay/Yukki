@@ -7,10 +7,10 @@ use Probe::Perl;
 
 use Sub::Exporter -setup => {
     exports => [
-        qw( yukki yukki_setup yukki_git_init ),
+        qw( yukki yukki_setup yukki_git_init yukki_add_user ),
     ],
     groups => {
-        default => [ qw( yukki yukki_setup yukki_git_init ) ],
+        default => [ qw( yukki yukki_setup yukki_git_init yukki_add_user ) ],
     },
 };
 
@@ -52,8 +52,20 @@ sub yukki_setup {
 }
 
 sub yukki_git_init {
-    my $repo_name = shift;
-    yukki([ 'git-init', $repo_name ]);
+    yukki([ 'git-init', @_ ]);
+}
+
+sub yukki_add_user {
+    my %options = @_;
+
+    my $groups = join "\n", @{ $options{groups} // [] };
+
+    yukki('add-user', qq[$options{username}
+$options{password}
+$options{fullname}
+$options{email}
+$groups
+]);
 }
 
 1;
