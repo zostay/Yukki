@@ -53,6 +53,11 @@ li.error, li.warning, li.info { list-style: none }
 /*** Login ***/
 
 #login-page { width: 30em; margin: 8em auto }
+#profile-page { width: 30em; margin: 0 auto }
+
+#profile-page div.login_name { display: inline-block }
+#profile-page input.name { width: 15em }
+#profile-page input.email { width: 15em }
 
 /*** Page ***/
 

@@ -191,6 +191,11 @@ sub dispatch {
 
         if ($ctx->session->{user}) {
             $ctx->response->add_navigation_item(user => {
+                label => $ctx->session->{user}{name},
+                href  => 'profile',
+                sort  => 200,
+            });
+            $ctx->response->add_navigation_item(user => {
                 label => 'Sign out',
                 href  => 'logout',
                 sort  => 100,

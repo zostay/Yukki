@@ -1,0 +1,33 @@
+<div id="profile-page">
+    <form class="local-form" action="/profile/update" method="POST">
+        <div class="field">
+            <label for="login_name">Login name:</label>
+            <input id="login_name" class="login_name" name="login_name" type="hidden">
+            <div class="login_name">login</div>
+        </div>
+        <div class="field">
+            <label for="name">Name:</label>
+            <input id="name" class="name" name="name" type="text"/>
+        </div>
+        <div class="field">
+            <label for="email">Email:</label>
+            <input id="email" class="email" name="email" type="text"/>
+        </div>
+        <div class="field">
+            <label for="password_old">Current password:</label>
+            <input id="password_old" name="password_old" type="password"/>
+        </div>
+        <div class="field">
+            <label for="password_new">New password:</label>
+            <input id="password_old" name="password_new" type="password"/>
+        </div>
+        <div class="field">
+            <label for="password_confirm">New password (again):</label>
+            <input id="password_confirm" name="password_confirm" type="password"/>
+        </div>
+
+        <div class="button-group">
+            <button id="submit" name="submit" type="submit">Save Changes</button>
+        </div>
+    </form>
+</div>

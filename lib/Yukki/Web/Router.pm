@@ -87,6 +87,19 @@ sub BUILD {
         target => $self->controller('Login'),
     ));
 
+    $self->add_route('profile/?:action' => (
+        defaults => {
+            action => 'profile',
+        },
+        validations => {
+            action => qr/^(?:profile|update)$/,
+        },
+        acl => [
+            [ none => { action => sub { 1 } } ],
+        ],
+        target => $self->controller('Login'),
+    ));
+
     $self->add_route('logout' => (
         defaults => {
             action => 'exit',
