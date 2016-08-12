@@ -2,17 +2,14 @@
 use strict;
 use warnings;
 
+use lib 't/lib';
 use Test::More;
 use HTTP::Request::Common;
 use Plack::Test;
 use File::Temp qw( tempdir );
+use Yukki::Test;
 
-my $tmp = tempdir( CLEANUP => 1 );
-
-system(qw( perl bin/yukki-setup ), "$tmp/yukki") == 0
-    or die "cannot run yukki-setup: $!";
-
-$ENV{YUKKI_CONFIG} = "$tmp/yukki/etc/yukki.conf";
+yukki_setup;
 
 #system(qw( bin/yukki-git-init
 

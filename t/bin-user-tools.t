@@ -19,11 +19,11 @@ script_compiles('bin/yukki-passwd', 'yukki-passwd compiles');
 my $tempdir = tempdir;
 diag("TEMPDIR = $tempdir") if $ENV{YUKKI_TEST_KEEP_FILES};
 
-script_runs([ 'bin/yukki-setup', "$tempdir/yukki-test" ], 
+script_runs([ 'bin/yukki-setup', "$tempdir/yukki-test", 'skel' ],
     'yukki-setup runs');
 
 ok(-d "$tempdir/yukki-test", 'created the test directory');
-ok(!-f "$tempdir/yukki-test/var/db/users/foo", 
+ok(!-f "$tempdir/yukki-test/var/db/users/foo",
     'the user we are about to create does not exist yet');
 
 $ENV{YUKKI_CONFIG} = "$tempdir/yukki-test/etc/yukki.conf";

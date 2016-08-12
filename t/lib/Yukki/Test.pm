@@ -30,13 +30,13 @@ sub yukki {
         $cmd  = shift @opts;
     }
 
-    my $rv = run3([ $perl, '-Mblib', "bin/yukki-$cmd", @opts ], 
+    my $rv = run3([ $perl, "bin/yukki-$cmd", @opts ],
         \$stdin, \$stdout, \$stderr);
 
     my $exit   = $? ? ($? >> 8) : 0;
     my $ok     = !! ( $rv and $exit == 0 );
 
-    Carp::confess("failed running bin/yukki-$cmd: exit code $exit\n$stderr") 
+    Carp::confess("failed running bin/yukki-$cmd: exit code $exit\n$stderr")
         unless $ok;
 }
 
@@ -46,7 +46,7 @@ sub yukki_setup {
     my $tempdir = tempdir;
     diag("TEMPDIR = $tempdir") if $ENV{YUKKI_TEST_KEEP_FILES};
 
-    yukki([ 'setup', "$tempdir/yukki-test" ]);
+    yukki([ 'setup', "$tempdir/yukki-test", 'skel' ]);
 
     $ENV{YUKKI_CONFIG} = "$tempdir/yukki-test/etc/yukki.conf";
 }
