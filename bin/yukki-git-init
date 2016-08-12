@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-use 5.12.1;
+use v5.24;
 
 use Yukki;
 
@@ -21,7 +21,7 @@ die qq[Could not find o repository named "$repo_name" in yukki.conf\n]
 my $repo_dir = ''.$app->locate('repository_path', $config->{repository});
 
 if (defined $remote_repo) {
-    Git::Repository->create('clone', '--mirror', 
+    Git::Repository->create('clone', '--mirror',
         $remote_repo, $repo_dir);
 }
 
@@ -47,7 +47,7 @@ END_OF_STUB_MAIN
 
     my $stub_tree = "100655 blob $object_id\t$page\n";
     my $tree_id   = $git->run('mktree', { input => $stub_tree });
-    my $commit_id = $git->run('commit-tree', $tree_id, { 
+    my $commit_id = $git->run('commit-tree', $tree_id, {
         input => 'Initializing empty Yukki repository.',
         env   => {
             GIT_AUTHOR_NAME  => 'yukki-git-init',

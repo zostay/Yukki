@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-use 5.12.1;
+use v5.24;
 
 use Yukki;
 
@@ -12,9 +12,9 @@ my $app = Yukki->new;
 my $digest = $app->hasher;
 
 my @user_fields = (
-    login_name => [ 'Login name:', 
-        -must => { 
-            'be only letters, numbers, and underscores' =>  
+    login_name => [ 'Login name:',
+        -must => {
+            'be only letters, numbers, and underscores' =>
                 qr{^[a-zA-Z0-9_]+$}
         },
     ],
