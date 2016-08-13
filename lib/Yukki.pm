@@ -7,6 +7,7 @@ use Moose;
 use Class::Load;
 
 use Yukki::Settings;
+use Yukki::TextUtil qw( load_file );
 use Yukki::Types qw( AccessLevel YukkiSettings );
 use Yukki::Error qw( http_throw );
 
@@ -15,7 +16,6 @@ use List::MoreUtils qw( any );
 use MooseX::Params::Validate;
 use MooseX::Types::Path::Class;
 use Path::Class;
-use YAML qw( LoadFile );
 
 # ABSTRACT: Yet Uh-nother wiki
 
@@ -84,7 +84,7 @@ has settings => (
 
 sub _build_settings {
     my $self = shift;
-    LoadFile(''.$self->config_file);
+    load_file($self->config_file);
 }
 
 =head1 METHODS

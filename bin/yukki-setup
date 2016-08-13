@@ -3,12 +3,12 @@ use v5.24;
 use utf8;
 
 use Yukki::Web;
+use Yukki::TextUtil qw( load_file );
 
 use autodie;
 use File::ShareDir qw( module_dir );
 use File::Copy::Recursive qw( dircopy );
 use Path::Class;
-use YAML qw( LoadFile );
 
 my $site_dir = shift;
 my $skel_dir = shift;
@@ -28,8 +28,8 @@ my $yaml = file($root, 'etc', 'yukki.conf');
 
 # Don't use YAML to load the file or we'll lose spaces and comments
 rename $yaml, "$yaml~";
-open my $out_config, '>', $yaml;
-open my $in_config, '<', "$yaml~";
+open my $out_config, '>:encoding(UTF-8)', $yaml;
+open my $in_config, '<:encoding(UTF-8)', "$yaml~";
 while (my $line = <$in_config>) {
     if ($line =~ /^root:/) {
         $line = "root: $root\n";
@@ -42,7 +42,7 @@ unlink "$yaml~";
 
 chmod 0444, "$yaml";
 
-my $config = LoadFile("$yaml");
+my $config = load_file($yaml);
 
 say "Please read the installation instructions if you have not:\n";
 say "\tperldoc Yukki::Manual::Installation\n";

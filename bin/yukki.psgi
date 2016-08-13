@@ -2,10 +2,8 @@
 use v5.24;
 use utf8;
 
-
 use Plack::App::File;
 use Plack::Builder;
-use YAML qw( LoadFile );
 
 use Yukki::Web;
 

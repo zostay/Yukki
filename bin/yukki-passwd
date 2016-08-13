@@ -3,9 +3,7 @@ use v5.24;
 use utf8;
 
 use Yukki;
-
-use IO::Prompter;
-use YAML qw( LoadFile DumpFile );
+use Yukki::TextUtil qw( prompt dump_file load_file );
 
 my $app = Yukki->new;
 my $digest = $app->hasher;
@@ -17,7 +15,7 @@ if (not -f "$user_file") {
     die "User $username does not exist. Please create this user before setting the password.\n";
 }
 
-my $user = LoadFile("$user_file");
+my $user = load_file($user_file);
 
 my $password = prompt 'Password:', -echo => '', -v;
 
@@ -27,7 +25,7 @@ my $password = $digest->generate;
 $user->{password} = $password;
 
 chmod 0600, "$user_file";
-DumpFile("$user_file", $user);
+dump_file($user_file, $user);
 chmod 0400, "$user_file";
 
 # ABSTRACT: set the password for a user

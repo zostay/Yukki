@@ -7,8 +7,8 @@ use Moose;
 with 'Yukki::Web::Controller';
 
 use Email::Address;
-use YAML qw( DumpFile );
 use Yukki::Error qw( http_throw );
+use Yukki::TextUtil qw( dump_file );
 
 # ABSTRACT: shows the login page and handles login
 
@@ -155,7 +155,7 @@ sub update_profile {
 
     my $user_file = $self->app->locate('user_path', $login_name);
     chmod 0600, "$user_file";
-    DumpFile("$user_file", \%user);
+    dump_file($user_file, \%user);
     chmod 0400, "$user_file";
 
     $ctx->session->{user} = \%user;

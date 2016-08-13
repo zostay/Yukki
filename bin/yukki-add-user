@@ -3,11 +3,11 @@ use v5.24;
 use utf8;
 
 use Yukki;
+use Yukki::TextUtil qw( prompt dump_file );
 
 use File::Path;
 use IO::Prompter;
 use Path::Class;
-use YAML qw( DumpFile );
 
 my $app = Yukki->new;
 my $digest = $app->hasher;
@@ -46,7 +46,7 @@ if (-f "$user_file") {
 
 mkpath(''.$user_file->dir);
 
-DumpFile("$user_file", \%user);
+dump_file($user_file, \%user);
 chmod 0400, "$user_file";
 
 # ABSTRACT: add users to a Yukki installation

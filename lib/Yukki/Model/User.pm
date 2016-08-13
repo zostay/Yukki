@@ -7,11 +7,11 @@ use Moose;
 extends 'Yukki::Model';
 
 use Yukki::Types qw( LoginName );
+use Yukki::TextUtil qw( load_file );
 
 use Path::Class;
 use MooseX::Params::Validate;
 use MooseX::Types::Path::Class;
-use YAML qw( LoadFile );
 
 # ABSTRACT: lookup users
 
@@ -47,7 +47,7 @@ sub find {
 
     my $user_file = $self->locate('user_path', $login_name);
     if (-e $user_file) {
-        return LoadFile($user_file);
+        return load_file($user_file);
     }
 
     return;
