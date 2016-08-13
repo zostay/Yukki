@@ -1,6 +1,7 @@
 package Yukki::Model;
 
 use v5.24;
+use utf8;
 use Moose;
 
 # ABSTRACT: Base class for model objects

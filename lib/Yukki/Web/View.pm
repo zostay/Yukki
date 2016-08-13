@@ -1,6 +1,7 @@
 package Yukki::Web::View;
 
 use v5.24;
+use utf8;
 use Moose;
 
 use File::Slurp qw( read_file );

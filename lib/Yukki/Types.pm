@@ -1,6 +1,7 @@
 package Yukki::Types;
 
 use v5.24;
+use utf8;
 
 use Type::Library -base, -declare => qw(
     LoginName AccessLevel

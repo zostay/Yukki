@@ -1,5 +1,7 @@
 #!/usr/bin/env plackup
-use 5.12.1;
+use v5.24;
+use utf8;
+
 
 use Plack::App::File;
 use Plack::Builder;
@@ -18,7 +20,7 @@ builder {
     mount "/script"   => Plack::App::File->new( root => $server->locate_dir('static_path', 'script') )->to_app;
     mount "/template" => Plack::App::File->new( root => $server->locate_dir('static_path', 'template') )->to_app;
 
-    mount "/"       => builder { 
+    mount "/"       => builder {
         enable $server->session_middleware;
 
         $app;

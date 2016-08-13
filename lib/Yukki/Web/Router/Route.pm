@@ -1,6 +1,7 @@
 package Yukki::Web::Router::Route;
 
 use v5.24;
+use utf8;
 use Moose;
 
 extends 'Path::Router::Route';

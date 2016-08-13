@@ -1,6 +1,7 @@
 package Yukki::Web::Request;
 
 use v5.24;
+use utf8;
 use Moose;
 
 use Plack::Request;

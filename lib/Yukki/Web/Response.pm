@@ -1,6 +1,7 @@
 package Yukki::Web::Response;
 
 use v5.24;
+use utf8;
 use Moose;
 
 use Yukki::Types qw( BreadcrumbLinks NavigationMenuMap );

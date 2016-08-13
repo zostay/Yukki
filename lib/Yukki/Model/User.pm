@@ -1,6 +1,7 @@
 package Yukki::Model::User;
 
 use v5.24;
+use utf8;
 use Moose;
 
 extends 'Yukki::Model';

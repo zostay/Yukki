@@ -1,6 +1,7 @@
 package Yukki::Role::App;
 
 use v5.24;
+use utf8;
 use Moose::Role;
 
 requires qw(

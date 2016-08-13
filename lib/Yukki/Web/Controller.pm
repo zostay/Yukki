@@ -1,6 +1,7 @@
 package Yukki::Web::Controller;
 
 use v5.24;
+use utf8;
 use Moose::Role;
 
 # ABSTRACT: Base class for Yukki::Web controllers

@@ -1,6 +1,7 @@
 package Yukki::Web::Plugin::Role::Formatter;
 
 use v5.24;
+use utf8;
 use Moose::Role;
 
 # ABSTRACT: interface for HTML formatters

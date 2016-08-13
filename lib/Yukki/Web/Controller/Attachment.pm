@@ -1,6 +1,7 @@
 package Yukki::Web::Controller::Attachment;
 
 use v5.24;
+use utf8;
 use Moose;
 
 with 'Yukki::Web::Controller';

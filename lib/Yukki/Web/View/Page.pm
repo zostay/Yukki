@@ -1,6 +1,7 @@
 package Yukki::Web::View::Page;
 
 use v5.24;
+use utf8;
 use Moose;
 
 extends 'Yukki::Web::View';
@@ -284,7 +285,7 @@ sub edit {
     $self->page_navigation($ctx->response, 'edit', $vars);
 
     return $self->render_page(
-        template => 'page/edit.html',
+        template => $self->edit_template,
         context  => $ctx,
         vars     => {
             page        => $vars->{page},

@@ -1,6 +1,7 @@
 package Yukki::Web::Plugin::Viewer;
 
 use v5.24;
+use utf8;
 use Moose;
 
 extends 'Yukki::Web::Plugin';
