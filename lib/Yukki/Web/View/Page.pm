@@ -27,7 +27,7 @@ sub _build_blank_template {
         directives => [
             '#yukkiname'        => 'page',
             '#create-page@href' => 'link',
-            '#file-list'        => 'attachments',
+            '#file-list'        => 'attachments | encoded_string',
         ],
     );
 }
@@ -115,13 +115,30 @@ sub _build_edit_template {
             '#yukkitext'                => 'source',
             '#yukkitext_position@value' => 'position',
             '#preview-yukkitext'        => 'html | encoded_string',
-            '#attachments-list'         => sub {
-                my ($t, $el, $data) = @_;
-                if ($data->{attachments}) {
-                    $el->attr(class => 'attachment-list');
-                }
+            '#attachments-list'         => 'attachments | encoded_string',
+        ],
+    );
+}
+
+has attachments_template => (
+    is          => 'ro',
+    isa         => 'Template::Pure',
+    lazy        => 1,
+    builder     => '_build_attachments_template',
+);
+
+sub _build_attachments_template {
+    shift->prepare_template(
+        template   => 'page/attachments.html',
+        directives => [
+            '.file' => {
+                'file<-files' => [
+                    '@id'       => 'file.file_id',
+                    '.filename' => 'file.file_name | encoded_string',
+                    '.size'     => 'file.file_size',
+                    '.action'   => 'file.action | encoded_string',
+                ],
             },
-            '#attachments-list'         => 'attachments',
         ],
     );
 }
@@ -292,7 +309,7 @@ sub edit {
             source      => scalar $vars->{file}->fetch // '',
             position    => $vars->{position},
             html        => $html,
-            attachments => $vars->{attachments},
+            attachments => $self->attachments($ctx, $vars->{attachments}),
         },
     );
 }
@@ -358,29 +375,28 @@ Renders the attachments table.
 sub attachments {
     my ($self, $ctx, $attachments) = @_;
 
-    my @files = map {
-        my @links = $self->attachment_links($ctx, $_);
-
-        my %primary_link = %{ $links[0] };
-        $primary_link{label} = $_->file_name;
-
-        my $file_name = $self->render_links(
-            context => $ctx,
-            links   => [ \%primary_link ],
-        );
-
-        +{
-            './@id'     => $_->file_id,
-            '.filename' => $file_name,
-            '.size'     => $_->formatted_file_size,
-            '.action'   => $self->render_attachment_links($ctx, \@links),
-        };
-    } @$attachments;
-
     return $self->render(
-        template   => 'page/attachments.html',
+        template   => $self->attachments_template,
+        context    => $ctx,
         vars       => {
-            '.file' => \@files,
+            files => @$attachments ? [ map {
+                my @links = $self->attachment_links($ctx, $_);
+
+                my %primary_link = %{ $links[0] };
+                $primary_link{label} = $_->file_name;
+
+                my $file_name = $self->render_links(
+                    context => $ctx,
+                    links   => [ \%primary_link ],
+                );
+
+                {
+                    file_id   => $_->file_id,
+                    file_name => $file_name,
+                    file_size => $_->formatted_file_size,
+                    action    => $self->render_attachment_links($ctx, \@links),
+                }
+            } @$attachments ] : undef,
         },
     );
 }

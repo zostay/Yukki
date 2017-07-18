@@ -10,6 +10,7 @@ extends 'Yukki::Web::Plugin';
 
 use Syntax::Highlight::Engine::Kate;
 use Syntax::Highlight::Engine::Kate::All;
+use Syntax::Highlight::Engine::Kate::Perl6;
 
 =head1 SYNOPSIS
 
@@ -83,7 +84,6 @@ sub highlight_syntax {
     my ($language, $text) = split /:/, $arg, 2;
 
     my $engine = Syntax::Highlight::Engine::Kate->new(
-        language => $language,
         substitutions => {
             "<"  => "&#x3c;",
             ">"  => "&#x3e;",
@@ -115,6 +115,11 @@ sub highlight_syntax {
             Warning      => [q[<span class="syntax-warning">],       q[</span>]],
         },
     );
+
+    # HACK BECAUSE KATE HIGHLIGHTER SUCKS
+    $engine->{'syntaxes'}{'Perl6'} = 'Perl6';
+
+    $engine->language($language);
 
     my $highlighted_text = $engine->highlightText($text);
 

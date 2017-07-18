@@ -123,14 +123,12 @@ sub _build_links_template {
     $self->prepare_template(
         template   => 'links.html',
         directives => [
-            'link<-links' => [
-                'a'      => 'link.label',
-                'a@href' => 'link.href',
-                sub {
-                    my ($t, $a, $vars) = @_;
-                    $vars->{ctx}->rebase_url($vars->{link}{href});
-                },
-            ],
+            '.links' => {
+                'link<-links' => [
+                    'a'      => 'link.label',
+                    'a@href' => 'link.href',
+                ],
+            },
         ],
     );
 }
@@ -363,17 +361,18 @@ sub render_links {
         links    => { isa => 'ArrayRef[HashRef]' },
     );
 
+    use DDP;
+    p $links;
     return $self->render(
         template => $self->links_template,
         context  => $ctx,
         vars     => {
-            links => [
-                map {
-                    {
-                        'a'      => $_->{label},
-                        'a@href' => $_->{href},
-                    },
-                } @$links ],
+            links => [ map {
+                +{
+                    label => $_->{label},
+                    href  => $ctx->rebase_url($_->{href}),
+                }
+            } @$links ],
         },
     );
 }

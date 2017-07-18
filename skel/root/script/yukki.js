@@ -2,7 +2,7 @@
 
 // TODO Naive
 function rebase_url(url) {
-    return yukki_base_url + url;
+    return window.location.origin + url;
 }
 
 var templates = {};
@@ -75,8 +75,8 @@ $(document).ready(function() {
     show_hide_revision_checkbox('r2', $('input[name="r1"]:checked').val());
     show_hide_revision_checkbox('r1', $('input[name="r2"]:checked').val());
 
-    $('input[name="r1"]').live('click', function() { show_hide_revision_checkbox('r2', $(this).val()) });
-    $('input[name="r2"]').live('click', function() { show_hide_revision_checkbox('r1', $(this).val()) });
+    $('input[name="r1"]').on('click', 'body', function() { show_hide_revision_checkbox('r2', $(this).val()) });
+    $('input[name="r2"]').on('click', 'body', function() { show_hide_revision_checkbox('r1', $(this).val()) });
 
     $('.attachments').each(function() {
         var $this = $(this);
