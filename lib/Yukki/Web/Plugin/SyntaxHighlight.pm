@@ -88,9 +88,9 @@ sub highlight_syntax {
             "<"  => "&#x3c;",
             ">"  => "&#x3e;",
             "&"  => "&#x26;",
-            " "  => "&#xa0;",
-            "\t" => "&#xa0;&#xa0;&#xa0;&#xa0;",
-            "\n" => "<br/>\n",
+            " "  => " ",
+            "\t" => " " x 4,
+            "\n" => "\n",
         },
         format_table => {
             Alert        => [q[<span class="syntax-alert">],         q[</span>]],
@@ -125,13 +125,12 @@ sub highlight_syntax {
 
     if ($params->{helper_name} =~ /highlight-(div|span)/) {
         my $element = $1;
+        $element = 'pre' if $element eq 'div';
         $highlighted_text
             = qq[<$element class="syntax-highlight language-$language">]
             . $engine->highlightText($text)
             . qq[</$element>];
     }
-
-    warn "$highlighted_text\n";
 
     return $highlighted_text;
 }
