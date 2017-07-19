@@ -11,6 +11,8 @@ use Types::URI qw( Uri );
 use Yukki::Web::Request;
 use Yukki::Web::Response;
 
+use namespace::clean;
+
 # ABSTRACT: request-response context descriptor
 
 =head1 SYNOPSIS

@@ -21,6 +21,8 @@ use Scalar::Util qw( blessed weaken );
 use Try::Tiny;
 use Type::Utils;
 
+use namespace::clean;
+
 # ABSTRACT: the Yukki web server
 
 =head1 DESCRIPTION

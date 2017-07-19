@@ -20,6 +20,8 @@ use Email::Address;
 use List::Util qw( first );
 use List::MoreUtils qw( all );
 
+use namespace::clean;
+
 # ABSTRACT: standard types for use in Yukki
 
 =head1 SYNOPSIS

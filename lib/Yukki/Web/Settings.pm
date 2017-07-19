@@ -10,6 +10,8 @@ use Types::Path::Tiny qw( Path );
 use Types::Standard qw( ArrayRef HashRef Str );
 use Yukki::Types qw( BaseURL PluginConfig );
 
+use namespace::clean;
+
 # ABSTRACT: provides structure and validation to web settings in yukki.conf
 
 =head1 DESCRIPTION

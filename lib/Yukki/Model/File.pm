@@ -14,6 +14,8 @@ use Type::Utils;
 use Types::Standard qw( Maybe Str );
 use Yukki::Error qw( http_throw );
 
+use namespace::clean;
+
 # ABSTRACT: the model for loading and saving files in the wiki
 
 =head1 SYNOPSIS

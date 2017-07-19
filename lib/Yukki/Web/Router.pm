@@ -12,6 +12,8 @@ use Types::Standard qw( ArrayRef Str );
 use Type::Utils qw( class_type declare as where );
 use List::MoreUtils qw( all );
 
+use namespace::clean;
+
 # ABSTRACT: send requests to the correct controllers, yo
 
 =head1 DESCRIPTION

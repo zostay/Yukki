@@ -6,6 +6,8 @@ use Moo;
 
 use Types::Standard qw( Str Int );
 
+use namespace::clean;
+
 extends 'Yukki::Model::File';
 
 # ABSTRACT: a sub-class of the File model for handling previews

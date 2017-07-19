@@ -14,6 +14,8 @@ extends 'Yukki::Web::Plugin';
 use Text::MultiMarkdown;
 use Try::Tiny;
 
+use namespace::clean;
+
 =head1 SYNOPSIS
 
   # Plugins are not used directly...

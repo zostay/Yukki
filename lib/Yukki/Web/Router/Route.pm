@@ -12,6 +12,8 @@ use Yukki::Web::Router::Route::Match;
 use Types::Standard qw( ArrayRef HashRef Tuple );
 use List::MoreUtils qw( any );
 
+use namespace::clean;
+
 # ABSTRACT: Adds ACLs to routes
 
 =head1 DESCRIPTION

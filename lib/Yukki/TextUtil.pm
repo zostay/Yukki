@@ -8,6 +8,8 @@ use File::Slurper ();
 use IO::Prompter ();
 use YAML ();
 
+use namespace::clean;
+
 # ABSTRACT: Utilities to help make everything happy UTF-8
 
 =head1 DESCRIPTION

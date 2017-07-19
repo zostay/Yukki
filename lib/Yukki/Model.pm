@@ -6,6 +6,8 @@ use Moo;
 
 use Type::Utils;
 
+use namespace::clean;
+
 # ABSTRACT: Base class for model objects
 
 =head1 DESCRIPTION

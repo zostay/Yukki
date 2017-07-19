@@ -10,6 +10,8 @@ extends 'Yukki::Web::Plugin';
 
 use Yukki::Error qw( http_throw );
 
+use namespace::clean;
+
 # ABSTRACT: plugin for custom page viewers
 
 =head1 SYNOPSIS

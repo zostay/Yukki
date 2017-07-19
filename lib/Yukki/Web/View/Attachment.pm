@@ -6,6 +6,8 @@ use Moo;
 
 use Type::Utils;
 
+use namespace::clean;
+
 extends 'Yukki::Web::View';
 
 # ABSTRACT: View for attachment forms

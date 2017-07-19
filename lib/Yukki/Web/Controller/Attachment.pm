@@ -9,6 +9,8 @@ with 'Yukki::Web::Controller';
 use JSON;
 use Yukki::Error qw( http_throw );
 
+use namespace::clean;
+
 # ABSTRACT: Controller for uploading, downloading, and viewing attachments
 
 =head1 DESCRIPTION

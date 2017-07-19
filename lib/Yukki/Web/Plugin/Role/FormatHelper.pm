@@ -3,6 +3,7 @@ package Yukki::Web::Plugin::Role::FormatHelper;
 use v5.24;
 use utf8;
 use Moo::Role;
+
 # ABSTRACT: interface for quick format helpers
 
 =head1 SYNOPSIS

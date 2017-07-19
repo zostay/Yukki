@@ -10,6 +10,8 @@ use Yukki::Types qw( BreadcrumbLinks NavigationMenuMap );
 
 use Plack::Response;
 
+use namespace::clean;
+
 # ABSTRACT: the response to the client
 
 =head1 DESCRIPTION

@@ -16,6 +16,8 @@ use Types::Path::Tiny qw( Path );
 use Types::Standard qw( Str );
 use Try::Tiny;
 
+use namespace::clean;
+
 # ABSTRACT: model for accessing objects in a git repository
 
 =head1 SYNOPSIS

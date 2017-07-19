@@ -12,6 +12,8 @@ use Sub::Exporter -setup => {
 
 use Yukki::Web::View;
 
+use namespace::clean;
+
 # ABSTRACT: Yukki's exception class
 
 =head1 SYNOPSIS

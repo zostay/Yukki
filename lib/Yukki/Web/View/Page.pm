@@ -6,6 +6,8 @@ use Moo;
 
 use Type::Utils;
 
+use namespace::clean;
+
 extends 'Yukki::Web::View';
 
 # ABSTRACT: render HTML for viewing and editing wiki pages

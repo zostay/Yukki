@@ -6,6 +6,8 @@ use Moo::Role;
 
 use Type::Utils;
 
+use namespace::clean;
+
 # ABSTRACT: Base class for Yukki::Web controllers
 
 =head1 DESCRIPTION

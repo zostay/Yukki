@@ -10,6 +10,8 @@ use Email::Address;
 use Yukki::Error qw( http_throw );
 use Yukki::TextUtil qw( dump_file );
 
+use namespace::clean;
+
 # ABSTRACT: shows the login page and handles login
 
 =head1 DESCRIPTION

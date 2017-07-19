@@ -14,6 +14,8 @@ use Try::Tiny;
 use Type::Utils;
 use Types::Standard qw( Dict Str ArrayRef HashRef slurpy );
 
+use namespace::clean;
+
 # ABSTRACT: base class for Yukki::Web views
 
 =head1 DESCRIPTION

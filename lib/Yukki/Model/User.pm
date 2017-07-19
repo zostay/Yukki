@@ -13,6 +13,8 @@ use Path::Class;
 use Type::Validate;
 use Types::Path::Tiny;
 
+use namespace::clean;
+
 # ABSTRACT: lookup users
 
 =head1 SYNOPSIS

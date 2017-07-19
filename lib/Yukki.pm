@@ -19,6 +19,8 @@ use Types::Standard qw( Dict HashRef Str Undef slurpy );
 use Path::Tiny;
 use Types::Path::Tiny qw( Path );
 
+use namespace::clean;
+
 # ABSTRACT: Yet Uh-nother wiki
 
 =head1 DESCRIPTION

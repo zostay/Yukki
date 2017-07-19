@@ -6,6 +6,8 @@ use Moo;
 
 use Types::Standard qw( HashRef Str );
 
+use namespace::clean;
+
 extends 'Yukki::Web::Plugin';
 
 # ABSTRACT: add syntax highlighting to wiki pages

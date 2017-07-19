@@ -8,6 +8,8 @@ use Types::Path::Tiny qw( Path );
 use Types::Standard qw( Str );
 use Yukki::Types qw( RepositoryMap YukkiSettingsAnonymous );
 
+use namespace::clean;
+
 # ABSTRACT: provides structure and validation to settings in yukki.conf
 
 =head1 DESCRIPTION

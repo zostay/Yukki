@@ -6,6 +6,8 @@ use Moo;
 
 use Type::Utils;
 
+use namespace::clean;
+
 # ABSTRACT:  base class for Yukki plugins
 
 =head1 SYNOPSIS

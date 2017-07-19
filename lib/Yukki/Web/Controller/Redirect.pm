@@ -6,6 +6,8 @@ use Moo;
 
 use Yukki::Error qw( http_throw );
 
+use namespace::clean;
+
 # ABSTRACT: Simple controller for handling internal redirects
 
 =head1 DESCRIPTION

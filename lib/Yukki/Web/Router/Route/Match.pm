@@ -9,6 +9,8 @@ extends 'Path::Router::Route::Match';
 use List::Util qw( all any );
 use Yukki::Error qw( http_throw );
 
+use namespace::clean;
+
 # ABSTRACT: Matching with access controls
 
 =head1 DESCRIPTION

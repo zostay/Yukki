@@ -9,6 +9,8 @@ with 'Yukki::Web::Controller';
 use Try::Tiny;
 use Yukki::Error qw( http_throw );
 
+use namespace::clean;
+
 # ABSTRACT: controller for viewing and editing pages
 
 =head1 DESCRIPTION

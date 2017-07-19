@@ -8,6 +8,8 @@ use Plack::Request;
 use Type::Utils;
 use Types::Standard qw( HashRef );
 
+use namespace::clean;
+
 # ABSTRACT: Yukki request descriptor
 
 =head1 DESCRIPTION
