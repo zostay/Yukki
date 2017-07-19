@@ -54,7 +54,7 @@ Returns the value of L</content>.
 sub fetch {
     my $self = shift;
     return $self->content;
-};
+}
 
 =head2 fetch_formatted
 
@@ -66,6 +66,6 @@ sub fetch_formatted {
     my ($self, $ctx, $position) = @_;
     $position //= $self->position;
     return $self->SUPER::fetch_formatted($ctx, $position);
-};
+}
 
 1;
