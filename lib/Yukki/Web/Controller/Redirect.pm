@@ -2,7 +2,7 @@ package Yukki::Web::Controller::Redirect;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
 use Yukki::Error qw( http_throw );
 
@@ -33,4 +33,4 @@ sub fire {
     });
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

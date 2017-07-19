@@ -2,7 +2,7 @@ package Yukki::Model::User;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
 extends 'Yukki::Model';
 
@@ -10,8 +10,8 @@ use Yukki::Types qw( LoginName );
 use Yukki::TextUtil qw( load_file );
 
 use Path::Class;
-use MooseX::Params::Validate;
-use MooseX::Types::Path::Class;
+use Type::Validate;
+use Types::Path::Tiny;
 
 # ABSTRACT: lookup users
 
@@ -53,4 +53,4 @@ sub find {
     return;
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

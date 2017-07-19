@@ -2,7 +2,7 @@ package Yukki::Error;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
 extends qw( HTTP::Throwable::Factory );
 
@@ -119,7 +119,7 @@ sub BUILDARGS {
 {
     package Yukki::Error::Body;
 
-    use Moose::Role;
+    use Moo::Role;
 
 =head1 METHODS
 
@@ -190,5 +190,4 @@ Returns the message.
 
 }
 
-__PACKAGE__->meta->make_immutable;
-
+1;

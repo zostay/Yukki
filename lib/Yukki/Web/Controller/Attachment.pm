@@ -2,7 +2,7 @@ package Yukki::Web::Controller::Attachment;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
 with 'Yukki::Web::Controller';
 
@@ -228,4 +228,4 @@ sub upload_file {
     );
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

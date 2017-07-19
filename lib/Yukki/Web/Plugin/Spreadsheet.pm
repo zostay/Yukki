@@ -2,7 +2,9 @@ package Yukki::Web::Plugin::Spreadsheet;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
+
+use Types::Standard qw( HashRef Str );
 
 extends 'Yukki::Web::Plugin';
 
@@ -34,7 +36,7 @@ This sets up the "=" format helper mapped to the L</spreadsheet_eval> method.
 
 has format_helpers => (
     is          => 'ro',
-    isa         => 'HashRef[Str]',
+    isa         => HashRef[Str],
     required    => 1,
     default     => sub { +{
         '=' => 'spreadsheet_eval',
@@ -238,4 +240,4 @@ sub load_spreadsheet {
     $file->fetch_formatted($ctx);
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

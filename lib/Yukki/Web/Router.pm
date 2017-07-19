@@ -2,14 +2,14 @@ package Yukki::Web::Router;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
 extends 'Path::Router';
 
 use Yukki::Web::Router::Route;
 
 use Types::Standard qw( ArrayRef Str );
-use Type::Utils qw( declare as where );
+use Type::Utils qw( class_type declare as where );
 use List::MoreUtils qw( all );
 
 # ABSTRACT: send requests to the correct controllers, yo
@@ -48,7 +48,7 @@ This is the L<Yukki> handler.
 
 has app => (
     is          => 'ro',
-    isa         => 'Yukki',
+    isa         => class_type('Yukki'),
     required    => 1,
     weak_ref    => 1,
     handles     => 'Yukki::Role::App',
@@ -151,4 +151,4 @@ sub BUILD {
     ));
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

@@ -2,7 +2,7 @@ package Yukki::Web::Controller::Login;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
 with 'Yukki::Web::Controller';
 
@@ -223,4 +223,4 @@ sub logout {
     $ctx->response->redirect($ctx->rebase_url('page/view/main'));
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

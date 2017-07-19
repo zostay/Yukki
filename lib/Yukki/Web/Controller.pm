@@ -2,7 +2,9 @@ package Yukki::Web::Controller;
 
 use v5.24;
 use utf8;
-use Moose::Role;
+use Moo::Role;
+
+use Type::Utils;
 
 # ABSTRACT: Base class for Yukki::Web controllers
 
@@ -20,7 +22,7 @@ This is the L<Yukki::Web> application.
 
 has app => (
     is          => 'ro',
-    isa         => 'Yukki::Web',
+    isa         => class_type('Yukki::Web'),
     required    => 1,
     weak_ref    => 1,
     handles     => 'Yukki::Role::App',

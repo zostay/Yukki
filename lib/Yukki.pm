@@ -2,7 +2,7 @@ package Yukki;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
 use Class::Load;
 
@@ -13,9 +13,11 @@ use Yukki::Error qw( http_throw );
 
 use Crypt::SaltedHash;
 use List::MoreUtils qw( any );
-use MooseX::Params::Validate;
-use MooseX::Types::Path::Class;
-use Path::Class;
+use Type::Params qw( validate );
+use Type::Utils;
+use Types::Standard qw( Dict HashRef Str Undef slurpy );
+use Path::Tiny;
+use Types::Path::Tiny qw( Path );
 
 # ABSTRACT: Yet Uh-nother wiki
 
@@ -45,16 +47,17 @@ This is the name of the configuraiton file. The application will try to find it 
 
 has config_file => (
     is          => 'ro',
-    isa         => 'Path::Class::File',
+    isa         => Path,
     required    => 1,
     coerce      => 1,
-    lazy_build  => 1,
+    lazy        => 1,
+    builder     => '_build_config_file',
 );
 
 sub _build_config_file {
     my $self = shift;
 
-    my $cwd_conf = file(dir(), 'etc', 'yukki.conf');
+    my $cwd_conf = path('/etc/yukki.conf');
     if (not $ENV{YUKKI_CONFIG} and -f "$cwd_conf") {
         return $cwd_conf;
     }
@@ -79,12 +82,13 @@ has settings => (
     isa         => YukkiSettings,
     required    => 1,
     coerce      => 1,
-    lazy_build  => 1,
+    lazy        => 1,
+    builder     => '_build_settings',
 );
 
 sub _build_settings {
     my $self = shift;
-    load_file($self->config_file);
+    load_file($self->config_file)
 }
 
 =head1 METHODS
@@ -132,23 +136,19 @@ sub model {
 The first argument is the name of the configuration directive naming the path.
 It may be followed by one or more path components to be tacked on to the end.
 
-Returns a L<Path::Class::File> for the file.
+Returns a L<Path::Tiny> for the file.
 
 =cut
 
 sub _locate {
     my ($self, $type, $base, @extra_path) = @_;
 
-    my $path_class = $type eq 'file' ? 'Path::Class::File'
-                   : $type eq 'dir'  ? 'Path::Class::Dir'
-                   : http_throw("unknown location type $type");
-
     my $base_path = $self->settings->$base;
     if ($base_path !~ m{^/}) {
-        return $path_class->new($self->settings->root, $base_path, @extra_path);
+        return path($self->settings->root, $base_path, @extra_path);
     }
     else {
-        return $path_class->new($base_path, @extra_path);
+        return path($base_path, @extra_path);
     }
 }
 
@@ -161,7 +161,7 @@ sub locate {
 
   my $dir = $app->locate_dir('repository_path', 'main.git');
 
-The arguments are identical to L</locate>, but returns a L<Path::Class::Dir> for
+The arguments are identical to L</locate>, but returns a L<Path::Tiny> for
 the given file.
 
 =cut
@@ -189,11 +189,14 @@ The method returns a true value if access should be granted or false otherwise.
 =cut
 
 sub check_access {
-    my ($self, $user, $repository, $needs) = validated_list(\@_,
-        user       => { isa => 'Undef|HashRef', optional => 1 },
-        repository => { isa => 'Str' },
-        needs      => { isa => AccessLevel },
-    );
+    my ($self, $opt)
+        = validate(\@_, class_type(__PACKAGE__),
+            slurpy Dict[
+                user       => Undef|HashRef,
+                repository => Str,
+                needs      => AccessLevel,
+            ]);
+    my ($user, $repository, $needs) = @{$opt}{qw( user repository needs )};
 
     # Always grant none
     return 1 if $needs eq 'none';
@@ -263,4 +266,4 @@ Does it suit your needs? I don't really care, but if I've shared this on the CPA
 
 =cut
 
-__PACKAGE__->meta->make_immutable;
+1;

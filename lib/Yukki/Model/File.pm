@@ -2,7 +2,7 @@ package Yukki::Model::File;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
 extends 'Yukki::Model';
 
@@ -10,7 +10,8 @@ use Class::Load;
 use Digest::SHA1 qw( sha1_hex );
 use Number::Bytes::Human qw( format_bytes );
 use LWP::MediaTypes qw( guess_media_type );
-use Path::Class;
+use Type::Utils;
+use Types::Standard qw( Maybe Str );
 use Yukki::Error qw( http_throw );
 
 # ABSTRACT: the model for loading and saving files in the wiki
@@ -41,7 +42,7 @@ This is the path to the file in the repository, but without the file suffix.
 
 has path => (
     is         => 'ro',
-    isa        => 'Str',
+    isa        => Str,
     required   => 1,
 );
 
@@ -53,7 +54,7 @@ The suffix of the file. Defaults to "yukki".
 
 has filetype => (
     is         => 'ro',
-    isa        => 'Maybe[Str]',
+    isa        => Maybe[Str],
     required   => 1,
     default    => 'yukki',
 );
@@ -67,7 +68,7 @@ stored into.
 
 has repository => (
     is         => 'ro',
-    isa        => 'Yukki::Model::Repository',
+    isa        => class_type('Yukki::Model::Repository'),
     required   => 1,
     handles    => {
         'make_blob'           => 'make_blob',
@@ -562,4 +563,4 @@ sub parent {
     );
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

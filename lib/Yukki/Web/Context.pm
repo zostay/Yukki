@@ -2,12 +2,14 @@ package Yukki::Web::Context;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
+use Sub::Name qw( subname );
+use Type::Utils;
+use Types::Standard qw( ArrayRef HashRef Str );
+use Types::URI qw( Uri );
 use Yukki::Web::Request;
 use Yukki::Web::Response;
-
-use MooseX::Types::URI qw( Uri );
 
 # ABSTRACT: request-response context descriptor
 
@@ -40,7 +42,7 @@ renamed to make it more difficult to use directly in the future.
 
 has env => (
     is          => 'ro',
-    isa         => 'HashRef',
+    isa         => HashRef,
     required    => 1,
 );
 
@@ -52,7 +54,7 @@ This is the L<Yukki::Web::Request> object representing the incoming request.
 
 has request => (
     is          => 'ro',
-    isa         => 'Yukki::Web::Request',
+    isa         => class_type('Yukki::Web::Request'),
     required    => 1,
     lazy        => 1,
     default     => sub { Yukki::Web::Request->new(env => shift->env) },
@@ -68,7 +70,7 @@ back to the client.
 
 has response => (
     is          => 'ro',
-    isa         => 'Yukki::Web::Response',
+    isa         => class_type('Yukki::Web::Response'),
     required    => 1,
     lazy        => 1,
     default     => sub { Yukki::Web::Response->new },
@@ -84,7 +86,7 @@ only be used as a last resort.
 
 has stash => (
     is          => 'ro',
-    isa         => 'HashRef',
+    isa         => HashRef,
     required    => 1,
     default     => sub { +{} },
 );
@@ -127,7 +129,8 @@ has base_url => (
     isa         => Uri,
     required    => 1,
     coerce      => 1,
-    lazy_build  => 1,
+    lazy        => 1,
+    builder     => '_build_base_url',
 );
 
 sub _build_base_url {
@@ -179,17 +182,29 @@ you if there are any messages.
 for my $message_type (qw( errors warnings info )) {
     has $message_type => (
         is          => 'ro',
-        isa         => 'ArrayRef[Str]',
+        isa         => ArrayRef[Str],
         required    => 1,
         default     => sub { [] },
-        traits      => [ 'Array' ],
-        handles     => {
-            "list_$message_type" => [ 'map', sub { ucfirst "$_." } ],
-            "add_$message_type"  => 'push',
-            "has_$message_type"  => 'count',
-        },
     );
+
+    no strict 'refs';
+
+    *{__PACKAGE__ . "::list_$message_type"} = subname "list_$message_type", sub {
+        my $self = shift;
+        map { ucfirst "$_." } $self->$message_type->@*
+    };
+
+    *{__PACKAGE__ . "::add_$message_type"} = subname "add_$message_type", sub {
+        my $self = shift;
+        push $self->$message_type->@*, @_;
+    };
+
+    *{__PACKAGE__ . "::has_$message_type"} = subname "add_$message_type", sub {
+        my $self = shift;
+        scalar $self->$message_type->@*;
+    };
 }
+
 
 =head1 METHODS
 
@@ -206,5 +221,4 @@ sub rebase_url {
     return URI->new($url)->abs($self->base_url);
 }
 
-
-__PACKAGE__->meta->make_immutable;
+1;

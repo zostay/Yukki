@@ -2,7 +2,9 @@ package Yukki::Model::FilePreview;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
+
+use Types::Standard qw( Str Int );
 
 extends 'Yukki::Model::File';
 
@@ -22,7 +24,7 @@ This is the content the file should have in the preview.
 
 has content => (
     is          => 'rw',
-    isa         => 'Str',
+    isa         => Str,
     required    => 1,
 );
 
@@ -34,7 +36,7 @@ The position in the text for the caret.
 
 has position => (
     is          => 'rw',
-    isa         => 'Int',
+    isa         => Int,
     required    => 1,
     default     => -1,
 );
@@ -64,4 +66,4 @@ override fetch_formatted => sub {
     return $self->SUPER::fetch_formatted($ctx, $position);
 };
 
-__PACKAGE__->meta->make_immutable;
+1;

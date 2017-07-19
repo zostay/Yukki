@@ -2,7 +2,9 @@ package Yukki::Web::Plugin::SyntaxHighlight;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
+
+use Types::Standard qw( HashRef Str );
 
 extends 'Yukki::Web::Plugin';
 
@@ -16,7 +18,7 @@ use Syntax::Highlight::Engine::Kate::Perl6;
 
   <div>{{highlight:Perl:
   use v5.14;
-  use Moose;
+  use Moo;
 
   has something => ( is => 'ro' );
   }}</div>
@@ -25,7 +27,7 @@ use Syntax::Highlight::Engine::Kate::Perl6;
 
   {{highlight-div:Perl:
   use v5.14;
-  use Moose;
+  use Moo;
 
   has something => ( is => 'ro' );
   }}
@@ -54,7 +56,7 @@ Sets up the "highlight" helper.
 
 has format_helpers => (
     is          => 'ro',
-    isa         => 'HashRef[Str]',
+    isa         => HashRef[Str],
     required    => 1,
     default     => sub { +{
         'highlight'      => 'highlight_syntax',
@@ -135,4 +137,4 @@ sub highlight_syntax {
     return $highlighted_text;
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

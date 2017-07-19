@@ -2,7 +2,9 @@ package Yukki::Web::Plugin::Attachment;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
+
+use Types::Standard qw( HashRef Str );
 
 extends 'Yukki::Web::Plugin';
 
@@ -28,7 +30,7 @@ Links the "attachment" format helper to L</attachment_url>.
 
 has format_helpers => (
     is          => 'ro',
-    isa         => 'HashRef[Str]',
+    isa         => HashRef[Str],
     required    => 1,
     default     => sub { +{
         'attachment' => 'attachment_url',
@@ -83,4 +85,4 @@ sub attachment_url {
     return;
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

@@ -2,7 +2,7 @@ package Yukki::Web::Controller::Page;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
 with 'Yukki::Web::Controller';
 
@@ -447,4 +447,4 @@ sub breadcrumb {
     return \@breadcrumb;
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

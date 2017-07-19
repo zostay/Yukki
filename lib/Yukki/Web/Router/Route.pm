@@ -2,7 +2,7 @@ package Yukki::Web::Router::Route;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
 extends 'Path::Router::Route';
 
@@ -172,4 +172,4 @@ sub match {
     );
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

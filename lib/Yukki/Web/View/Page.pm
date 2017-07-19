@@ -2,7 +2,9 @@ package Yukki::Web::View::Page;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
+
+use Type::Utils;
 
 extends 'Yukki::Web::View';
 
@@ -16,7 +18,7 @@ Renders wiki pages.
 
 has blank_template => (
     is          => 'ro',
-    isa         => 'Template::Pure',
+    isa         => class_type('Template::Pure'),
     lazy        => 1,
     builder     => '_build_blank_template',
 );
@@ -34,7 +36,7 @@ sub _build_blank_template {
 
 has view_template => (
     is          => 'ro',
-    isa         => 'Template::Pure',
+    isa         => class_type('Template::Pure'),
     lazy        => 1,
     builder     => '_build_view_template',
 );
@@ -50,7 +52,7 @@ sub _build_view_template {
 
 has history_template => (
     is          => 'ro',
-    isa         => 'Template::Pure',
+    isa         => class_type('Template::Pure'),
     lazy        => 1,
     builder     => '_build_history_template',
 );
@@ -86,7 +88,7 @@ sub _build_history_template {
 
 has diff_template => (
     is          => 'ro',
-    isa         => 'Template::Pure',
+    isa         => class_type('Template::Pure'),
     lazy        => 1,
     builder     => '_build_diff_template',
 );
@@ -102,7 +104,7 @@ sub _build_diff_template {
 
 has edit_template => (
     is          => 'ro',
-    isa         => 'Template::Pure',
+    isa         => class_type('Template::Pure'),
     lazy        => 1,
     builder     => '_build_edit_template',
 );
@@ -120,9 +122,43 @@ sub _build_edit_template {
     );
 }
 
+has rename_template => (
+    is          => 'ro',
+    isa         => class_type('Template::Pure'),
+    lazy        => 1,
+    builder     => '_build_rename_template',
+);
+
+sub _build_rename_template {
+    shift->prepare_template(
+        template   => 'page/rename.html',
+        directives => [
+            '#yukkiname'           => 'page',
+            '#yukkiname_new@value' => 'page',
+        ],
+    );
+}
+
+has remove_template => (
+    is          => 'ro',
+    isa         => class_type('Template::Pure'),
+    lazy        => 1,
+    builder     => '_build_remove_template',
+);
+
+sub _build_remove_template {
+    shift->prepare_template(
+        template   => 'page/remove.html',
+        directives => [
+            '.yukkiname'          => 'page',
+            '#cancel_remove@href' => 'return_link',
+        ],
+    );
+}
+
 has attachments_template => (
     is          => 'ro',
-    isa         => 'Template::Pure',
+    isa         => class_type('Template::Pure'),
     lazy        => 1,
     builder     => '_build_attachments_template',
 );
@@ -331,11 +367,10 @@ sub rename {
         unless $ctx->request->path_parameters->{file};
 
     return $self->render_page(
-        template => 'page/rename.html',
+        template => $self->rename_template,
         context  => $ctx,
         vars     => {
-            '#yukkiname'                => $vars->{page},
-            '#yukkiname_new@value'      => $vars->{page},
+            page => $vars->{page},
         },
     );
 }
@@ -357,11 +392,11 @@ sub remove {
         unless $ctx->request->path_parameters->{file};
 
     return $self->render_page(
-        template => 'page/remove.html',
+        template => $self->remove_template,
         context  => $ctx,
         vars     => {
-            '.yukkiname'          => $vars->{page},
-            '#cancel_remove@href' => $vars->{return_link},
+            page        => $vars->{page},
+            return_link => $vars->{return_link},
         },
     );
 }
@@ -477,4 +512,4 @@ sub preview {
     return $html;
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

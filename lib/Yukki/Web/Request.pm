@@ -2,9 +2,11 @@ package Yukki::Web::Request;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
 use Plack::Request;
+use Type::Utils;
+use Types::Standard qw( HashRef );
 
 # ABSTRACT: Yukki request descriptor
 
@@ -22,7 +24,7 @@ This is the PSGI environment. Do not use.
 
 has env => (
     is          => 'ro',
-    isa         => 'HashRef',
+    isa         => HashRef,
     required    => 1,
 );
 
@@ -40,9 +42,10 @@ This is the internal L<Plack::Request> object. Do not use. Use one of the method
 
 has request => (
     is          => 'ro',
-    isa         => 'Plack::Request',
+    isa         => class_type('Plack::Request'),
     required    => 1,
-    lazy_build  => 1,
+    lazy        => 1,
+    builder     => '_build_request',
     handles     => [ qw(
         address remote_host method protocol request_uri path_info path script_name scheme
         secure body input session session_options logger cookies query_parameters
@@ -65,9 +68,9 @@ These are the variables found in the path during dispatch.
 
 has path_parameters => (
     is          => 'rw',
-    isa         => 'HashRef',
+    isa         => HashRef,
     required    => 1,
     default     => sub { +{} },
 );
 
-__PACKAGE__->meta->make_immutable;
+1;

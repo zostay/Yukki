@@ -2,9 +2,10 @@ package Yukki::Settings;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
-use MooseX::Types::Path::Class;
+use Types::Path::Tiny qw( Path );
+use Types::Standard qw( Str );
 use Yukki::Types qw( RepositoryMap YukkiSettingsAnonymous );
 
 # ABSTRACT: provides structure and validation to settings in yukki.conf
@@ -25,7 +26,7 @@ This is the wiki site directory. This should be the same folder that was given t
 
 has root => (
     is          => 'ro',
-    isa         => 'Path::Class::Dir',
+    isa         => Path,
     required    => 1,
     coerce      => 1,
     default     => '.',
@@ -39,7 +40,7 @@ This is the folder where Yukki will find the git repositories installed under C<
 
 has repository_path => (
     is          => 'ro',
-    isa         => 'Path::Class::Dir',
+    isa         => Path,
     required    => 1,
     coerce      => 1,
     default     => 'repositories',
@@ -53,7 +54,7 @@ This is the folder where the list of user files can be found.
 
 has user_path => (
     is          => 'ro',
-    isa         => 'Path::Class::Dir',
+    isa         => Path,
     required    => 1,
     coerce      => 1,
     default     => 'var/db/users',
@@ -69,7 +70,7 @@ N.B. If you change digest algorithms, old passwords saved with the old digest al
 
 has digest => (
     is          => 'ro',
-    isa         => 'Str',
+    isa         => Str,
     required    => 1,
     default     => 'SHA-512',
 );
@@ -154,12 +155,13 @@ has repositories => (
 {
     package Yukki::Settings::Anonymous;
 
-    use Moose;
+    use Moo;
+    use Types::Standard qw( Str );
     use Yukki::Types qw( EmailAddress );
 
     has author_name => (
         is          => 'ro',
-        isa         => 'Str',
+        isa         => Str,
         required    => 1,
         default     => 'Anonymous',
     );
@@ -176,31 +178,33 @@ has repositories => (
 {
     package Yukki::Settings::Repository;
 
-    use Moose;
+    use Moo;
+    use Types::Path::Tiny qw( Path );
+    use Types::Standard qw( ArrayRef Int Str );
 
     has repository => (
         is          => 'ro',
-        isa         => 'Path::Class::Dir',
+        isa         => Path,
         required    => 1,
         coerce      => 1,
     );
 
     has site_branch => (
         is          => 'ro',
-        isa         => 'Str',
+        isa         => Str,
         required    => 1,
         default     => 'refs/heads/master',
     );
 
     has name => (
         is          => 'ro',
-        isa         => 'Str',
+        isa         => Str,
         required    => 1,
     );
 
     has default_page => (
         is          => 'ro',
-        isa         => 'Path::Class::File',
+        isa         => Path,
         required    => 1,
         coerce      => 1,
         default     => 'home.yukki',
@@ -208,7 +212,7 @@ has repositories => (
 
     has sort => (
         is          => 'ro',
-        isa         => 'Int',
+        isa         => Int,
         required    => 1,
         default     => 50,
     );
@@ -222,17 +226,17 @@ has repositories => (
 
     has read_groups => (
         is          => 'ro',
-        isa         => 'Str|ArrayRef[Str]',
+        isa         => Str|ArrayRef[Str],
         required    => 1,
         default     => 'NONE',
     );
 
     has write_groups => (
         is          => 'ro',
-        isa         => 'Str|ArrayRef[Str]',
+        isa         => Str|ArrayRef[Str],
         required    => 1,
         default     => 'NONE',
     );
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

@@ -2,7 +2,9 @@ package Yukki::Model;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
+
+use Type::Utils;
 
 # ABSTRACT: Base class for model objects
 
@@ -20,10 +22,10 @@ This is the L<Yukki> application instance.
 
 has app => (
     is          => 'ro',
-    isa         => 'Yukki',
+    isa         => class_type('Yukki'),
     required    => 1,
     weak_ref    => 1,
     handles     => 'Yukki::Role::App',
 );
 
-__PACKAGE__->meta->make_immutable;
+1;

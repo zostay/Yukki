@@ -2,20 +2,22 @@ package Yukki::Web::Plugin::Role::FormatHelper;
 
 use v5.24;
 use utf8;
-use Moose::Role;
+use Moo::Role;
 # ABSTRACT: interface for quick format helpers
 
 =head1 SYNOPSIS
 
   package MyPlugins::LowerCase;
   use 5.12.1;
-  use Moose;
+  use Moo;
+
+  use Types::Standard qw( HashRef Str );
 
   extends 'Yukki::Web::Plugin';
 
   has format_helpers => (
       is          => 'ro',
-      isa         => 'HashRef[Str]',
+      isa         => HashRef[Str],
       default     => sub { +{
           'lc' => 'lc_helper',
       } },

@@ -2,7 +2,7 @@ package Yukki::Web;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
 extends qw( Yukki );
 
@@ -19,6 +19,7 @@ use LWP::MediaTypes qw( add_type );
 use Plack::Session::Store::Cache;
 use Scalar::Util qw( blessed weaken );
 use Try::Tiny;
+use Type::Utils;
 
 # ABSTRACT: the Yukki web server
 
@@ -31,7 +32,10 @@ controllers.
 
 =cut
 
-has '+settings' => ( isa => YukkiWebSettings );
+has '+settings' => (
+    isa       => YukkiWebSettings,
+    coerce    => 1,
+);
 
 =head2 router
 
@@ -42,9 +46,10 @@ sent. It is automatically set to a L<Yukki::Web::Router> instance.
 
 has router => (
     is          => 'ro',
-    isa         => 'Path::Router',
+    isa         => class_type('Path::Router'),
     required    => 1,
-    lazy_build  => 1,
+    lazy        => 1,
+    builder     => '_build_router',
 );
 
 sub _build_router {
@@ -66,18 +71,26 @@ has plugins => (
     is          => 'ro',
     isa         => PluginList,
     required    => 1,
-    lazy_build  => 1,
-    traits      => [ 'Array' ],
-    handles     => {
-        all_plugins              => 'elements',
-        format_helper_plugins => [ grep => sub {
-            $_->does('Yukki::Web::Plugin::Role::FormatHelper')
-        } ],
-        formatter_plugins => [ grep => sub {
-            $_->does('Yukki::Web::Plugin::Role::Formatter')
-        } ],
-    },
+    lazy        => 1,
+    builder     => '_build_plugins',
 );
+
+sub all_plugins {
+    my $self = shift;
+    $self->plugins->@*;
+}
+
+sub format_helper_plugins {
+    my $self = shift;
+    grep { $_->does('Yukki::Web::Plugin::Role::FormatHelper') }
+        $self->plugins->@*;
+}
+
+sub formatter_plugins {
+    my $self = shift;
+    grep { $_->does('Yukki::Web::Plugin::Role::Formatter') }
+        $self->plugins->@*;
+}
 
 sub _build_plugins {
     my $self = shift;
@@ -310,4 +323,4 @@ sub munge_label {
 
 =cut
 
-__PACKAGE__->meta->make_immutable;
+1;

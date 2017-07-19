@@ -1,9 +1,10 @@
 #!/usr/bin/env perl
 use 5.12.1;
 
-use Test::More tests => 58;
+use Test2::V0;
 use Test::Exception;
-use Test::Moose;
+
+plan 58;
 
 use Path::Class;
 
@@ -11,7 +12,7 @@ use_ok('Yukki');
 
 my $app = Yukki->new;
 isa_ok($app, 'Yukki');
-does_ok($app, 'Yukki::Role::App');
+DOES_ok($app, 'Yukki::Role::App');
 
 throws_ok { $app->config_file } qr/make YUKKI_CONFIG point/, 'missing config location complains';
 

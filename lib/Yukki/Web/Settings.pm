@@ -2,10 +2,12 @@ package Yukki::Web::Settings;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
 extends 'Yukki::Settings';
 
+use Types::Path::Tiny qw( Path );
+use Types::Standard qw( ArrayRef HashRef Str );
 use Yukki::Types qw( BaseURL PluginConfig );
 
 # ABSTRACT: provides structure and validation to web settings in yukki.conf
@@ -24,7 +26,7 @@ THis is the folder where Yukki will find templates under the C<root>. The defaul
 
 has template_path => (
     is          => 'ro',
-    isa         => 'Path::Class::Dir',
+    isa         => Path,
     required    => 1,
     coerce      => 1,
     default     => 'root/template',
@@ -38,7 +40,7 @@ This is the folder where Yukki will find the static files to serve for your appl
 
 has static_path => (
     is          => 'ro',
-    isa         => 'Path::Class::Dir',
+    isa         => Path,
     required    => 1,
     coerce      => 1,
     default     => 'root',
@@ -87,7 +89,7 @@ at least the scripts listed above.
 
 has scripts => (
     is          => 'ro',
-    isa         => 'ArrayRef[Str]',
+    isa         => ArrayRef[Str],
     required    => 1,
     default     => sub {
         [ qw(
@@ -99,15 +101,16 @@ has scripts => (
             script/yukki.js
         ) ]
     },
-    traits      => [ 'Array' ],
-    handles     => {
-        all_scripts => 'elements',
-    },
 );
+
+sub all_scripts {
+    my $self = shift;
+    $self->scripts->@*;
+}
 
 has styles => (
     is          => 'ro',
-    isa         => 'ArrayRef[Str]',
+    isa         => ArrayRef[Str],
     required    => 1,
     default     => sub {
         [ qw(
@@ -115,11 +118,12 @@ has styles => (
             style/lib/jquery/jquery.css
         ) ]
     },
-    traits      => [ 'Array' ],
-    handles     => {
-        all_styles => 'elements',
-    },
 );
+
+sub all_styles {
+    my $self = shift;
+    $self->styles->@*;
+}
 
 =head2 menu_names
 
@@ -137,7 +141,7 @@ This will insure that those menus are empty when they should be empty.
 
 has menu_names => (
     is          => 'ro',
-    isa         => 'ArrayRef[Str]',
+    isa         => ArrayRef[Str],
     required    => 1,
     default     => sub { [ qw(
         repository
@@ -171,7 +175,7 @@ This is the list of page views to provide. By default, this is
 
 has page_views => (
     is          => 'ro',
-    isa         => 'HashRef[HashRef]',
+    isa         => HashRef[HashRef],
     required    => 1,
     default     => sub { +{
         default => {
@@ -218,11 +222,11 @@ By default, "text/yukki" is mapped to the "yukki" file extension.
 
 has media_types => (
     is          => 'ro',
-    isa         => 'HashRef[Str|ArrayRef[Str]]',
+    isa         => HashRef[Str|ArrayRef[Str]],
     required    => 1,
     default     => sub { +{
         'text/yukki' => 'yukki',
     } },
 );
 
-__PACKAGE__->meta->make_immutable;
+1;

@@ -2,11 +2,11 @@ package Yukki::Web::Router::Route::Match;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
 extends 'Path::Router::Route::Match';
 
-use List::MoreUtils qw( all any );
+use List::Util qw( all any );
 use Yukki::Error qw( http_throw );
 
 # ABSTRACT: Matching with access controls
@@ -62,4 +62,4 @@ sub access_level {
     http_throw("no ACL found to match " . $self->path);
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

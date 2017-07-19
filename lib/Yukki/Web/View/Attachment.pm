@@ -2,7 +2,9 @@ package Yukki::Web::View::Attachment;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
+
+use Type::Utils;
 
 extends 'Yukki::Web::View';
 
@@ -16,7 +18,7 @@ Handles the display of attachment forms.
 
 has rename_template => (
     is          => 'ro',
-    isa         => 'Template::Pure',
+    isa         => class_type('Template::Pure'),
     lazy        => 1,
     builder     => '_build_rename_template',
 );
@@ -33,7 +35,7 @@ sub _build_rename_template {
 
 has remove_template => (
     is          => 'ro',
-    isa         => 'Template::Pure',
+    isa         => class_type('Template::Pure'),
     lazy        => 1,
     builder     => '_build_remove_template',
 );
@@ -88,4 +90,4 @@ sub remove {
     );
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

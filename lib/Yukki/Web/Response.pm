@@ -2,8 +2,10 @@ package Yukki::Web::Response;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
+use Type::Utils;
+use Types::Standard qw( Str );
 use Yukki::Types qw( BreadcrumbLinks NavigationMenuMap );
 
 use Plack::Response;
@@ -29,9 +31,10 @@ Use the delegated methods instead:
 
 has response => (
     is          => 'ro',
-    isa         => 'Plack::Response',
+    isa         => class_type('Plack::Response'),
     required    => 1,
-    lazy_build  => 1,
+    lazy        => 1,
+    builder     => '_build_response',
     handles     => [ qw(
         status headers body header content_type content_length content_encoding
         redirect location cookies finalize
@@ -51,7 +54,7 @@ This is the title to give the page in the HTML.
 
 has page_title => (
     is          => 'rw',
-    isa         => 'Str',
+    isa         => Str,
     predicate   => 'has_page_title',
 );
 
@@ -74,11 +77,12 @@ has navigation => (
     isa         => NavigationMenuMap,
     required    => 1,
     default     => sub { +{} },
-    traits      => [ 'Hash' ],
-    handles     => {
-        navigation_menu_names => 'keys',
-    },
 );
+
+sub navigation_menu_names {
+    my $self = shift;
+    keys $self->navigation->%*;
+}
 
 =head2 breadcrumb
 
@@ -91,12 +95,17 @@ has breadcrumb => (
     isa         => BreadcrumbLinks,
     required    => 1,
     default     => sub { [] },
-    traits      => [ 'Array' ],
-    handles     => {
-        breadcrumb_links => 'elements',
-        has_breadcrumb   => 'count',
-    },
 );
+
+sub breadcrumb_links {
+    my $self = shift;
+    $self->breadcrumb->@*;
+}
+
+sub has_breadcrumb {
+    my $self = shift;
+    scalar $self->breadcrumb->@*;
+}
 
 =head1 METHODS
 
@@ -144,4 +153,4 @@ sub add_navigation_items {
     }
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

@@ -2,7 +2,7 @@ package Yukki::Model::Repository;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
 extends 'Yukki::Model';
 
@@ -11,7 +11,9 @@ use Yukki::Model::File;
 
 use DateTime::Format::Mail;
 use Git::Repository v1.18;
-use MooseX::Types::Path::Class;
+use Type::Utils;
+use Types::Path::Tiny qw( Path );
+use Types::Standard qw( Str );
 use Try::Tiny;
 
 # ABSTRACT: model for accessing objects in a git repository
@@ -43,7 +45,7 @@ the repository from the F<yukki.conf>.
 
 has name => (
     is          => 'ro',
-    isa         => 'Str',
+    isa         => Str,
     required    => 1,
 );
 
@@ -57,7 +59,7 @@ information in the F<yukki.conf>.
 
 has repository_settings => (
     is          => 'ro',
-    isa         => 'Yukki::Settings::Repository',
+    isa         => class_type('Yukki::Settings::Repository'),
     required    => 1,
     lazy        => 1,
     default     => sub {
@@ -79,10 +81,11 @@ and C<repository> keys in the configuration.
 
 has repository_path => (
     is          => 'ro',
-    isa         => 'Path::Class::Dir',
+    isa         => Path,
     coerce      => 1,
     required    => 1,
-    lazy_build  => 1,
+    lazy        => 1,
+    builder     => '_build_repository_path',
 );
 
 sub _build_repository_path {
@@ -100,9 +103,10 @@ This is a L<Git::Repository> object which helps us do the real work.
 
 has git => (
     is          => 'ro',
-    isa         => 'Git::Repository',
+    isa         => class_type('Git::Repository'),
     required    => 1,
-    lazy_build  => 1,
+    lazy        => 1,
+    builder     => '_build_git',
 );
 
 sub _build_git {
@@ -730,4 +734,4 @@ END_OF_STUB_MAIN
     return;
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

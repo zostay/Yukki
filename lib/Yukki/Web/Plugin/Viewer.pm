@@ -2,7 +2,9 @@ package Yukki::Web::Plugin::Viewer;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
+
+use Types::Standard qw( HashRef Str );
 
 extends 'Yukki::Web::Plugin';
 
@@ -28,7 +30,7 @@ Provides the viewer link.
 
 has format_helpers => (
     is          => 'ro',
-    isa         => 'HashRef[Str]',
+    isa         => HashRef[Str],
     required    => 1,
     default     => sub { +{
         'show view' => 'show_view_link',
@@ -75,4 +77,4 @@ sub show_view_link {
     return '';
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

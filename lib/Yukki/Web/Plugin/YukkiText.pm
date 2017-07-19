@@ -2,7 +2,10 @@ package Yukki::Web::Plugin::YukkiText;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
+
+use Type::Utils;
+use Types::Standard qw( HashRef Str );
 
 extends 'Yukki::Web::Plugin';
 
@@ -45,7 +48,7 @@ This returns the yukkitext formatter for "text/yukki".
 
 has html_formatters => (
     is          => 'ro',
-    isa         => 'HashRef[Str]',
+    isa         => HashRef[Str],
     required    => 1,
     default     => sub { +{
         'text/yukki'    => 'yukkitext',
@@ -65,9 +68,10 @@ Provides a C<format_markdown> method delegated to C<markdown>. Do not use.
 
 has markdown => (
     is          => 'ro',
-    isa         => 'Text::MultiMarkdown',
+    isa         => class_type('Text::MultiMarkdown'),
     required    => 1,
-    lazy_build  => 1,
+    lazy        => 1,
+    builder     => '_build_markdown',
     handles     => {
         'format_markdown' => 'markdown',
     },
@@ -259,7 +263,7 @@ sub yukkitext {
             plugin_name => $1,
             arg         => $2,
         });
-    }xegms;
+   }xegms;
 
     # Handle the escaped plugin thing
     $yukkitext =~ s{
@@ -282,4 +286,4 @@ sub yukkitext {
     return $formatted;
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

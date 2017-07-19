@@ -2,7 +2,7 @@ package Yukki::Web::Plugin::Role::Formatter;
 
 use v5.24;
 use utf8;
-use Moose::Role;
+use Moo::Role;
 
 # ABSTRACT: interface for HTML formatters
 
@@ -10,13 +10,15 @@ use Moose::Role;
 
   package MyPlugins::SimpleText;
   use 5.12.1;
-  use Moose;
+  use Moo;
+
+  use Types::Standard qw( HashRef Str );
 
   extends 'Yukki::Web::Plugin';
 
   has html_formatters => (
       is          => 'ro',
-      isa         => 'HashRef[Str]',
+      isa         => HashRef[Str],
       default     => sub { +{
           'text/simple' => 'format_simple',
         } },

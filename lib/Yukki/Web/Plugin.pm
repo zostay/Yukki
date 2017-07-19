@@ -2,20 +2,25 @@ package Yukki::Web::Plugin;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
+
+use Type::Utils;
+
 # ABSTRACT:  base class for Yukki plugins
 
 =head1 SYNOPSIS
 
   package MyPlugins::LowerCase;
   use 5.12.1;
-  use Moose;
+  use Moo;
+
+  use Types::Standard qw( HashRef CodeRef );
 
   extends 'Yukki::Web::Plugin';
 
   has format_helpers => (
       is          => 'ro',
-      isa         => 'HashRef[CodeRef]',
+      isa         => HashRef[CodeRef],
       default     => sub { +{
           'lc' => \&lc_helper,
       } },
@@ -54,10 +59,10 @@ This is the L<Yukki::Web> singleton. All the methods required in L<Yukki::Role::
 
 has app => (
     is          => 'ro',
-    isa         => 'Yukki::Web',
+    isa         => class_type('Yukki::Web'),
     required    => 1,
     weak_ref    => 1,
     handles     => 'Yukki::Role::App',
 );
 
-__PACKAGE__->meta->make_immutable;
+1;

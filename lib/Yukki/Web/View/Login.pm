@@ -2,7 +2,9 @@ package Yukki::Web::View::Login;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
+
+use Type::Utils;
 
 extends 'Yukki::Web::View';
 
@@ -16,7 +18,7 @@ Renders the login form.
 
 has login_template => (
     is          => 'ro',
-    isa         => 'Template::Pure',
+    isa         => class_type('Template::Pure'),
     lazy        => 1,
     builder     => '_build_login_template',
 );
@@ -32,7 +34,7 @@ sub _build_login_template {
 
 has profile_template => (
     is          => 'ro',
-    isa         => 'Template::Pure',
+    isa         => class_type('Template::Pure'),
     lazy        => 1,
     builder     => '_build_profile_template',
 );
@@ -93,4 +95,4 @@ sub profile {
     );
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

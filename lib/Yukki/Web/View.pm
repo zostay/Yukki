@@ -2,16 +2,17 @@ package Yukki::Web::View;
 
 use v5.24;
 use utf8;
-use Moose;
+use Moo;
 
 use File::Slurp qw( read_file );
-use MooseX::Params::Validate;
-use Path::Class;
+use Type::Params qw( validate );
 use Scalar::Util qw( blessed reftype );
 use Spreadsheet::Engine;
 use Template::Pure;
 use Text::MultiMarkdown;
 use Try::Tiny;
+use Type::Utils;
+use Types::Standard qw( Dict Str ArrayRef HashRef slurpy );
 
 # ABSTRACT: base class for Yukki::Web views
 
@@ -29,7 +30,7 @@ This is the L<Yukki::Web> singleton.
 
 has app => (
     is          => 'ro',
-    isa         => 'Yukki::Web',
+    isa         => class_type('Yukki::Web'),
     required    => 1,
     weak_ref    => 1,
     handles     => 'Yukki::Role::App',
@@ -46,9 +47,10 @@ Provides a C<format_markdown> method delegated to C<markdown>. Do not use.
 
 has markdown => (
     is          => 'ro',
-    isa         => 'Text::MultiMarkdown',
+    isa         => class_type('Text::MultiMarkdown'),
     required    => 1,
-    lazy_build  => 1,
+    lazy        => 1,
+    builder     => '_build_markdown',
     handles     => {
         'format_markdown' => 'markdown',
     },
@@ -69,7 +71,7 @@ This is the template used to render info, warning, and error messages to the pag
 
 has messages_template => (
     is          => 'ro',
-    isa         => 'Template::Pure',
+    isa         => class_type('Template::Pure'),
     lazy        => 1,
     builder     => '_build_messages_template',
 );
@@ -100,7 +102,7 @@ sub _build_messages_template {
 
 has _page_templates => (
     is          => 'ro',
-    isa         => 'HashRef',
+    isa         => HashRef,
     required    => 1,
     default     => sub { +{} },
 );
@@ -113,7 +115,7 @@ This is the template object used to render links.
 
 has links_template => (
     is          => 'ro',
-    isa         => 'Template::Pure',
+    isa         => class_type('Template::Pure'),
     lazy        => 1,
     builder     => '_build_links_template',
 );
@@ -209,10 +211,13 @@ The C<directives> are the L<Template::Pure> directives to apply data given at re
 =cut
 
 sub prepare_template {
-    my ($self, $template, $directives) = validated_list(\@_,
-        template   => { isa => 'Str', coerce => 1 },
-        directives => { isa => 'ArrayRef' },
-    );
+    my ($self, $opt)
+        = validate(\@_, class_type(__PACKAGE__),
+            slurpy Dict[
+                template   => Str,
+                directives => ArrayRef,
+            ]);
+    my ($template, $directives) = @{$opt}{qw( template directives )};
 
     my $template_content = read_file(
         $self->app->locate_dir('template_path', $template)
@@ -242,11 +247,15 @@ The C<vars> are processed against the given template with L<Template::Pure>.
 =cut
 
 sub render_page {
-    my ($self, $template, $ctx, $vars) = validated_list(\@_,
-        template   => { isa => 'Template::Pure' },
-        context    => { isa => 'Yukki::Web::Context' },
-        vars       => { isa => 'HashRef', default => {} },
-    );
+    my ($self, $opt)
+        = validate(\@_, class_type(__PACKAGE__),
+            slurpy Dict[
+                template => class_type('Template::Pure'),
+                context  => class_type('Yukki::Web::Context'),
+                vars     => HashRef,
+            ]);
+    my ($template, $ctx, $vars) = @{$opt}{qw( template context vars )};
+    $vars //= {};
 
     my $messages = $self->render(
         template => $self->messages_template,
@@ -356,13 +365,14 @@ This renders a set of links using the F<links.html> template.
 =cut
 
 sub render_links {
-    my ($self, $ctx, $links) = validated_list(\@_,
-        context  => { isa => 'Yukki::Web::Context' },
-        links    => { isa => 'ArrayRef[HashRef]' },
-    );
+    my ($self, $opt)
+        = validate(\@_, class_type(__PACKAGE__),
+            slurpy Dict[
+                context => class_type('Yukki::Web::Context'),
+                links   => ArrayRef[HashRef],
+            ]);
+    my ($ctx, $links) = @{$opt}{qw( context links )};
 
-    use DDP;
-    p $links;
     return $self->render(
         template => $self->links_template,
         context  => $ctx,
@@ -390,11 +400,15 @@ used as the ones passed to the C<process> method.
 =cut
 
 sub render {
-    my ($self, $template, $ctx, $vars) = validated_list(\@_,
-        template   => { isa => 'Template::Pure' },
-        context    => { isa => 'Yukki::Web::Context' },
-        vars       => { isa => 'HashRef', default => {} },
-    );
+    my ($self, $opt)
+        = validate(\@_, class_type(__PACKAGE__),
+            slurpy Dict[
+                template => class_type('Template::Pure'),
+                context  => class_type('Yukki::Web::Context'),
+                vars     => HashRef,
+            ]);
+    my ($template, $ctx, $vars) = @{$opt}{qw( template context vars )};
+    $vars //= {};
 
     my %vars = (
         %$vars,
@@ -405,4 +419,4 @@ sub render {
     return $template->render($vars);
 }
 
-__PACKAGE__->meta->make_immutable;
+1;
