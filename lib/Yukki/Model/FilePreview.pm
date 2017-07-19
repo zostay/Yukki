@@ -51,7 +51,7 @@ Returns the value of L</content>.
 
 =cut
 
-override fetch => sub {
+sub fetch {
     my $self = shift;
     return $self->content;
 };
@@ -62,7 +62,7 @@ Same as in L<Yukki::Model::File>, except that the default position is L</positio
 
 =cut
 
-override fetch_formatted => sub {
+sub fetch_formatted {
     my ($self, $ctx, $position) = @_;
     $position //= $self->position;
     return $self->SUPER::fetch_formatted($ctx, $position);

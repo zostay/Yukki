@@ -223,4 +223,30 @@ sub rebase_url {
     return URI->new($url)->abs($self->base_url);
 }
 
+=head2 list_errors
+
+=head2 list_warnings
+
+=head2 list_info
+
+These methods return the list of errors, warnings, and info messages associated with the current flow.
+
+=head2 add_errors
+
+=head2 add_warnings
+
+=head2 add_info
+
+These methods add zero or more errors, warnings, and info messages to be associated with the current flow.
+
+=head2 has_errors
+
+=head2 has_warnings
+
+=head2 has_info
+
+These methods return a true value if there are any errors, warnings, or info messages associated with the current flow.
+
+=cut
+
 1;

@@ -44,7 +44,7 @@ if (-f "$user_file") {
     die "User $user{login_name} already exists. Try editing $user_file instead.\n";
 }
 
-mkpath(''.$user_file->dir);
+mkpath(''.$user_file->parent);
 
 dump_file($user_file, \%user);
 chmod 0400, "$user_file";

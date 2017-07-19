@@ -59,7 +59,7 @@ has config_file => (
 sub _build_config_file {
     my $self = shift;
 
-    my $cwd_conf = path('/etc/yukki.conf');
+    my $cwd_conf = path('.', 'etc', 'yukki.conf');
     if (not $ENV{YUKKI_CONFIG} and -f "$cwd_conf") {
         return $cwd_conf;
     }

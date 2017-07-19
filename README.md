@@ -4,7 +4,7 @@ Yukki::Manual::Installation - installaction instructions
 
 # VERSION
 
-version 0.990000
+version 0.140291
 
 # SYNOPSIS
 

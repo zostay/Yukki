@@ -155,4 +155,22 @@ sub add_navigation_items {
     }
 }
 
+=head2 breadcrumb_links
+
+Convenience accessor that returns C<breadcrumbs> as a list.
+
+=head2 has_breadcrumb
+
+Returns a true value if C<breadcrumbs> has any items in it.
+
+=head2 has_page_title
+
+Returns a true value if C<page_title> is set.
+
+=head2 navigation_menu_names
+
+Convenience accessor that returns C<navigation> as a list.
+
+=cut
+
 1;

@@ -4,11 +4,11 @@ use 5.12.1;
 use Test2::V0;
 use Test::Exception;
 
-plan 58;
+BEGIN { plan 58; }
 
-use Path::Class;
+use Path::Tiny;
 
-use_ok('Yukki');
+use ok('Yukki');
 
 my $app = Yukki->new;
 isa_ok($app, 'Yukki');
@@ -18,18 +18,18 @@ throws_ok { $app->config_file } qr/make YUKKI_CONFIG point/, 'missing config loc
 
 $ENV{YUKKI_CONFIG} = 't/test-site/etc/bad-yukki.conf';
 
-throws_ok { $app->config_file} qr/no configuration found/i, 'missing config file complains';
+throws_ok { $app->config_file } qr/no configuration found/i, 'missing config file complains';
 
 delete $ENV{YUKKI_CONFIG};
 chdir 't/test-site';
 
-is($app->config_file, file(dir(), 'etc', 'yukki.conf'), 'config set by CWD works');
+is($app->config_file, path('.', 'etc', 'yukki.conf'), 'config set by CWD works');
 
 delete $app->{config_file};
 chdir '../..';
 $ENV{YUKKI_CONFIG} = 't/test-site/etc/yukki.conf';
 
-is($app->config_file, file(dir(), 't', 'test-site', 'etc', 'yukki.conf'), 'config set by env works');
+is($app->config_file, path('.', 't', 'test-site', 'etc', 'yukki.conf'), 'config set by env works');
 
 throws_ok { $app->view } qr/unimplemented/i, 'view is not implemented';
 throws_ok { $app->controller } qr/unimplemented/i, 'controller is not implemented';
@@ -38,11 +38,11 @@ my $model = $app->model('User');
 isa_ok($model, 'Yukki::Model::User');
 
 my $dir = $app->locate_dir('repository_path', 'main.git');
-isa_ok($dir, 'Path::Class::Dir');
+isa_ok($dir, 'Path::Tiny');
 is("$dir", "/tmp/repositories/main.git", 'locate_dir makes the right dir');
 
 my $file = $app->locate('user_path', 'demo');
-isa_ok($file, 'Path::Class::File');
+isa_ok($file, 'Path::Tiny');
 is("$file", "/tmp/var/db/users/demo", 'locate makes the right file');
 
 is($app->check_access( user => undef, repository => 'noaccess', needs => 'none' ), 1);
@@ -94,5 +94,5 @@ is($app->check_access( user => { groups => ['group4'] }, repository => 'groupacc
 is($app->check_access( user => { groups => ['group4'] }, repository => 'groupaccess', needs => 'read' ), 1);
 is($app->check_access( user => { groups => ['group4'] }, repository => 'groupaccess', needs => 'write' ), 1);
 
-isa_ok($app->hasher, 'Crypt::SaltedHash', 'hasher is what it is supposed to be');
+isa_ok($app->hasher, 'Crypt::SaltedHash');
 is($app->hasher->{algorithm}, $app->settings->digest, 'hasher is using the proper algorithm');

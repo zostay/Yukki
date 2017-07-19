@@ -231,4 +231,16 @@ has media_types => (
     } },
 );
 
+=head1 METHODS
+
+=head2 all_scripts
+
+Convenience accessor that returns C<scripts> as a list.
+
+=head2 all_styles
+
+Convenience accessor that returns C<styles> as a list.
+
+=cut
+
 1;

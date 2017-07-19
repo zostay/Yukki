@@ -317,6 +317,18 @@ sub munge_label {
     return $link;
 }
 
+=head2 all_plugins
+
+A convenience accessor that returns C<plugins> as a list.
+
+=head2 format_helper_plugins
+
+Returns all the format helper plugins as a list.
+
+=head2 formatter_plugins
+
+Returns all the formatter plugins as a list.
+
 =begin Pod::Coverage
 
   BUILD

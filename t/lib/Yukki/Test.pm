@@ -5,6 +5,8 @@ use IPC::Run3;
 use File::Temp qw( tempdir );
 use Probe::Perl;
 
+use namespace::clean;
+
 use Sub::Exporter -setup => {
     exports => [
         qw( yukki yukki_setup yukki_git_init yukki_add_user ),

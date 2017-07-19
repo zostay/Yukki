@@ -565,4 +565,10 @@ sub parent {
     );
 }
 
+=head2 branch
+
+Returns the repository branch to which this file belongs.
+
+=cut
+
 1;

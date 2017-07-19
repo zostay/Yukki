@@ -6,13 +6,13 @@ use Moo;
 
 extends qw( HTTP::Throwable::Factory );
 
-use Sub::Exporter -setup => {
-    exports => [ qw< http_throw http_exception > ],
-};
-
 use Yukki::Web::View;
 
 use namespace::clean;
+
+use Sub::Exporter -setup => {
+    exports => [ qw< http_throw http_exception > ],
+};
 
 # ABSTRACT: Yukki's exception class
 

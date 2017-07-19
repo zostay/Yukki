@@ -10,8 +10,10 @@ use Yukki::Types qw( LoginName );
 use Yukki::TextUtil qw( load_file );
 
 use Path::Class;
-use Type::Validate;
+use Type::Params qw( validate );
+use Type::Utils;
 use Types::Path::Tiny;
+use Types::Standard qw( slurpy Dict );
 
 use namespace::clean;
 
@@ -36,16 +38,16 @@ Read access to the current list of authorized users.
 
 =head2 find
 
-  my $user = $users->find($login_name);
+  my $user = $users->find(login_name => $login_name);
 
 Returns a hash containing the information related to a specific user named by login name.
 
 =cut
 
 sub find {
-    my ($self, $login_name) = validated_list(\@_,
-        login_name => { isa => LoginName },
-    );
+    my ($self, $opt)
+        = validate(\@_, class_type(__PACKAGE__), slurpy Dict[login_name => LoginName]);
+    my $login_name = $opt->{login_name};
 
     my $user_file = $self->locate('user_path', $login_name);
     if (-e $user_file) {
