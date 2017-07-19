@@ -1,10 +1,20 @@
 {{$NEXT}}
 
+    * Major: This is a significant update and refactor of internals, but doesn't
+      really change anything regarding actual functionality. Mostly, it was a
+      little broken due to a lack of maintenance.
     * Major: Now requires Perl v5.24.
     * Major: Templates are now rendered using Template::Pure rather than
       Template::Sematic. This is a better maintained templating system that adds
       an additional abstraction layer, which is very helpful. Templates are
       unchanged, though.
+    * Major: Completely refactored to use Moo and Types::Tiny instead of Moose
+      and Path::Tiny instead of Path::Class. I'm trying to get rid of all the
+      silly extra CPAN requirements it had before, but didn't really need.
+    * Major: Updated to jQuery 3.2.1, jQuery UI 1.12.1, and plupload 2.3.1.
+    * Minor: Better UTF-8 support.
+    * Minor: Removed "Fork on Github" banners.
+    * Minor: Some testing infrastructure updated to explicitly use Test2::V0
 
 0.140290  2014-01-29 08:28:15 America/Chicago
 
