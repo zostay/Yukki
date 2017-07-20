@@ -6,7 +6,7 @@ Yukki::Manual::Installation - installaction instructions
 
 # VERSION
 
-version 0.99\_02
+version 0.990\_001
 
 # SYNOPSIS
 
