@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+    * Minor: Using the correct number of digits in the V#.
+
 0.99_01   2017-07-19 11:03:27-05:00 America/Chicago (TRIAL RELEASE)
 
     * Major: This is a significant update and refactor of internals, but doesn't
