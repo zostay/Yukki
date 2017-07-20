@@ -2,6 +2,8 @@
 
 Yukki::Manual::Installation - installaction instructions
 
+[![Build Status](https://travis-ci.org/zostay/Yukki.png?branch=master)](https://travis-ci.org/zostay/Yukki)
+
 # VERSION
 
 version 0.99\_02
