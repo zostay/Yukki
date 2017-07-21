@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+    * Major: Fix yukki-git-init, which was broke since a long time ago.
+
+0.990_001 2017-07-20 13:41:13-05:00 America/Chicago (TRIAL RELEASE)
+
     * Minor: Using the correct number of digits in the V#.
 
 0.99_01   2017-07-19 11:03:27-05:00 America/Chicago (TRIAL RELEASE)
