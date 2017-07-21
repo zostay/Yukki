@@ -1,5 +1,9 @@
 {{$NEXT}}
 
+    * Major: More yukki-git-init fixing.
+
+0.990_002 2017-07-20 19:29:15-05:00 America/Chicago (TRIAL RELEASE)
+
     * Major: Fix yukki-git-init, which was broke since a long time ago.
 
 0.990_001 2017-07-20 13:41:13-05:00 America/Chicago (TRIAL RELEASE)
