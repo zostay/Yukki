@@ -4,7 +4,6 @@ use v5.24;
 use utf8;
 use Moo;
 
-use File::Slurp qw( read_file );
 use Type::Params qw( validate );
 use Scalar::Util qw( blessed reftype );
 use Spreadsheet::Engine;
@@ -221,9 +220,8 @@ sub prepare_template {
             ]);
     my ($template, $directives) = @{$opt}{qw( template directives )};
 
-    my $template_content = read_file(
-        $self->app->locate_dir('template_path', $template)
-    );
+    my $template_content =
+        $self->app->locate_dir('template_path', $template)->slurp;
 
     return Template::Pure->new(
         template   => $template_content,

@@ -4,8 +4,8 @@ use v5.24;
 use utf8;
 
 use Encode ();
-use File::Slurper ();
 use IO::Prompter ();
+use Path::Tiny;
 use YAML ();
 
 use namespace::clean;
@@ -38,7 +38,7 @@ This is pretty much identical in purpose to L<YAML/DumpFile>, but encodes to UTF
 
 sub dump_file {
     my ($file, $data) = @_;
-    File::Slurper::write_text("$file", YAML::Dump($data));
+    path($file)->spew(YAML::Dump($data));
 }
 
 =head2 load_file
@@ -51,7 +51,7 @@ This is similar to L<YAML/LoadFile>, but decodes from UTF-8 while reading input.
 
 sub load_file {
     my ($file) = @_;
-    YAML::Load(File::Slurper::read_text("$file"));
+    YAML::Load(path($file)->slurp);
 }
 
 =head2 prompt
