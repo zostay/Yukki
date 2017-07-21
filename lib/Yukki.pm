@@ -12,7 +12,7 @@ use Yukki::Types qw( AccessLevel YukkiSettings );
 use Yukki::Error qw( http_throw );
 
 use Crypt::SaltedHash;
-use List::MoreUtils qw( any );
+use List::Util qw( any );
 use Type::Params qw( validate );
 use Type::Utils;
 use Types::Standard qw( Dict HashRef Str Undef slurpy );

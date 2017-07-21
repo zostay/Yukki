@@ -17,8 +17,7 @@ use Types::Standard qw( Str Int ArrayRef Maybe HashRef Dict );
 use Types::URI qw( Uri );
 
 use Email::Address;
-use List::Util qw( first );
-use List::MoreUtils qw( all );
+use List::Util qw( first all );
 
 use namespace::clean;
 

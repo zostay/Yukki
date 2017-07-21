@@ -10,7 +10,7 @@ use Yukki::Web::Router::Route;
 
 use Types::Standard qw( ArrayRef Str );
 use Type::Utils qw( class_type declare as where );
-use List::MoreUtils qw( all );
+use List::Util qw( all );
 
 use namespace::clean;
 

@@ -10,7 +10,7 @@ use Yukki::Types qw( AccessLevel );
 use Yukki::Web::Router::Route::Match;
 
 use Types::Standard qw( ArrayRef HashRef Tuple );
-use List::MoreUtils qw( any );
+use List::Util qw( any );
 
 use namespace::clean;
 
