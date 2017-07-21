@@ -5,7 +5,7 @@ use lib 't/lib';
 use Yukki::Test;
 
 use File::Temp qw( tempdir );
-use Test::More tests => 14;
+use Test2::V0;
 use Test::Script;
 use Try::Tiny;
 use YAML qw( LoadFile );
@@ -47,14 +47,14 @@ ok(-f "$tempdir/yukki-test/var/db/users/foo",
 
 my $user = LoadFile("$tempdir/yukki-test/var/db/users/foo");
 my $password = delete $user->{password};
-is_deeply($user, {
+is($user, {
     login_name => 'foo',
     name       => 'Foo Bar',
     email      => 'foo@bar.com',
     groups     => [ 'some_group', 'another_group' ],
 }, 'the user was created correctly');
 
-use_ok('Yukki');
+use ok('Yukki');
 my $app = Yukki->new;
 my $digest = $app->hasher;
 
@@ -70,7 +70,7 @@ catch {
 
 my $user_again = LoadFile("$tempdir/yukki-test/var/db/users/foo");
 my $new_password = delete $user_again->{password};
-is_deeply($user_again, {
+is($user_again, {
     login_name => 'foo',
     name       => 'Foo Bar',
     email      => 'foo@bar.com',
@@ -78,3 +78,5 @@ is_deeply($user_again, {
 }, 'the user is unchanged');
 
 ok(scalar $digest->validate($new_password, 'My Other Secret'), 'password is valid, but different');
+
+done_testing;

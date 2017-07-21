@@ -5,7 +5,6 @@ use utf8;
 use Yukki;
 use Yukki::TextUtil qw( prompt dump_file );
 
-use File::Path;
 use IO::Prompter;
 
 my $app = Yukki->new;
@@ -43,7 +42,7 @@ if (-f "$user_file") {
     die "User $user{login_name} already exists. Try editing $user_file instead.\n";
 }
 
-mkpath(''.$user_file->parent);
+$user_file->parent->mkpath;
 
 dump_file($user_file, \%user);
 chmod 0400, "$user_file";

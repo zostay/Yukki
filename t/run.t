@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use lib 't/lib';
-use Test::More;
+use Test2::V0;
 use HTTP::Request::Common;
 use Plack::Test;
 use File::Temp qw( tempdir );

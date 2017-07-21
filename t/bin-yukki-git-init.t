@@ -3,8 +3,10 @@ use 5.12.1;
 
 use File::Temp qw( tempdir );
 use Git::Repository;
-use Test::More tests => 12;
+use Test2::V0;
 use Test::Script;
+
+plan 12;
 
 script_compiles('bin/yukki-setup', 'yukki-setup compiles');
 script_compiles('bin/yukki-git-init', 'yukki-git-init compiles');

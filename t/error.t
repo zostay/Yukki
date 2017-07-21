@@ -1,7 +1,9 @@
 #!/usr/bin/env perl
 use 5.12.1;
 
-use Test::More tests => 2;
+use Test2::V0;
 
-use_ok('Yukki::Error');
+use ok('Yukki::Error');
 can_ok('Yukki::Error', 'throw');
+
+done_testing;
