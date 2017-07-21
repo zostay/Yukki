@@ -7,7 +7,6 @@ use Yukki::TextUtil qw( prompt dump_file );
 
 use File::Path;
 use IO::Prompter;
-use Path::Class;
 
 my $app = Yukki->new;
 my $digest = $app->hasher;

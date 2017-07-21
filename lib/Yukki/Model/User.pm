@@ -9,7 +9,6 @@ extends 'Yukki::Model';
 use Yukki::Types qw( LoginName );
 use Yukki::TextUtil qw( load_file );
 
-use Path::Class;
 use Type::Params qw( validate );
 use Type::Utils;
 use Types::Path::Tiny;
