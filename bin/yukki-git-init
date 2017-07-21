@@ -22,7 +22,7 @@ die qq[Could not find o repository named "$repo_name" in yukki.conf\n]
 my $repo_dir = ''.$app->locate('repository_path', $config->{repository});
 
 if (defined $remote_repo) {
-    Git::Repository->create('clone', '--mirror',
+    Git::Repository->run('clone', '--mirror',
         $remote_repo, $repo_dir);
 }
 
