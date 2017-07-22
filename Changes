@@ -1,10 +1,13 @@
 {{$NEXT}}
 
-    * Major: More yukki-git-init fixing.
+    * Bugfix: Fixing various bugs with yukki-setup. Mostly, removed
+      File::Copy::Recursive because it was flaking out in some cases.
+    * Minor: Improved modern testing infrastructure.
 
 0.990_002 2017-07-20 19:29:15-05:00 America/Chicago (TRIAL RELEASE)
 
-    * Major: Fix yukki-git-init, which was broke since a long time ago.
+    * Bugfix: Fix yukki-git-init, which was broke since a long time ago due to
+      the create() method being deprecated in Git::Repository.
 
 0.990_001 2017-07-20 13:41:13-05:00 America/Chicago (TRIAL RELEASE)
 
