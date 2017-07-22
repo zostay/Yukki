@@ -17,7 +17,7 @@ die qq[A file or directory named "$site_dir" already exists, will not overwrite.
     if -e $site_dir;
 
 my $root       = path($site_dir)->absolute;
-my $module_dir = path($skel_dir) // module_dir('Yukki::Web');
+my $module_dir = path($skel_dir // module_dir('Yukki::Web'));
 
 $root->mkpath;
 $module_dir->visit(
