@@ -4,9 +4,9 @@ use utf8;
 
 use Yukki;
 use Yukki::TextUtil qw( prompt dump_file );
+use Yukki::User;
 
 my $app = Yukki->new;
-my $digest = $app->hasher;
 
 my @user_fields = (
     login_name => [ 'Login name:',
@@ -25,25 +25,14 @@ while (my ($name, $label) = splice @user_fields, 0, 2) {
     $user{$name} = prompt @$label, -v;
 }
 
-$digest->add($user{password});
-$user{password} = $digest->generate;
-
 while (my $group = prompt 'Group name [enter a blank line to end]:', -v) {
     last unless $group =~ /\S/;
     push @{ $user{groups} }, $group;
 }
 
-my $user_file = $app->locate('user_path', $user{login_name});
-
-# Do not overwrite existing users.
-if (-f "$user_file") {
-    die "User $user{login_name} already exists. Try editing $user_file instead.\n";
-}
-
-$user_file->parent->mkpath;
-
-dump_file($user_file, \%user);
-chmod 0400, "$user_file";
+my $user = Yukki::User->new(\%user);
+$app->model('User')->set_password($user);
+$app->model('User')->save($user);
 
 # ABSTRACT: add users to a Yukki installation
 # PODNAME: yukki-add-user

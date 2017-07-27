@@ -42,7 +42,7 @@ This is the name the user uses to login.
 =cut
 
 has login_name => (
-    is          => 'ro',
+    is          => 'rw',
     isa         => Str,
     required    => 1,
 );
@@ -54,7 +54,7 @@ This is the hashed password for the user.
 =cut
 
 has password => (
-    is          => 'ro',
+    is          => 'rw',
     isa         => Str,
     required    => 1,
 );
@@ -66,7 +66,7 @@ This is the full name of the user, used as the author name on commits.
 =cut
 
 has name => (
-    is          => 'ro',
+    is          => 'rw',
     isa         => Str,
     required    => 1,
 );
@@ -78,7 +78,7 @@ This is the email address of the user, used to uniquely identify the author in c
 =cut
 
 has email => (
-    is          => 'ro',
+    is          => 'rw',
     isa         => Str,
     required    => 1,
 );
