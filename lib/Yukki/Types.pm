@@ -8,6 +8,7 @@ use Type::Library -base, -declare => qw(
     NavigationLinks NavigationMenuMap
     BaseURL BaseURLEnum BreadcrumbLinks RepositoryMap
     PluginConfig PluginList
+    PrivilegesMap
     EmailAddress YukkiSettings
     YukkiWebSettings YukkiSettingsAnonymous
 );
@@ -141,6 +142,26 @@ coerce RepositoryMap,
         my $source = $_;
         +{
             map { $_ => Yukki::Settings::Repository->new($source->{$_}) }
+                keys %$source
+        }
+    };
+
+=head2 PrivilegeMap
+
+This is a hash of L<Yukki::Settings::Privileges> objects.
+
+=cut
+
+my $Privileges = class_type 'Yukki::Settings::Privileges';
+declare PrivilegesMap,
+    as HashRef[$Privileges];
+
+coerce PrivilegesMap,
+    from HashRef,
+    via {
+        my $source = $_;
+        +{
+            map { $_ => Yukki::Settings::Privileges->new($source->{$_}) }
                 keys %$source
         }
     };

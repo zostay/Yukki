@@ -42,7 +42,7 @@ This is the name the user uses to login.
 =cut
 
 has login_name => (
-    is          => 'rw',
+    is          => 'ro',
     isa         => Str,
     required    => 1,
 );

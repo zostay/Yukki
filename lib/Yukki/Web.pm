@@ -202,6 +202,7 @@ sub dispatch {
         }) unless $self->check_access(
                 user       => $ctx->session->{user},
                 repository => $match->mapping->{repository} // '-',
+                special    => $match->mapping->{special} // '-',
                 needs      => $access_level_needed,
             );
 
@@ -264,7 +265,7 @@ sub dispatch {
         else {
             warn "ISE: $_";
 
-            $response = http_exception($_, {
+            $response = http_exception("Oh darn. Something went wrong.", {
                 status           => 'InternalServerError',
                 show_stack_trace => 0,
             })->as_psgi($env);

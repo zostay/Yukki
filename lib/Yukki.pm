@@ -15,7 +15,7 @@ use Crypt::SaltedHash;
 use List::Util qw( any );
 use Type::Params qw( validate );
 use Type::Utils;
-use Types::Standard qw( Dict HashRef Str Undef slurpy );
+use Types::Standard qw( Dict HashRef Str Maybe slurpy Optional );
 use Path::Tiny;
 use Types::Path::Tiny qw( Path );
 
@@ -204,16 +204,20 @@ sub check_access {
     my ($self, $opt)
         = validate(\@_, class_type(__PACKAGE__),
             slurpy Dict[
-                user       => Undef|HashRef,
-                repository => Str,
+                user       => Maybe[class_type('Yukki::User')],
+                special    => Optional[Str],
+                repository => Optional[Str],
                 needs      => AccessLevel,
-            ]);
-    my ($user, $repository, $needs) = @{$opt}{qw( user repository needs )};
+            ]
+        );
+    my ($user, $repository, $special, $needs)
+        = @{$opt}{qw( user repository special needs )};
 
     # Always grant none
     return 1 if $needs eq 'none';
 
-    my $config = $self->settings->repositories->{$repository};
+    my $config = $self->settings->repositories->{$repository}
+              // $self->settings->special_privileges->{$special};
 
     return '' unless $config;
 

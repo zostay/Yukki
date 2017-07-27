@@ -7,7 +7,7 @@ use Moo;
 use Types::Path::Tiny qw( Path );
 use Types::Standard qw( Str );
 use Yukki::Settings::Repository;
-use Yukki::Types qw( RepositoryMap YukkiSettingsAnonymous );
+use Yukki::Types qw( PrivilegesMap RepositoryMap YukkiSettingsAnonymous );
 
 use namespace::clean;
 
@@ -157,5 +157,37 @@ has repositories => (
         default     => 'anonymous@localhost',
     );
 }
+
+=head2 special_privileges
+
+This section of the settings configures which groups grant special privileges. These special privileges grant access to view or change the configuration from within the application. By default, no one has these privileges, effectively disabling any in-app administrative features.
+
+The grants for each here are identical to that available to repositories:
+
+=over
+
+=item anonymous_access_level
+
+This names the access level anonymous users have. Obviously, it would generally be unwise for this to be anything but "none" for adminsitrative functions, but "read" and "write" are other possible values.
+
+=item read_groups
+
+Names the list of groups that are granted permission to perform read-only actions. This may also be set to "ANY" to specify that any logged user may perform this action or "NONE" to specify that no logged user may perform this action.
+
+=item write_groups
+
+Names the list of groups that are granted permission to perform read-write actions. As with read, this may be set to "ANY" and "NONE" with the same meaning.
+
+=back
+
+=cut
+
+has special_privileges => (
+    is          => 'ro',
+    isa         => PrivilegesMap,
+    required    => 1,
+    coerce      => 1,
+    default     => sub { +{} },
+);
 
 1;

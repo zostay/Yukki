@@ -123,4 +123,19 @@ sub find {
     return;
 }
 
+=head2 list
+
+    my @names = $users->list;
+
+Returns a list of login names for all users configured.
+
+=cut
+
+sub list {
+    my $self = shift;
+
+    my $user_dir = $self->locate('user_path');
+    return map { $_->basename } $user_dir->children;
+}
+
 1;

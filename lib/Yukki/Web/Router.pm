@@ -151,6 +151,20 @@ sub BUILD {
         ],
         target => $self->controller('Attachment'),
     ));
+
+    $self->add_route('admin/user/?:action' => (
+        defaults => {
+            action  => 'list',
+            special => 'admin_user',
+        },
+        validations => {
+            action => qr/^(?:list)$/,
+        },
+        acl => [
+            [ read => { action => [ qw( list ) ] } ],
+        ],
+        target => $self->controller('Admin::User'),
+    ));
 }
 
 1;
