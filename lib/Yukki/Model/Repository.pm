@@ -66,7 +66,16 @@ has repository_settings => (
     lazy        => 1,
     default     => sub {
         my $self = shift;
-        $self->app->settings->repositories->{$self->name};
+        my $repo_config = $self->app->settings->repositories->{$self->name};
+
+        if (!$repo_config) {
+            my $file = $self->app->locate('repo_path', $self->name);
+            $repo_config = Yukki::Settings::Repository->load_yaml(
+                $file->slurp_utf8
+            );
+        }
+
+        return $repo_config;
     },
     handles     => {
         'title'  => 'name',
@@ -732,6 +741,23 @@ END_OF_STUB_MAIN
 
     my $branch = $self->branch;
     $self->git->run('update-ref', $branch, $commit_id, '0' x 40);
+
+    return;
+}
+
+=head2 clone_repository
+
+    $self->clone_repository($origin);
+
+Given a remote repository URI to clone from in C<$origin>, initialize the local repository from a clone of the remote one.
+
+=cut
+
+sub clone_repository {
+    my ($self, $origin) = @_;
+
+    my $repository_path = ''.$self->repository_path;
+    Git::Repository->run('clone', '--bare', $origin, $repository_path);
 
     return;
 }

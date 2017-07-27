@@ -2,8 +2,9 @@ package Yukki::Test;
 use 5.12.1;
 
 use IPC::Run3;
-use File::Temp qw( tempdir );
+use Path::Tiny qw( tempdir );
 use Probe::Perl;
+use Test2::V0;
 
 use namespace::clean;
 
@@ -42,15 +43,16 @@ sub yukki {
         unless $ok;
 }
 
+my $tempdir;
 sub yukki_setup {
     $File::Temp::KEEP_ALL = 1 if $ENV{YUKKI_TEST_KEEP_FILES};
 
-    my $tempdir = tempdir;
+    $tempdir = tempdir;
     diag("TEMPDIR = $tempdir") if $ENV{YUKKI_TEST_KEEP_FILES};
 
-    yukki([ 'setup', "$tempdir/yukki-test", 'skel' ]);
+    yukki([ 'setup', $tempdir->child("yukki-test"), 'skel' ]);
 
-    $ENV{YUKKI_CONFIG} = "$tempdir/yukki-test/etc/yukki.conf";
+    $ENV{YUKKI_CONFIG} = $tempdir->child("yukki-test/etc/yukki.conf");
 }
 
 sub yukki_git_init {

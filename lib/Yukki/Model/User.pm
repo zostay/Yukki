@@ -14,6 +14,8 @@ use Type::Utils;
 use Types::Path::Tiny;
 use Types::Standard qw( slurpy Dict );
 
+use Yukki::User;
+
 use namespace::clean;
 
 # ABSTRACT: lookup users
@@ -23,11 +25,11 @@ use namespace::clean;
   my $users = $app->model('User');
   my $user  = $users->find('bob');
 
-  my $login_name = $user->{login_name};
-  my $password   = $user->{password};
-  my $name       = $user->{name};
-  my $email      = $user->{email};
-  my @groups     = @{ $user->{groups} };
+  my $login_name = $user->login_name;
+  my $password   = $user->password;
+  my $name       = $user->name;
+  my $email      = $user->email;
+  my @groups     = $user->groups->@*;
 
 =head1 DESCRIPTION
 
@@ -45,12 +47,16 @@ Returns a hash containing the information related to a specific user named by lo
 
 sub find {
     my ($self, $opt)
-        = validate(\@_, class_type(__PACKAGE__), slurpy Dict[login_name => LoginName]);
+        = validate(\@_, class_type(__PACKAGE__),
+            slurpy Dict[
+                login_name => LoginName
+            ],
+        );
     my $login_name = $opt->{login_name};
 
     my $user_file = $self->locate('user_path', $login_name);
     if (-e $user_file) {
-        return load_file($user_file);
+        return Yukki::User->load_yaml($user_file->slurp_utf8);
     }
 
     return;

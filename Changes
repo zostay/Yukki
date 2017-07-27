@@ -1,5 +1,10 @@
 {{$NEXT}}
 
+    * Minor: Internal refactored to allow app-managed users and repository
+      configuration.
+
+0.991_001 2017-07-22 23:48:59-05:00 America/Chicago (TRIAL RELEASE)
+
     * Bugfix: Fixing various bugs with yukki-setup. Mostly, removed
       File::Copy::Recursive because it was flaking out in some cases.
     * Minor: Improved modern testing infrastructure.

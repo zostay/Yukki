@@ -4,7 +4,7 @@ use 5.12.1;
 use lib 't/lib';
 use Yukki::Test;
 
-use File::Temp qw( tempdir );
+use Path::Tiny qw( tempdir );
 use Test2::V0;
 use Test::Script;
 use Try::Tiny;

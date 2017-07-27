@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use 5.12.1;
 
-use File::Temp qw( tempdir );
+use Path::Tiny qw( tempdir );
 use Git::Repository;
 use Test2::V0;
 use Test::Script;

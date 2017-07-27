@@ -14,50 +14,11 @@ die "usage: $0 repository-name [ remote-repository-url ]\n"
 
 my $app = Yukki->new;
 
-my $config = $app->settings->{repositories}{ $repo_name };
-
-die qq[Could not find o repository named "$repo_name" in yukki.conf\n]
-    unless $config;
-
-my $repo_dir = ''.$app->locate('repository_path', $config->{repository});
-
-if (defined $remote_repo) {
-    Git::Repository->run('clone', '--mirror',
-        $remote_repo, $repo_dir);
-}
-
-else {
-    my $title  = $config->{name} // ucfirst($repo_name);
-    my $page   = $config->{default_page} // 'home.yukki';
-    my $branch = $config->{site_branch} // 'refs/heads/master';
-
-    my $stub_main = <<END_OF_STUB_MAIN;
-# $title
-
-Welcome to your new wiki repository. The first thing you will probably
-want to do is edit this page.
-
-Cheers.
-
-END_OF_STUB_MAIN
-
-    Git::Repository->run('init', '--bare', $repo_dir);
-    my $git = Git::Repository->new(git_dir => $repo_dir);
-
-    my $object_id = $git->run('hash-object', '-t', 'blob', '-w', '--stdin', "--path=$page", { input => $stub_main });
-
-    my $stub_tree = "100655 blob $object_id\t$page\n";
-    my $tree_id   = $git->run('mktree', { input => $stub_tree });
-    my $commit_id = $git->run('commit-tree', $tree_id, {
-        input => 'Initializing empty Yukki repository.',
-        env   => {
-            GIT_AUTHOR_NAME  => 'yukki-git-init',
-            GIT_AUTHOR_EMAIL => 'hanenkamp@cpan.org',
-        },
-    });
-
-    $git->run('update-ref', $branch, $commit_id, '0' x 40);
-}
+$app->model('Root')->init_repository(
+    key                => $repo_name,
+    origin             => $remote_repo,
+    init_from_settings => 1,
+);
 
 # ABSTRACT: Initialize a git repository for use with Yukki
 # PODNAME: yukki-git-init

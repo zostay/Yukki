@@ -146,12 +146,22 @@ sub _locate {
     my ($self, $type, $base, @extra_path) = @_;
 
     my $base_path = $self->settings->$base;
+    my $root_path;
+
     if ($base_path !~ m{^/}) {
-        return path($self->settings->root, $base_path, @extra_path);
+        $root_path = path($self->settings->root, $base_path);
     }
     else {
-        return path($base_path, @extra_path);
+        $root_path = path($base_path);
     }
+
+    my $located_path = $root_path->child(@extra_path);
+
+    # Small safety mechanism
+    die "attempted to lookup an illegal $base path: ", join('/', @extra_path)
+        unless $root_path->subsumes($located_path);
+
+    return $located_path;
 }
 
 sub locate {

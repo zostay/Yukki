@@ -38,7 +38,7 @@ This is pretty much identical in purpose to L<YAML/DumpFile>, but encodes to UTF
 
 sub dump_file {
     my ($file, $data) = @_;
-    path($file)->spew(YAML::Dump($data));
+    path($file)->spew_utf8(YAML::Dump($data));
 }
 
 =head2 load_file
@@ -51,7 +51,7 @@ This is similar to L<YAML/LoadFile>, but decodes from UTF-8 while reading input.
 
 sub load_file {
     my ($file) = @_;
-    YAML::Load(path($file)->slurp);
+    YAML::Load(path($file)->slurp_utf8);
 }
 
 =head2 prompt

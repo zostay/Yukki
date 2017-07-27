@@ -5,8 +5,6 @@ use utf8;
 use Yukki;
 use Yukki::TextUtil qw( prompt dump_file );
 
-use IO::Prompter;
-
 my $app = Yukki->new;
 my $digest = $app->hasher;
 
