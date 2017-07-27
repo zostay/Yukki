@@ -69,11 +69,12 @@ sub save {
 
     my $user_file = $self->locate('user_path', $user->login_name);
 
-    if ($opt{create_only} && -e $user_file) {
+    if ($opt{create_only} && $user_file->exists) {
         die "User ", $user->login_name, " already exists.";
     }
 
     $user_file->parent->mkpath;
+    $user_file->chmod(0600) if $user_file->exists;
     $user_file->spew_utf8($user->dump_yaml);
     $user_file->chmod(0400);
 
@@ -92,7 +93,7 @@ sub delete {
     my ($self, $user) = @_;
 
     my $user_file = $self->locate('user_file', $user->login_name);
-    $user_file->remove if -f $user_file;
+    $user_file->remove if $user_file->is_file;
 
     return;
 }
@@ -115,7 +116,7 @@ sub find {
     my $login_name = $opt->{login_name};
 
     my $user_file = $self->locate('user_path', $login_name);
-    if (-e $user_file) {
+    if ($user_file->exists) {
         return Yukki::User->load_yaml($user_file->slurp_utf8);
     }
 

@@ -6,27 +6,18 @@ use Yukki;
 use Yukki::TextUtil qw( prompt dump_file load_file );
 
 my $app = Yukki->new;
-my $digest = $app->hasher;
 
 my $username = prompt 'Login name:';
 
-my $user_file = $app->locate('user_path', $username);
-if (not -f "$user_file") {
+my $user = $app->model('User')->find(login_name => $username);
+if (not defined $user) {
     die "User $username does not exist. Please create this user before setting the password.\n";
 }
 
-my $user = load_file($user_file);
-
 my $password = prompt 'Password:', -echo => '', -v;
 
-$digest->add($password);
-my $password = $digest->generate;
-
-$user->{password} = $password;
-
-chmod 0600, "$user_file";
-dump_file($user_file, $user);
-chmod 0400, "$user_file";
+$app->model('User')->set_password($user, $password);
+$app->model('User')->save($user);
 
 # ABSTRACT: set the password for a user
 # PODNAME: yukki-passwd
