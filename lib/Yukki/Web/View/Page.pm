@@ -287,7 +287,7 @@ sub history {
 
     my $i = 0;
     return $self->render_page(
-        template => 'page/history.html',
+        template => $self->history_template,
         context  => $ctx,
         vars     => {
             'form_action' => join('/', '/page/diff', $vars->{repository}, $vars->{page}),
