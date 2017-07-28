@@ -50,6 +50,11 @@ li.error, li.warning, li.info { list-style: none }
 .warning { padding: 3px; margin: 3px; border: 1px solid #CDCD0A; color: #CDCD0A; background-color: #FEFEEC }
 .info { padding: 3px; margin: 3px; border: 1px solid #0A0ACD; color: #0A0ACD; background-color: #ECF1FE }
 
+body ul.tag-editor { border: 1px solid #99f; display: inline-block; width: 20em; vertical-align: middle }
+body ul.tag-editor .tag-editor-tag { background-color: #eef; color: #339; }
+body ul.tag-editor .tag-editor-delete { padding-top: 1px; padding-bottom: 1px; background-color: #eef; color: #339 }
+body ul.tag-editor .tag-editor-delete i:before { color: #339; }
+
 /*** Login ***/
 
 #login-page { width: 30em; margin: 8em auto }
