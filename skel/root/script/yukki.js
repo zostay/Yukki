@@ -27,7 +27,7 @@ setInterval(function() { $(window).trigger('every_10s'); }, 10000);
 function updatePosition() {
     if ($('textarea#yukkitext').length > 0) {
         $('#yukkitext_position').val(
-            $('textarea#yukkitext').getSelection().end
+            $('textarea#yukkitext').caret()
         );
     }
 }
@@ -45,7 +45,7 @@ $(document).ready(function() {
             var url = String(window.location).replace(/\/edit\//, '/preview/');
             $.post(url, { 
                     'yukkitext'          : $('#yukkitext').val(),
-                    'yukkitext_position' : $('#yukkitext').getSelection().end
+                    'yukkitext_position' : $('#yukkitext').caret()
                 }, 
                 function(data) {
                     $('#preview-yukkitext').html(data);
