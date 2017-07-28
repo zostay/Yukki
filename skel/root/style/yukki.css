@@ -114,8 +114,6 @@ div.attachment-dropzone { display: none; background: #eef; text-align: center; p
 /* Users */
 
 #user-edit { width: 40% }
-#user-edit .group-editor { margin-left: 145px }
-#user-edit .group-editor td { vertical-align: middle }
 #user-edit label { display: inline-block; width: 125px }
 #user-edit .field { margin-top: 1em; margin-bottom: 1em }
 #login_name.hide { display: none }

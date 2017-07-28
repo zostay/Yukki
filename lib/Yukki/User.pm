@@ -99,6 +99,14 @@ has groups => (
 
 =head1 METHODS
 
+=head2 groups_string
+
+Returns the groups concatenated together into a single string.
+
+=cut
+
+sub groups_string { join ' ', shift->groups->@* }
+
 =head2 savable_attributes
 
 Returns the savable attributes.

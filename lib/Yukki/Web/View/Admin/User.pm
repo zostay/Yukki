@@ -59,8 +59,10 @@ sub _build_edit_template {
             '#login_name-input@type' => 'login_name_type',
             '#login_name@class' => 'login_name_display',
             '#login_name'  => 'user.login_name',
+            '#login_name-input@value' => 'user.login_name',
             '#name@value'  => 'user.name',
             '#email@value' => 'user.email',
+            '#user-groups@value' => 'user.groups_string',
         ],
     );
 }
@@ -127,10 +129,11 @@ sub edit {
     }
 
     my $user = $vars->{user} // +{
-        login_name => '',
-        name       => '',
-        email      => '',
-        groups     => [],
+        login_name    => '',
+        name          => '',
+        email         => '',
+        groups        => [],
+        groups_string => '',
     };
 
     return $self->render_page(

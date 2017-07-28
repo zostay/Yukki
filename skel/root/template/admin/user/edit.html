@@ -20,24 +20,10 @@
         <input type="password" id="password" name="password">
     </div>
 
-    <table class="group-editor">
-        <thead>
-            <tr>
-                <th>Group</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="group">
-                <td class="group-name">wizard</td>
-                <td class="actions"></td>
-            </tr>
-            <tr>
-                <td><input type="text" name="add_group"></td>
-                <td><button type="button" id="add-group" name="submit">Add Group</button></td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="field">
+        <label for="groups">Groups:</label>
+        <input type="text" id="user-groups" name="groups" value="wizard">
+    </div>
 
     <div class="button-group">
         <button type="submit" id="submit" name="submit">Save</button>

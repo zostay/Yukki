@@ -74,7 +74,8 @@ shell template. If not set, the defaults are:
   scripts:
       - script/lib/jquery/jquery.js
       - script/lib/jquery/jquery-ui.js
-      - script/lib/jquery/jquery-fieldselection.js
+      - script/lib/jquery/jquery.caret.js
+      - script/lib/jquery/jquery.tag-editor.js
       - script/lib/plupload/plupload.full.js
       - script/lib/sha1/sha1.js
       - script/yukki.js
@@ -82,6 +83,7 @@ shell template. If not set, the defaults are:
   styles:
       - style/yukki.css
       - style/lib/jquery/jquery.css
+      - style/lib/jquery/jquery.tag-editor.css
 
 As you can see, these are full paths and may be given as paths to foreign hosts.
 In order to keep Yukki working in good order, you will probaby want to include
@@ -97,7 +99,8 @@ has scripts => (
         [ qw(
             script/lib/jquery/jquery.js
             script/lib/jquery/jquery-ui.js
-            script/lib/jquery/jquery-fieldselection.js
+            script/lib/jquery/jquery.caret.js
+            script/lib/jquery/jquery.tag-editor.js
             script/lib/plupload/plupload.full.js
             script/lib/sha1/sha1.js
             script/yukki.js
@@ -118,6 +121,7 @@ has styles => (
         [ qw(
             style/yukki.css
             style/lib/jquery/jquery.css
+            style/lib/jquery/jquery.tag-editor.css
         ) ]
     },
 );
