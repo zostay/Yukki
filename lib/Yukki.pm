@@ -213,6 +213,9 @@ sub check_access {
     my ($user, $repository, $special, $needs)
         = @{$opt}{qw( user repository special needs )};
 
+    $repository //= '-';
+    $special //= '-';
+
     # Always grant none
     return 1 if $needs eq 'none';
 

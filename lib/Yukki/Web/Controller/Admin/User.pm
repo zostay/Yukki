@@ -26,7 +26,8 @@ sub fire {
     my ($self, $ctx) = @_;
 
     my $action = $ctx->request->path_parameters->{action};
-    if ($action eq 'list') { $self->list_users($ctx) }
+    if ($action eq 'list')   { $self->list_users($ctx) }
+    elsif ($action eq 'add') { $self->edit_user($ctx) }
     else {
         http_throw('No action found matching that URL.', {
             status => 'NotFound',
@@ -48,6 +49,28 @@ sub list_users {
 
     my $body = $self->view('Admin::User')->list($ctx, {
         users => \@users,
+    });
+
+    $ctx->response->body($body);
+}
+
+=head2 edit_user
+
+Add or edit a user account.
+
+=cut
+
+sub edit_user {
+    my ($self, $ctx) = @_;
+
+    my $login_name = $ctx->request->path_parameters->{login_name};
+    my $user;
+    if (defined $login_name) {
+        $user = $self->model('User')->find(login_name => $login_name);
+    }
+
+    my $body = $self->view('Admin::User')->edit($ctx, {
+        user => $user,
     });
 
     $ctx->response->body($body);

@@ -1,0 +1,45 @@
+<form method="POST" id="user-edit">
+    <div class="field">
+        <label for="login_name">Login Name:</label>
+        <input type="hidden" id="login_name-input" name="login_name" value="zostay"></div>
+        <div class="show" id="login_name">zostay</div>
+    </div>
+
+    <div class="field">
+        <label for="email">Email Address:</label>
+        <input type="text" id="email" name="email" value="hanenkamp@cpan.org">
+    </div>
+
+    <div class="field">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="Sterling">
+    </div>
+
+    <div class="field">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+    </div>
+
+    <table class="group-editor">
+        <thead>
+            <tr>
+                <th>Group</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="group">
+                <td class="group-name">wizard</td>
+                <td class="actions"></td>
+            </tr>
+            <tr>
+                <td><input type="text" name="add_group"></td>
+                <td><button type="button" id="add-group" name="submit">Add Group</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="button-group">
+        <button type="submit" id="submit" name="submit">Save</button>
+    </div>
+</form>

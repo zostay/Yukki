@@ -110,3 +110,16 @@ div.attachment-dropzone { display: none; background: #eef; text-align: center; p
 .syntax-string { color: #ff6060 }
 .syntax-variable { color: #6060ff }
 .syntax-warning { color: #6060ff }
+
+/* Users */
+
+#user-edit { width: 40% }
+#user-edit .group-editor { margin-left: 145px }
+#user-edit .group-editor td { vertical-align: middle }
+#user-edit label { display: inline-block; width: 125px }
+#user-edit .field { margin-top: 1em; margin-bottom: 1em }
+#login_name.hide { display: none }
+#user-edit #login_name-input { width: 8em }
+#user-edit #name { width: 12em }
+#user-edit #email { width: 20em }
+#user-edit #password { width: 8em }

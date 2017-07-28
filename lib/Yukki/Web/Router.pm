@@ -158,10 +158,11 @@ sub BUILD {
             special => 'admin_user',
         },
         validations => {
-            action => qr/^(?:list)$/,
+            action => qr/^(?:add|list)$/,
         },
         acl => [
             [ read => { action => [ qw( list ) ] } ],
+            [ write => { action => [ qw( add ) ] } ],
         ],
         target => $self->controller('Admin::User'),
     ));
