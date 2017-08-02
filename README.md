@@ -1,8 +1,11 @@
+[![Build Status](https://travis-ci.org/zostay/Yukki.svg?branch=master)](https://travis-ci.org/zostay/Yukki)
+[![Coverage Status](https://coveralls.io/repos/zostay/Yukki/badge.svg?branch=master)](https://coveralls.io/r/zostay/Yukki?branch=master)
+[![GitHub issues](https://img.shields.io/github/issues/zostay/Yukki.svg)](https://github.com/zostay/Yukki/issues)
+[![Kwalitee status](http://cpants.cpanauthors.org/dist/Yukki.png)](http://cpants.charsbar.org/dist/overview/Yukki)
+
 # NAME
 
 Yukki::Manual::Installation - installaction instructions
-
-[![Build Status](https://travis-ci.org/zostay/Yukki.png?branch=master)](https://travis-ci.org/zostay/Yukki)
 
 # VERSION
 
