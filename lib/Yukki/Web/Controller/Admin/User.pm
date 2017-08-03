@@ -86,6 +86,7 @@ validation_spec add_user => [
         must => length_in_range(8, 72),
     ],
     groups => [
+        optional  => 1,
         into      => split_by(qr/,/),
         each_into => trim(),
         each_must => limit_character_set('a-z', 'A-Z', '0-9', '_', '-'),
@@ -154,9 +155,11 @@ validation_spec edit_user => [
         },
     ],
     password => [
+        optional => 1,
         must => length_in_range(8, 72),
     ],
     groups => [
+        optional  => 1,
         into      => split_by(qr/,/),
         each_into => trim(),
         each_must => limit_character_set('a-z', 'A-Z', '0-9', '_', '-'),
