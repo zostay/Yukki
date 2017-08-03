@@ -41,6 +41,7 @@ sub _build_list_template {
                             '.' => 'group',
                         ],
                     },
+                    '.action'     => 'user.action | encoded_string',
                 ],
             },
         ],
@@ -109,11 +110,36 @@ sub list {
     $ctx->response->page_title("List Users");
     $self->page_navigation($ctx->response, 'list');
 
+    my @users = map {
+        my $user = $_;
+        my $action = $self->render_links(
+            context => $ctx,
+            links   => [
+                {
+                    label => 'Edit',
+                    href  => "/admin/user/edit/" . $user->login_name,
+                },
+                {
+                    label => 'Remove',
+                    href  => "/admin/user/delete/" . $user->login_name,
+                }
+            ],
+        );
+
+        {
+            login_name => $user->login_name,
+            name       => $user->name,
+            email      => $user->email,
+            groups     => $user->groups,
+            action     => $action,
+        }
+    } @{ $vars->{users} // [] };
+
     return $self->render_page(
         template => $self->list_template,
         context  => $ctx,
         vars     => {
-            users => $vars->{users},
+            users   => \@users,
         },
     );
 }

@@ -11,6 +11,7 @@ use Yukki::Web::Router::Route;
 use Types::Standard qw( ArrayRef Str );
 use Type::Utils qw( class_type declare as where );
 use List::Util qw( all );
+use Yukki::Types qw( LoginName );
 
 use namespace::clean;
 
@@ -152,7 +153,7 @@ sub BUILD {
         target => $self->controller('Attachment'),
     ));
 
-    $self->add_route('admin/user/?:action' => (
+    $self->add_route('admin/user/:action' => (
         defaults => {
             action  => 'list',
             special => 'admin_user',
@@ -163,6 +164,21 @@ sub BUILD {
         acl => [
             [ read => { action => [ qw( list ) ] } ],
             [ write => { action => [ qw( add ) ] } ],
+        ],
+        target => $self->controller('Admin::User'),
+    ));
+
+    $self->add_route('admin/user/:action/:login_name' => (
+        defaults => {
+            action  => 'edit',
+            special => 'admin_user',
+        },
+        validations => {
+            action     => qr/^(?:edit|delete)$/,
+            login_name => LoginName,
+        },
+        acl => [
+            [ write => { action => [ qw( edit delete ) ] } ],
         ],
         target => $self->controller('Admin::User'),
     ));
