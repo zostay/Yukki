@@ -45,7 +45,7 @@ This is a valid login name. Login names may only contain letters and numbers, as
 
 declare LoginName,
     as Str,
-    where { /^[a-z0-9]+$/ },
+    where { /^[a-zA-Z0-9_-]{3,20}$/ },
     message { "login name $_ must only contain letters and numbers" };
 
 =head2 AccessLevel

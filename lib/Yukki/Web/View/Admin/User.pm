@@ -4,7 +4,9 @@ use v5.24;
 use utf8;
 use Moo;
 
+use Scalar::Util;
 use Type::Utils;
+use Yukki::TemplateUtil qw( field form_error );
 
 use namespace::clean;
 
@@ -56,13 +58,19 @@ sub _build_edit_template {
     shift->prepare_template(
         template   => 'admin/user/edit.html',
         directives => [
+            '#login_name-input' => form_error('login_name'),
+            '#email' => form_error('email'),
+            '#name' => form_error('name'),
+            '#password' => form_error('password'),
+            '#user-groups' => form_error('groups'),
+
             '#login_name-input@type' => 'login_name_type',
             '#login_name@class' => 'login_name_display',
-            '#login_name'  => 'user.login_name',
-            '#login_name-input@value' => 'user.login_name',
-            '#name@value'  => 'user.name',
-            '#email@value' => 'user.email',
-            '#user-groups@value' => 'user.groups_string',
+            '#login_name'  => field(['user.login_name', 'form.login_name']),
+            '#login_name-input@value' => field(['user.login_name', 'form.login_name']),
+            '#name@value'  => field(['user.name','form.name']),
+            '#email@value' => field(['user.email','form.email']),
+            '#user-groups@value' => field(['user.groups_string','form.groups']),
         ],
     );
 }
@@ -119,8 +127,11 @@ Show the user editor.
 sub edit {
     my ($self, $ctx, $vars) = @_;
 
-    if ($vars->{user}) {
-        $ctx->response->page_title('Edit ' . $vars->{user}->login_name);
+    my $user = $vars->{user};
+    my $form = $vars->{form};
+
+    if ($user) {
+        $ctx->response->page_title('Edit ' . $user->login_name);
         $self->page_navigation($ctx->response, 'edit');
     }
     else {
@@ -128,21 +139,17 @@ sub edit {
         $self->page_navigation($ctx->response, 'add');
     }
 
-    my $user = $vars->{user} // +{
-        login_name    => '',
-        name          => '',
-        email         => '',
-        groups        => [],
-        groups_string => '',
-    };
+    $ctx->response->breadcrumb($vars->{breadcrumb});
 
     return $self->render_page(
         template => $self->edit_template,
         context  => $ctx,
         vars     => {
+            form            => $form,
             user            => $user,
-            login_name_display => defined $vars->{user} ? 'show' : 'hide',
-            login_name_type => defined $vars->{user} ? 'hidden' : 'text',
+            login_name_display => defined $user ? 'show' : 'hide',
+            login_name_type => defined $user ? 'hidden' : 'text',
+            form_errors     => $vars->{form_errors},
         },
     );
 }

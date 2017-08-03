@@ -11,8 +11,8 @@ my $app = Yukki->new;
 my @user_fields = (
     login_name => [ 'Login name:',
         -must => {
-            'be only letters, numbers, and underscores' =>
-                qr{^[a-zA-Z0-9_]+$}
+            'be only letters, numbers, underscores, and hyphens' =>
+                qr/^[a-zA-Z0-9_-]{3,20}$/
         },
     ],
     password   => [ 'Password:', -echo => '' ],
