@@ -7,6 +7,7 @@ use Moo;
 with 'Yukki::Role::Savable';
 
 use Types::Standard qw( Str ArrayRef );
+use Yukki::Types qw( LoginName );
 
 use namespace::clean;
 
@@ -43,7 +44,7 @@ This is the name the user uses to login.
 
 has login_name => (
     is          => 'ro',
-    isa         => Str,
+    isa         => LoginName,
     required    => 1,
 );
 
