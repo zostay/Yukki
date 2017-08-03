@@ -13,7 +13,7 @@ use Types::URI qw( Uri );
 
 use namespace::clean;
 
-# ABSTRACt: model for accessing the git repositories
+# ABSTRACT: model for accessing the git repositories
 
 =head1 SYNOPSIS
 
