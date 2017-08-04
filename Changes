@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+0.991_002 2017-08-03 23:07:46-05:00 America/Chicago (TRIAL RELEASE)
+
     * Minor: Added a new set of management screens for managing users in the
       application. Requires new special permissions and no menus to get to these
       screens are yet provided. VERY ALPHA.
