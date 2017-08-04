@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-use 5.12.1;
+use v5.24;
 
 use Test2::V0;
 use Test::Exception;
