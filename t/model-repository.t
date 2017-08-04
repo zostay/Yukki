@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use 5.12.1;
+use v5.24;
 
 use lib 't/lib';
 use Yukki::Test;
