@@ -181,7 +181,6 @@ sub spreadsheet_eval {
     my ($self, $params) = @_;
 
     my $ctx         = $params->{context};
-    my $plugin_name = $params->{plugin_name};
     my $file        = $params->{file};
     my $arg         = $params->{arg};
 
@@ -223,7 +222,7 @@ sub spreadsheet_eval {
         $value  = $raw->{cellerrors}{ $new_cell };
     }
     else {
-        $attrs .= qq[ title="$arg" class="spreadsheet-cell error" ];
+        $attrs .= qq[ title="$arg" class="spreadsheet-cell"];
         $value = $raw->{datavalues}{ $new_cell };
     }
 
