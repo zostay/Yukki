@@ -1,3 +1,6 @@
-.build
 .*.swp
+
+.build
 Yukki-0.*
+
+cover_db

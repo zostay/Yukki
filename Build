@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+
+die "This is a fake shim. It does nothing but test."
+    unless $ARGV[0] eq 'test';
+
+system qw( prove -lv );

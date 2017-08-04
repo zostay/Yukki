@@ -3,7 +3,7 @@ perl:
   - "5.24"
   - "5.26"
 before_install:
-  - cpanm --notest --quiet Dist::Zilla Dist::Zilla::App::Command::cover Devel::Cover::Report::Coveralls
+  - cpanm --notest --quiet Dist::Zilla Devel::Cover::Report::Coveralls
   - dzil authordeps | cpanm --notest --quiet
   - cpanm --notest --quiet Pod::Coverage::TrustPod
 
@@ -16,7 +16,7 @@ install:
 
 script:
   - dzil test --release --verbose
-  - dzil cover -test
+  - cover -test
 
 after_success:
-  - dzil cover -report coveralls
+  - cover -report coveralls
