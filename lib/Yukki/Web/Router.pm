@@ -174,11 +174,11 @@ sub BUILD {
             special => 'admin_user',
         },
         validations => {
-            action     => qr/^(?:edit|delete)$/,
+            action     => qr/^(?:edit|remove)$/,
             login_name => LoginName,
         },
         acl => [
-            [ write => { action => [ qw( edit delete ) ] } ],
+            [ write => { action => [ qw( edit remove ) ] } ],
         ],
         target => $self->controller('Admin::User'),
     ));

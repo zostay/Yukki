@@ -76,6 +76,23 @@ sub _build_edit_template {
     );
 }
 
+has remove_template => (
+    is          => 'ro',
+    isa         => class_type('Template::Pure'),
+    lazy        => 1,
+    builder     => '_build_remove_template',
+);
+
+sub _build_remove_template {
+    shift->prepare_template(
+        template   => 'admin/user/remove.html',
+        directives => [
+            '.login_name'         => 'user.login_name',
+            '#cancel_remove@href' => 'return_link',
+        ],
+    );
+}
+
 =head1 METHODS
 
 =head2 page_navigation
@@ -121,7 +138,7 @@ sub list {
                 },
                 {
                     label => 'Remove',
-                    href  => "/admin/user/delete/" . $user->login_name,
+                    href  => "/admin/user/remove/" . $user->login_name,
                 }
             ],
         );
@@ -176,6 +193,30 @@ sub edit {
             login_name_display => defined $user ? 'show' : 'hide',
             login_name_type => defined $user ? 'hidden' : 'text',
             form_errors     => $vars->{form_errors},
+        },
+    );
+}
+
+=head2 remove
+
+Displays the remove user confirmation page.
+
+=cut
+
+sub remove {
+    my ($self, $ctx, $vars) = @_;
+
+    $ctx->response->page_title($vars->{title});
+    $ctx->response->breadcrumb($vars->{breadcrumb});
+
+    $self->page_navigation($ctx->response, 'remove');
+
+    return $self->render_page(
+        template => $self->remove_template,
+        context  => $ctx,
+        vars     => {
+            user        => $vars->{user},
+            return_link => $vars->{return_link},
         },
     );
 }

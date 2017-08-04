@@ -29,9 +29,10 @@ sub fire {
     my ($self, $ctx) = @_;
 
     my $action = $ctx->request->path_parameters->{action};
-    if ($action eq 'list')   { $self->list_users($ctx) }
+    if ($action eq 'list') { $self->list_users($ctx) }
     elsif ($action eq 'add') { $self->add_user($ctx) }
     elsif ($action eq 'edit') { $self->edit_user($ctx) }
+    elsif ($action eq 'remove') { $self->remove_user($ctx) }
     else {
         http_throw('No action found matching that URL.', {
             status => 'NotFound',
@@ -183,7 +184,8 @@ sub edit_user {
                 if defined $user_params->{password};
             $user->name($user_params->{name});
             $user->email($user_params->{email});
-            $user->groups->@* = $user_params->{groups}->@*;
+            $user->groups->@* = $user_params->{groups}->@*
+                if defined $user_params->{groups};
 
             $self->model('User')->save($user);
 
@@ -205,6 +207,50 @@ sub edit_user {
         user        => $user,
         breadcrumb  => \@breadcrumb,
         form_errors => $form_errors,
+    });
+
+    $ctx->response->body($body);
+}
+
+=head2 remove_user
+
+Display a confirmation page and confirm the deletion of a user.
+
+=cut
+
+sub remove_user {
+    my ($self, $ctx) = @_;
+
+    my $login_name = $ctx->request->path_parameters->{login_name};
+    my $user = $self->model('User')->find(login_name => $login_name);
+
+    if (!$user) {
+        $ctx->add_errors("No user found with login naem $login_name.");
+        $ctx->response->redirect('/admin/user/list');
+        return;
+    }
+
+    my @breadcrumb = (
+        {
+            label => 'List',
+            href  => '/admin/user/list',
+        },
+    );
+
+    my $confirmed = $ctx->request->body_parameters->{confirmed};
+    if ($ctx->request->method eq 'POST' and $confirmed) {
+
+        $self->model('User')->delete($user);
+        $ctx->add_info("Removed user with login name $login_name.");
+        $ctx->response->redirect('/admin/user/list');
+        return;
+    }
+
+    my $body = $self->view('Admin::User')->remove($ctx, {
+        title       => 'Remove ' . $user->login_name,
+        user        => $user,
+        breadcrumb  => \@breadcrumb,
+        return_link => $ctx->rebase_url('/admin/user/list'),
     });
 
     $ctx->response->body($body);

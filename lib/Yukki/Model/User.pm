@@ -92,7 +92,7 @@ Given a L<Yukki::User>, this method deletes the user file for that object.
 sub delete {
     my ($self, $user) = @_;
 
-    my $user_file = $self->locate('user_file', $user->login_name);
+    my $user_file = $self->locate('user_path', $user->login_name);
     $user_file->remove if $user_file->is_file;
 
     return;
