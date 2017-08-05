@@ -13,7 +13,7 @@ use DateTime::Format::Mail;
 use Git::Repository v1.18;
 use Type::Utils;
 use Types::Path::Tiny qw( Path );
-use Types::Standard qw( Str );
+use Types::Standard qw( Bool Str );
 use Try::Tiny;
 
 use namespace::clean;
@@ -49,6 +49,23 @@ has name => (
     is          => 'ro',
     isa         => Str,
     required    => 1,
+);
+
+=head2 is_master_repository
+
+This is a flag that is set to true if the configuration for this repository is stored in the mater yukki configuration file. It will be set to false if it is one of the configuration files stored under C<repo_path> defined in the master configuration.
+
+=cut
+
+has is_master_repository => (
+    is          => 'ro',
+    isa         => Bool,
+    required    => 1,
+    lazy        => 1,
+    default     => sub {
+        my $self = shift;
+        defined $self->app->settings->repositories->{ $self->name }
+    },
 );
 
 =head2 repository_settings

@@ -44,6 +44,32 @@ This will construct and return a L<Yukki::Model::Repository> object. It's basica
 
 sub repository { shift->app->model('Repository', { name => shift }) }
 
+=head2 list_repositories
+
+    @repositories = $root->list_repositories;
+
+This will return a list of all configured repositories.
+
+=cut
+
+sub list_repositories {
+    my $self = shift;
+
+    my @repos;
+
+    my $masters = $self->app->settings->repositories;
+    for my $name (keys %$masters) {
+        push @repos, $self->repository($name);
+    }
+
+    my $repo_dir = $self->locate('repo_path');
+    for my $config ($repo_dir->children) {
+        push @repos, $self->repository($config->basename);
+    }
+
+    return @repos;
+}
+
 =head2 attach_repository
 
     $root->attach_repository(%config);
@@ -64,7 +90,7 @@ sub attach_repository {
     my $repo = Yukki::Settings::Repository->new(\%opt);
     my $repo_file = $self->locate('repo_path', $key);
 
-    if ($self->app->settings->repositories->{$key}) {
+    if ($repo->is_master_repository) {
         die "repository with key '$key' is already defined in the master configuraiton file, cannot attach it again";
     }
     elsif (-e $self->locate('repo_path', $key)) {

@@ -182,6 +182,20 @@ sub BUILD {
         ],
         target => $self->controller('Admin::User'),
     ));
+
+    $self->add_route('admin/repository/:action' => (
+        defaults => {
+            action  => 'list',
+            special => 'admin_repository',
+        },
+        validations => {
+            action => qr/^(?:list)$/,
+        },
+        acl => [
+            [ read => { action => [ qw( list ) ] } ],
+        ],
+        target => $self->controller('Admin::Repository'),
+    ));
 }
 
 1;

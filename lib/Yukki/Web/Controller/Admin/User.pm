@@ -13,11 +13,11 @@ with 'Yukki::Web::Controller';
 
 use namespace::clean;
 
-# ABSTRACT: controller for administering your wiki
+# ABSTRACT: controller for administering your users
 
 =head1 DESCRIPTION
 
-Controller for administering the wiki repositories and users.
+Controller for administering the wiki users.
 
 =head1 METHODS
 
