@@ -128,8 +128,9 @@ sub edit {
         template => $self->edit_template,
         context  => $ctx,
         vars     => {
-            form    => $vars->{form},
-            default => $vars->{default},
+            form        => $vars->{form},
+            form_errors => $vars->{form_errors},
+            default     => $vars->{default},
         },
     );
 }

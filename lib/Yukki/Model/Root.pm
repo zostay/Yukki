@@ -90,7 +90,7 @@ sub attach_repository {
     my $repo = Yukki::Settings::Repository->new(\%opt);
     my $repo_file = $self->locate('repo_path', $key);
 
-    if ($repo->is_master_repository) {
+    if ($self->app->settings->repositories->{$key}) {
         die "repository with key '$key' is already defined in the master configuraiton file, cannot attach it again";
     }
     elsif (-e $self->locate('repo_path', $key)) {

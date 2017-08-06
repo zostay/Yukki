@@ -106,7 +106,7 @@ The list of savable attributes.
 sub savable_attributes {
     qw(
         repository
-        site_page
+        site_branch
         name
         default_page
         sort

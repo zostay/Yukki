@@ -125,6 +125,32 @@ Screen for adding repository configuration.
 sub add_repository {
     my ($self, $ctx) = @_;
 
+    my $form_errors;
+    if ($ctx->request->method eq 'POST') {
+        my $repo_params;
+        ($repo_params, $form_errors)
+            = validate_form add_repository => $ctx->request->body_parameters;
+
+        if (!defined $form_errors) {
+            $self->model('Root')->attach_repository(
+                key          => $repo_params->{name},
+                repository   => "$repo_params->{name}.git",
+                site_branch  => $repo_params->{branch},
+                name         => $repo_params->{title},
+                default_page => $repo_params->{default_page},
+                sort         => $repo_params->{sort},
+                anonymous_access_level => $repo_params->{anonymous_access_level},
+                read_groups  => $repo_params->{read_groups},
+                write_groups => $repo_params->{write_groups},
+            );
+
+            $ctx->add_info("Saved $repo_params->{name}.");
+
+            $ctx->response->redirect('/admin/repository/list');
+            return;
+        }
+    }
+
     my %default = (
         branch       => 'refs/heads/master',
         default_page => 'home.yukki',
@@ -142,9 +168,10 @@ sub add_repository {
     );
 
     my $body = $self->view('Admin::Repository')->edit($ctx, {
-        form       => $ctx->request->body_parameters->as_hashref,
-        default    => \%default,
-        breadcrumb => \@breadcrumb,
+        form        => $ctx->request->body_parameters->as_hashref,
+        form_errors => $form_errors,
+        default     => \%default,
+        breadcrumb  => \@breadcrumb,
     });
 
     $ctx->response->body($body);

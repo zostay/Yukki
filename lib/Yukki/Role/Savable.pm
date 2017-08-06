@@ -61,7 +61,7 @@ sub dump_yaml {
     my %output;
     for my $attr ($self->savable_attributes) {
         my $v = $self->$attr;
-        if (blessed $v && $v->does('Yukki::Role::Savable')) {
+        if (blessed $v && $v->can('does') && $v->does('Yukki::Role::Savable')) {
             $v = $v->dump_yaml;
         }
         $output{ $attr } = $v;
