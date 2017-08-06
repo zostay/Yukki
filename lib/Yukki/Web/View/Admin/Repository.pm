@@ -66,6 +66,7 @@ sub _build_edit_template {
                 'anonymous_access_level',
                 'repository.anonymous_access_level',
                 'form.anonymous_access_level',
+                'default.anonymous_access_level',
             ),
         ],
     );
@@ -96,14 +97,17 @@ sub list {
     my ($self, $ctx, $vars) = @_;
 
     $ctx->response->page_title('List Repositories');
+    $self->page_navigation($ctx->response, 'list');
 
     return $self->render_page(
         template => $self->list_template,
         context  => $ctx,
         vars     => {
             repositories => [
-                sort { $a->repository_settings->name cmp $b->repository_settings->name }
-                    @{ $vars->{repositories} }
+                sort {
+                    $a->repository_settings->sort <=> $b->repository_settings->sort
+                    || $a->repository_settings->name cmp $b->repository_settings->name
+                } @{ $vars->{repositories} }
             ],
         },
     );

@@ -48,6 +48,9 @@ label.radios { vertical-align: top }
 div.radio-group { display: inline-block; margin-left: 1em }
 div.radio-group div.radio label { width: auto }
 
+div.field input[type=checkbox] { margin-left: 10em }
+div.field label.for-checkbox { width: auto }
+
 div.button-group { text-align: right }
 div.progress { height: 15px }
 
