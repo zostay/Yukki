@@ -59,12 +59,12 @@ sub _build_edit_template {
         template   => 'admin/repository/edit.html',
         directives => [
             (map { form_error($_) } (@edit_fields, 'anonymous_access_level')),
-            (map { ("#$_\@value" => field(["repository.$_", "form.$_"])) } @edit_fields),
-            # mark_radio_checked(
-            #     'anonymous_access_level',
-            #     'repository.anonymous_access_level',
-            #     'form.anonymous_access_level',
-            # ),
+            (map { ("#$_\@value" => field(["repository.$_", "form.$_", "default.$_"])) } @edit_fields),
+            mark_radio_checked(
+                'anonymous_access_level',
+                'repository.anonymous_access_level',
+                'form.anonymous_access_level',
+            ),
         ],
     );
 }
@@ -106,7 +106,8 @@ sub edit {
         template => $self->edit_template,
         context  => $ctx,
         vars     => {
-            form => $vars->{form},
+            form    => $vars->{form},
+            default => $vars->{default},
         },
     );
 }

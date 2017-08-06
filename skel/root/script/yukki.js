@@ -32,10 +32,45 @@ function updatePosition() {
     }
 }
 
+function handleAnyAndNoneTagPlaceholders(field, editor, tags) {
+    console.log(editor);
+    $('li', editor).each(function() {
+        var $li = $(this);
+        if ($li.find('.tag-editor-tag').html() == 'NONE') {
+            $li.addClass('NONE-group');
+            $li.removeClass('ANY-group');
+            $li.removeClass('plain-group');
+        }
+        else if ($li.find('.tag-editor-tag').html() == 'ANY') {
+            $li.addClass('ANY-group');
+            $li.removeClass('NONE-group');
+            $li.removeClass('plain-group');
+        }
+        else {
+            $li.addClass('plain-group');
+            $li.removeClass('ANY-group');
+            $li.removeClass('NONE-group');
+        }
+    });
+}
+
 $(document).ready(function() {
     $(':button,.button').button();
 
-    $('input.space-tags').tagEditor({ delimiter: ' ' });
+    $('input.group-tags').tagEditor({ 
+        delimiter: ' ',
+        forceLowercase: false
+    });
+
+    $('input.all-group-tags').tagEditor({ 
+        delimiter: ' ',
+        forceLowercase: false,
+        onChange: handleAnyAndNoneTagPlaceholders
+    });
+
+    $('ul.tag-editor').each(function () {
+        handleAnyAndNoneTagPlaceholders(null, this, null);
+    });
 
     $('#preview-yukkitext').scrollTop('#yukkitext-caret');
 

@@ -62,6 +62,17 @@ Add a repository configuration.
 
 =cut
 
+sub _none_and_any_groups_are_special {
+    my ($value) = @_;
+    my @groups = @$value;
+    if (@groups > 1 && any { $_ eq 'ANY' || $_ eq 'NONE' } @groups) {
+        return (0, 'ANY or NONE must appear alone or not at all.');
+    }
+    else {
+        return (1, '');
+    }
+}
+
 validation_spec add_repository => [
     name => [
         required => 1,
@@ -95,11 +106,13 @@ validation_spec add_repository => [
         optional => 1,
         must => limit_character_set('a-z', 'A-Z', '0-9', '_', '-'),
         into => split_by(qr/\s+/),
+        must => \&_none_and_any_groups_are_special,
     ],
     write_groups => [
         optional => 1,
         must => limit_character_set('a-z', 'A-Z', '0-9', '_', '-'),
         into => split_by(qr/\s+/),
+        must => \&_none_and_any_groups_are_special,
     ],
 ];
 
@@ -112,6 +125,15 @@ Screen for adding repository configuration.
 sub add_repository {
     my ($self, $ctx) = @_;
 
+    my %default = (
+        branch       => 'refs/heads/master',
+        default_page => 'home.yukki',
+        sort         => '50',
+        anonymous_access_level => 'none',
+        read_groups  => 'NONE',
+        write_groups => 'NONE',
+    );
+
     my @breadcrumb = (
         {
             label => 'List',
@@ -121,6 +143,7 @@ sub add_repository {
 
     my $body = $self->view('Admin::Repository')->edit($ctx, {
         form       => $ctx->request->body_parameters->as_hashref,
+        default    => \%default,
         breadcrumb => \@breadcrumb,
     });
 

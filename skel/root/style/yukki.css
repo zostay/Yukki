@@ -149,3 +149,9 @@ div.attachment-dropzone { display: none; background: #eef; text-align: center; p
 #repository-edit #read_groups { 16em }
 #repository-edit #write_groups { 16em }
 
+body ul.tag-editor .ANY-group .tag-editor-tag { background-color: #339; color: #eef }
+body ul.tag-editor .ANY-group .tag-editor-delete { background-color: #339; color: #eef }
+body ul.tag-editor .ANY-group .tag-editor-delete i:before { color: #eef; }
+body ul.tag-editor .NONE-group .tag-editor-tag { background-color: #339; color: #eef }
+body ul.tag-editor .NONE-group .tag-editor-delete { background-color: #339; color: #eef }
+body ul.tag-editor .NONE-group .tag-editor-delete i:before { color: #eef; }
