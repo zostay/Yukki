@@ -11,6 +11,8 @@ use namespace::clean;
 
 extends 'Yukki::Web::View';
 
+with 'Yukki::Web::View::Role::Navigation';
+
 # ABSTRACT: display repository admin screens
 
 =head1 DESCRIPTION
@@ -71,6 +73,21 @@ sub _build_edit_template {
 
 =head1 METHODS
 
+=head1 standard_menu
+
+Standard navigation menu for repository administration.
+
+=cut
+
+sub standard_menu {
+    return map {
+        +{
+            action => $_,
+            href   => "admin/repository/$_",
+        },
+    } qw( add list );
+}
+
 =head2 list
 
 =cut
@@ -100,6 +117,7 @@ sub edit {
     my ($self, $ctx, $vars) = @_;
 
     $ctx->response->page_title('Add Repository');
+    $self->page_navigation($ctx->response, 'add');
     $ctx->response->breadcrumb($vars->{breadcrumb});
 
     return $self->render_page(

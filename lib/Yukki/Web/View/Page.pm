@@ -10,6 +10,8 @@ use namespace::clean;
 
 extends 'Yukki::Web::View';
 
+with 'Yukki::Web::View::Role::Navigation';
+
 # ABSTRACT: render HTML for viewing and editing wiki pages
 
 =head1 DESCRIPTION
@@ -209,24 +211,29 @@ sub blank {
     );
 }
 
-=head2 page_navigation
+=head2 standard_menu
 
-Sets up the page navigation menu.
+The standard navigation menu for pages.
 
 =cut
 
-sub page_navigation {
+sub standard_menu {
+    return map {
+        +{
+            action => $_,
+            href   => "page/$_/%{repository}s/%{page}s",
+        },
+    } qw( edit history rename remove );
+}
+
+=head2 page_navigation
+
+Modifies page navigation to add custom page views to the menu.
+
+=cut
+
+after page_navigation => sub {
     my ($self, $response, $this_action, $vars) = @_;
-
-    for my $action (qw( edit history rename remove )) {
-        next if $action eq $this_action;
-
-        $response->add_navigation_item([ qw( page page_bottom ) ] => {
-            label => ucfirst $action,
-            href  => join('/', 'page', $action, $vars->{repository}, $vars->{page}),
-            sort  => 20,
-        });
-    }
 
     for my $view_name (keys %{ $self->app->settings->page_views }) {
         my $view_info = $self->app->settings->page_views->{$view_name};
@@ -243,7 +250,7 @@ sub page_navigation {
             sort  => $view_info->{sort},
         });
     }
-}
+};
 
 =head2 view
 

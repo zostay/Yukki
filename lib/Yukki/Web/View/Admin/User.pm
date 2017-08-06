@@ -12,6 +12,8 @@ use namespace::clean;
 
 extends 'Yukki::Web::View';
 
+with 'Yukki::Web::View::Role::Navigation';
+
 # ABSTRACT: display user admin screens
 
 =head1 DESCRIPTION
@@ -93,25 +95,19 @@ sub _build_remove_template {
 
 =head1 METHODS
 
-=head2 page_navigation
+=head2 standard_menu
 
 Sets up page navigation menu for the user admin screens.
 
 =cut
 
-sub page_navigation {
-    my ($self, $response, $this_action, $vars) = @_;
-
-    for my $action (qw( add list )) {
-        next if $action eq $this_action;
-
-        $response->add_navigation_item([ qw( page page_bottom ) ] => {
-            label => ucfirst $action,
-            href  => join('/', 'admin/user', $action),
-            sort  => 20,
-        });
-    }
-}
+sub standard_menu {
+    return map {
+        +{
+            action => $_,
+            href   => "admin/user/$_",
+        },
+    } qw( add list );
 
 =head2 list
 
