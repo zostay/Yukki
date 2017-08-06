@@ -5,6 +5,7 @@ use utf8;
 use Moo;
 
 use Type::Utils qw( class_type );
+use Yukki::TemplateUtil qw( field form_error mark_radio_checked );
 
 use namespace::clean;
 
@@ -41,6 +42,33 @@ sub _build_list_template {
     );
 }
 
+has edit_template => (
+    is          => 'ro',
+    isa         => class_type('Template::Pure'),
+    lazy        => 1,
+    builder     => '_build_edit_template',
+);
+
+sub _build_edit_template {
+    my @edit_fields = qw(
+        name title branch default_page sort
+        read_groups write_groups
+    );
+
+    shift->prepare_template(
+        template   => 'admin/repository/edit.html',
+        directives => [
+            (map { form_error($_) } (@edit_fields, 'anonymous_access_level')),
+            (map { ("#$_\@value" => field(["repository.$_", "form.$_"])) } @edit_fields),
+            # mark_radio_checked(
+            #     'anonymous_access_level',
+            #     'repository.anonymous_access_level',
+            #     'form.anonymous_access_level',
+            # ),
+        ],
+    );
+}
+
 =head1 METHODS
 
 =head2 list
@@ -60,6 +88,25 @@ sub list {
                 sort { $a->repository_settings->name cmp $b->repository_settings->name }
                     @{ $vars->{repositories} }
             ],
+        },
+    );
+}
+
+=head1 edit
+
+=cut
+
+sub edit {
+    my ($self, $ctx, $vars) = @_;
+
+    $ctx->response->page_title('Add Repository');
+    $ctx->response->breadcrumb($vars->{breadcrumb});
+
+    return $self->render_page(
+        template => $self->edit_template,
+        context  => $ctx,
+        vars     => {
+            form => $vars->{form},
         },
     );
 }

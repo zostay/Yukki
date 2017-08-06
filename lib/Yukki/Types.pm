@@ -6,7 +6,8 @@ use utf8;
 use Type::Library -base, -declare => qw(
     LoginName AccessLevel
     NavigationLinks NavigationMenuMap
-    BaseURL BaseURLEnum BreadcrumbLinks RepositoryMap
+    BaseURL BaseURLEnum BreadcrumbLinks
+    RepositoryName RepositoryMap
     PluginConfig PluginList
     PrivilegesMap
     EmailAddress YukkiSettings
@@ -14,7 +15,7 @@ use Type::Library -base, -declare => qw(
 );
 use Type::Utils qw( declare as where message coerce enum from via class_type );
 
-use Types::Standard qw( Str Int ArrayRef Maybe HashRef Dict );
+use Types::Standard qw( Str Int ArrayRef Maybe Map HashRef Dict );
 use Types::URI qw( Uri );
 
 use Email::Address;
@@ -126,6 +127,17 @@ declare BreadcrumbLinks,
         ],
     ];
 
+=head2 RepositoryName
+
+This limits repository names to a limited subset of ASCII.
+
+=cut
+
+declare RepositoryName,
+    as Str,
+    where { /^[a-zA-Z0-9_.-]{1,50}$/ },
+    message { "repository name $_ must only contain letters, numbers, and periods" };
+
 =head2 RepositoryMap
 
 This is a hash of L<Yukki::Settings::Repository> objects.
@@ -134,7 +146,7 @@ This is a hash of L<Yukki::Settings::Repository> objects.
 
 my $Repository = class_type 'Yukki::Settings::Repository';
 declare RepositoryMap,
-    as HashRef[$Repository];
+    as Map[RepositoryName, $Repository];
 
 coerce RepositoryMap,
     from HashRef,

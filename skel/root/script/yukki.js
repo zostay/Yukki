@@ -35,6 +35,8 @@ function updatePosition() {
 $(document).ready(function() {
     $(':button,.button').button();
 
+    $('input.space-tags').tagEditor({ delimiter: ' ' });
+
     $('#preview-yukkitext').scrollTop('#yukkitext-caret');
 
     $('every_10s', updatePosition);
@@ -77,8 +79,6 @@ $(document).ready(function() {
 
     $('input[name="r1"]').on('click', 'body', function() { show_hide_revision_checkbox('r2', $(this).val()) });
     $('input[name="r2"]').on('click', 'body', function() { show_hide_revision_checkbox('r1', $(this).val()) });
-
-    $('#user-groups').tagEditor({ delimiter: ' ' });
 
     $('.attachments').each(function() {
         var $this = $(this);

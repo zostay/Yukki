@@ -1,0 +1,58 @@
+<form method="POST" id="repository-edit">
+    <div class="field">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="main">
+    </div>
+
+    <div class="field">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" value="Main">
+    </div>
+
+    <div class="field">
+        <label for="branch">Branch:</label>
+        <input type="text" id="branch" name="branch" value="refs/heads/master">
+    </div>
+
+    <div class="field">
+        <label for="default_page">Default Page:</label>
+        <input type="text" id="default_page" name="default_page" value="home.yukki">
+    </div>
+
+    <div class="field">
+        <label for="sort">Sort:</label>
+        <input type="text" id="sort" name="sort" value="50">
+    </div>
+
+    <div class="field">
+        <label class="radios">Anonymous Access Level:</label>
+        <div id="anonymous_access_level" class="radio-group">
+            <div class="radio">
+                <input type="radio" id="anonymous_access_level-none" name="anonymous_access_level" value="none">
+                <label for="anonymous_access_level-none">None</label>
+            </div>
+            <div class="radio">
+                <input type="radio" id="anonymous_access_level-read" name="anonymous_access_level" value="read">
+                <label for="anonymous_access_level-none">Read</label>
+            </div>
+            <div class="radio">
+                <input type="radio" id="anonymous_access_level-write" name="anonymous_access_level" value="write">
+                <label for="anonymous_access_level-none">Write</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="field">
+        <label for="read_groups">Read Groups:</label>
+        <input type="text" class="space-tags" id="read_groups" name="read_groups" value="NONE">
+    </div>
+
+    <div class="field">
+        <label for="write_groups">Write Groups:</label>
+        <input type="text" id="write_groups" class="space-tags" name="write_groups" value="NONE">
+    </div>
+
+    <div class="button-group">
+        <button type="submit" id="submit" name="submit">Save</button>
+    </div>
+</form>

@@ -189,10 +189,11 @@ sub BUILD {
             special => 'admin_repository',
         },
         validations => {
-            action => qr/^(?:list)$/,
+            action => qr/^(?:add|list)$/,
         },
         acl => [
             [ read => { action => [ qw( list ) ] } ],
+            [ write => { action => [ qw( add ) ] } ],
         ],
         target => $self->controller('Admin::Repository'),
     ));

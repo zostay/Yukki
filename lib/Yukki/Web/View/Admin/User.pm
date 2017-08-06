@@ -59,11 +59,9 @@ sub _build_edit_template {
     shift->prepare_template(
         template   => 'admin/user/edit.html',
         directives => [
-            '#login_name-input' => form_error('login_name'),
-            '#email' => form_error('email'),
-            '#name' => form_error('name'),
-            '#password' => form_error('password'),
-            '#user-groups' => form_error('groups'),
+            map { form_error($_) } qw(
+                login_name email name password groups
+            ),
 
             '#login_name-input@type' => 'login_name_type',
             '#login_name@class' => 'login_name_display',

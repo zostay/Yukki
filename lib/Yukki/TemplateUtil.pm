@@ -20,6 +20,7 @@ use Sub::Exporter -setup => {
     exports => [ qw(
         field
         form_error
+        mark_radio_checked
     ) ],
 };
 
@@ -90,7 +91,7 @@ sub form_error {
         my $form_error = try {
             $template->data_at_path($data, $path);
         };
-        return '' unless defined $form_error;
+        return unless defined $form_error;
 
         my $error = join ' ', @$form_error;
 
@@ -99,8 +100,51 @@ sub form_error {
             . html_escape($error)
             . qq[</div>]
         );
-        return '';
     };
+}
+
+=head2 mark_radio_checked
+
+    $view->prepare_template(
+        template => ...,
+        directives => [
+            ...,
+            '#anonymous_access_level' => mark_radio_checked(
+                'anonymous_access_level',
+                'repository.anonymous_access_level',
+                'form.anonymous_access_level',
+            ),
+        ],
+    );
+
+Returns a subroutine that will set a radio button to the given value.
+
+    my @directives = mark_radio_checked($field_name, @data_paths);
+
+The C<$field_name> gives the the C<name> attribute of the radios to try. The returned sub checks each C<@data_path> sequentially and ignores missing paths.
+
+=cut
+
+sub mark_radio_checked {
+    my ($field_name, @data_paths) = @_;
+
+    sub {
+        my ($template, $dom, $data) = @_;
+
+        my $value;
+        for my $path (@data_paths) {
+            $value = try {
+                $template->data_at_path($data, $path);
+            };
+            last if defined $value;
+        }
+
+        return unless defined $value;
+
+        $dom->at(
+            qq/input[type=radio][name="$field_name"][value="$value"]/,
+        )->attr(checked => 1);
+    }
 }
 
 1;

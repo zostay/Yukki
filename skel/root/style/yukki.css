@@ -44,6 +44,10 @@ div.field .error { border: none }
 div.field .warning { border: none }
 div.field .info { border: none }
 
+label.radios { vertical-align: top }
+div.radio-group { display: inline-block; margin-left: 1em }
+div.radio-group div.radio label { width: auto }
+
 div.button-group { text-align: right }
 div.progress { height: 15px }
 
@@ -133,3 +137,15 @@ div.attachment-dropzone { display: none; background: #eef; text-align: center; p
 #user-edit #name { width: 12em }
 #user-edit #email { width: 20em }
 #user-edit #password { width: 8em }
+
+/* Repositories */
+
+#repository-edit { margin: 0 auto; width: 40em }
+#repository-edit #name { width: 8em }
+#repository-edit #title { width: 20em }
+#repository-edit #branch { width: 12em }
+#repository-edit #default_page { width: 8em }
+#repository-edit #sort { width: 4em }
+#repository-edit #read_groups { 16em }
+#repository-edit #write_groups { 16em }
+
