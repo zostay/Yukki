@@ -227,13 +227,14 @@ sub dispatch {
             });
         }
 
-        for my $repository (keys %{ $self->settings->repositories }) {
-            my $config = $self->settings->repositories->{$repository};
+        for my $repo ($self->model('Root')->list_repositories) {
+            next unless $repo->repository_exists;
+            my $config = $repo->repository_settings;
 
             my $name = $config->name;
             $ctx->response->add_navigation_item(repository => {
                 label => $name,
-                href  => join('/', 'page/view',  $repository),
+                href  => join('/', 'page/view', $repo->name),
                 sort  => $config->sort,
             });
         }

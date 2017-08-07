@@ -18,6 +18,7 @@ use Type::Utils;
 use Types::Standard qw( Dict HashRef Str Maybe slurpy Optional );
 use Path::Tiny;
 use Types::Path::Tiny qw( Path );
+use Try::Tiny;
 
 use namespace::clean;
 
@@ -219,8 +220,11 @@ sub check_access {
     # Always grant none
     return 1 if $needs eq 'none';
 
-    my $config = $self->settings->repositories->{$repository}
-              // $self->settings->special_privileges->{$special};
+    my $config;
+    $config   = try {
+        $self->model('Root')->repository($repository)->repository_settings;
+    };
+    $config //= $self->settings->special_privileges->{$special};
 
     return '' unless $config;
 

@@ -42,7 +42,10 @@ This will construct and return a L<Yukki::Model::Repository> object. It's basica
 
 =cut
 
-sub repository { shift->app->model('Repository', { name => shift }) }
+sub repository {
+    my ($self, $name) = @_;
+    $self->app->model('Repository', { name => $name })
+}
 
 =head2 list_repositories
 

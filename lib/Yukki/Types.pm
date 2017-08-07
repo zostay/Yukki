@@ -135,7 +135,7 @@ This limits repository names to a limited subset of ASCII.
 
 declare RepositoryName,
     as Str,
-    where { /^[a-zA-Z0-9_.-]{1,50}$/ },
+    where { /^[a-zA-Z0-9_.-]{3,50}$/ },
     message { "repository name $_ must only contain letters, numbers, and periods" };
 
 =head2 RepositoryMap

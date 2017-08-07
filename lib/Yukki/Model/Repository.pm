@@ -15,6 +15,7 @@ use Type::Utils;
 use Types::Path::Tiny qw( Path );
 use Types::Standard qw( Bool Str );
 use Try::Tiny;
+use Yukki::Types qw( RepositoryName );
 
 use namespace::clean;
 
@@ -47,7 +48,7 @@ the repository from the F<yukki.conf>.
 
 has name => (
     is          => 'ro',
-    isa         => Str,
+    isa         => RepositoryName,
     required    => 1,
 );
 
@@ -143,6 +144,17 @@ sub _build_git {
 }
 
 =head1 METHODS
+
+=head2 repository_exists
+
+Checks to see if the git repository is present at all.
+
+=cut
+
+sub repository_exists {
+    my $self = shift;
+    return $self->repository_path->exists;
+}
 
 =head2 author_name
 

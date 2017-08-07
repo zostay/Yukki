@@ -73,11 +73,22 @@ sub _none_and_any_groups_are_special {
     }
 }
 
+sub _unbox_none_and_any {
+    my ($value) = @_;
+    my @groups = @$value;
+    if (@groups == 1 && ($groups[0] eq 'ANY' || $groups[0] eq 'NONE')) {
+        return $groups[0];
+    }
+    else {
+        return $value;
+    }
+}
+
 validation_spec add_repository => [
     name => [
         required => 1,
         must => limit_character_set('a-z', 'A-Z', '0-9', '_', '-', '.'),
-        must => length_in_range('*', 50),
+        must => length_in_range(3, 50),
     ],
     title => [
         required => 1,
@@ -107,12 +118,14 @@ validation_spec add_repository => [
         must => limit_character_set('a-z', 'A-Z', '0-9', '_', '-'),
         into => split_by(qr/\s+/),
         must => \&_none_and_any_groups_are_special,
+        into => \&_unbox_none_and_any,
     ],
     write_groups => [
         optional => 1,
         must => limit_character_set('a-z', 'A-Z', '0-9', '_', '-'),
         into => split_by(qr/\s+/),
         must => \&_none_and_any_groups_are_special,
+        into => \&_unbox_none_and_any,
     ],
 ];
 
