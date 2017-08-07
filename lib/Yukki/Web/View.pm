@@ -416,8 +416,8 @@ sub available_menu_items {
         my $access_level_needed = $match->access_level;
         $self->check_access(
             user       => $ctx->session->{user},
-            repository => $match->mapping->{repository} // '-',
-            special    => $match->mapping->{special} // '-',
+            repository => ($match->mapping->{repository} // '-'),
+            special    => ($match->mapping->{special} // '-'),
             needs      => $access_level_needed,
         );
     } $ctx->response->navigation_menu($name);

@@ -4,6 +4,7 @@ use v5.24;
 use utf8;
 use Moo::Role;
 
+use Carp;
 use Scalar::Util qw( blessed );
 use YAML qw( Dump Load );
 
@@ -85,6 +86,9 @@ This constructs a new class from the data loaded from the given YAML text.
 
 sub load_yaml {
     my ($class, $yaml) = @_;
+
+    croak "No data given to from which to load $class"
+        unless defined $yaml && $yaml =~ /\S/;
 
     my $input = Load($yaml);
     $class->new($input);

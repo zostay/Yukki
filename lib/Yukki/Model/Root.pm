@@ -69,6 +69,7 @@ sub list_repositories {
     return @repos unless $repo_dir->is_dir;
 
     for my $config ($repo_dir->children) {
+        next if $config->basename =~ /^\./;
         push @repos, $self->repository($config->basename);
     }
 
