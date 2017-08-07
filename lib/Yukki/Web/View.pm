@@ -12,6 +12,7 @@ use Text::MultiMarkdown;
 use Try::Tiny;
 use Type::Utils;
 use Types::Standard qw( Dict Str ArrayRef HashRef slurpy );
+use Types::URI qw( Uri );
 
 use namespace::clean;
 
@@ -136,6 +137,33 @@ sub _build_links_template {
     );
 }
 
+=head2 confirm_template
+
+The template used by L</render_confirmation>.
+
+=cut
+
+has confirm_template => (
+    is          => 'ro',
+    isa         => class_type('Template::Pure'),
+    lazy        => 1,
+    builder     => '_build_confirm_template',
+);
+
+sub _build_confirm_template {
+    my $self = shift;
+
+    $self->prepare_template(
+        template   => 'confirm.html',
+        directives => [
+            'h1.title'                  => 'title',
+            '.question'                 => 'question',
+            '#submit'                   => 'yes_label',
+            '#cancel_confirmation@href' => 'no_link',
+        ],
+    );
+}
+
 =head1 METHODS
 
 =head2 page_template
@@ -226,6 +254,46 @@ sub prepare_template {
     return Template::Pure->new(
         template   => $template_content,
         directives => $directives,
+    );
+}
+
+=head2 render_confirmation
+
+    my $document = $self->render_confirmation({
+        context   => $ctx,
+        question  => 'What are you confirming?',
+        yes_label => 'Do The Thing',
+        no_link   => 'go/back',
+    });
+
+The standard Yukki confirmation screen.
+
+=cut
+
+sub render_confirmation {
+    my ($self, $opt)
+        = validate(\@_, class_type(__PACKAGE__),
+            slurpy Dict[
+                context   => class_type('Yukki::Web::Context'),
+                title     => Str,
+                question  => Str,
+                yes_label => Str,
+                no_link   => Str|Uri,
+            ]
+        );
+    my ($ctx, $title, $question, $yes_label, $no_link) = @{$opt}{qw(
+        context title question yes_label no_link
+    )};
+
+    return $self->render_page(
+        template => $self->confirm_template,
+        context  => $ctx,
+        vars     => {
+            title     => $title,
+            question  => $question,
+            yes_label => $yes_label,
+            no_link   => $no_link,
+        },
     );
 }
 

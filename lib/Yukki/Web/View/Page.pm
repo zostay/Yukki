@@ -400,13 +400,12 @@ sub remove {
     $self->page_navigation($ctx->response, 'remove', $vars)
         unless $ctx->request->path_parameters->{file};
 
-    return $self->render_page(
-        template => $self->remove_template,
-        context  => $ctx,
-        vars     => {
-            page        => $vars->{page},
-            return_link => $vars->{return_link},
-        },
+    return $self->render_confirmation(
+        context   => $ctx,
+        title     => "Remove $vars->{page}?",
+        question  => "Are you sure that you wish to remove $vars->{page} from the repository?",
+        yes_label => 'Remove Now',
+        no_link   => $vars->{return_link},
     );
 }
 

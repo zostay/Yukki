@@ -206,13 +206,13 @@ sub remove {
 
     $self->page_navigation($ctx->response, 'remove');
 
-    return $self->render_page(
-        template => $self->remove_template,
-        context  => $ctx,
-        vars     => {
-            user        => $vars->{user},
-            return_link => $vars->{return_link},
-        },
+    my $login_name = $vars->{user}->login_name;
+    return $self->render_confirmation(
+        context   => $ctx,
+        title     => "Remove $login_name?",
+        question  => "Are you sure you wish to remove the user with login name $login_name?",
+        yes_label => 'Remove Now',
+        no_link   => $vars->{return_link},
     );
 }
 
