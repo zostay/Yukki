@@ -108,6 +108,7 @@ sub standard_menu {
             href   => "admin/user/$_",
         },
     } qw( add list );
+}
 
 =head2 list
 

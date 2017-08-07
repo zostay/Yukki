@@ -57,8 +57,8 @@ sub repo_name_and_path {
     my $path       = $ctx->request->path_parameters->{page};
 
     if (not defined $path) {
-        my $repo_config
-            = $self->app->settings->repositories->{$repo_name};
+        my $repo = $self->model('Root')->repository($repo_name);
+        my $repo_config = $repo->repository_settings;
 
         my $path_str = $repo_config->default_page;
 

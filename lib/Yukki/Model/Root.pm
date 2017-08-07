@@ -66,6 +66,8 @@ sub list_repositories {
     }
 
     my $repo_dir = $self->locate('repo_path');
+    return @repos unless $repo_dir->is_dir;
+
     for my $config ($repo_dir->children) {
         push @repos, $self->repository($config->basename);
     }
@@ -100,7 +102,10 @@ sub attach_repository {
         die "repository with key '$key' is already configured, cannot attach it again";
     }
 
+    $repo_file->parent->mkpath;
+    $repo_file->chmod(0600) if $repo_file->exists;
     $repo_file->spew_utf8($repo->dump_yaml);
+    $repo_file->chmod(0400);
     return;
 }
 

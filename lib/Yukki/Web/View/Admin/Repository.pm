@@ -74,7 +74,7 @@ sub _build_edit_template {
 
 =head1 METHODS
 
-=head1 standard_menu
+=head2 standard_menu
 
 Standard navigation menu for repository administration.
 
@@ -113,7 +113,7 @@ sub list {
     );
 }
 
-=head1 edit
+=head2 edit
 
 =cut
 

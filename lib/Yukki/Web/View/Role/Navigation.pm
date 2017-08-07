@@ -48,7 +48,7 @@ requires 'standard_menu';
 
 =head1 PROVIDED METHODS
 
-=head1 page_navigation
+=head2 page_navigation
 
     $view->page_navigation($ctx->response, $action, \%vars);
 
