@@ -266,7 +266,10 @@ sub dispatch {
         else {
             warn "ISE: $_";
 
-            $response = http_exception("Oh darn. Something went wrong.", {
+            my $message = "Oh darn. Something went wrong.";
+            $message = "ERROR: $_" if $ENV{YUKKI_DEBUG};
+
+            $response = http_exception($message, {
                 status           => 'InternalServerError',
                 show_stack_trace => 0,
             })->as_psgi($env);

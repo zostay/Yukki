@@ -6,7 +6,9 @@ use Moo;
 
 with 'Yukki::Web::Controller';
 
+use FormValidator::Tiny qw( :all );
 use Try::Tiny;
+use Types::Standard qw( Int );
 use Yukki::Error qw( http_throw );
 
 use namespace::clean;
@@ -137,6 +139,21 @@ Displays or processes the edit form for a page using.
 
 =cut
 
+validation_spec edit_page => [
+    yukkitext => [
+        trim => 0,
+        required => 1,
+    ],
+    yukkitext_position => [
+        optional => 1,
+        must => Int,
+        into => '+',
+    ],
+    comment => [
+        required => 1,
+    ],
+];
+
 sub edit_page {
     my ($self, $ctx) = @_;
 
@@ -146,23 +163,40 @@ sub edit_page {
 
     my $breadcrumb = $self->breadcrumb($page->repository, $path);
 
+    my ($p, $err);
     if ($ctx->request->method eq 'POST') {
-        my $new_content = $ctx->request->parameters->{yukkitext};
-        my $position    = $ctx->request->parameters->{yukkitext_position};
-        my $comment     = $ctx->request->parameters->{comment};
+        ($p, $err) = validate_form edit_page => $ctx->request->body_parameters;
 
-        if (my $user = $ctx->session->{user}) {
-            $page->author_name($user->{name});
-            $page->author_email($user->{email});
+        if (!$err) {
+            my $new_content = $p->{yukkitext};
+            my $position    = $p->{yukkitext_position} // 0;
+            my $comment     = $p->{comment};
+
+            if (my $user = $ctx->session->{user}) {
+                $page->author_name($user->{name});
+                $page->author_email($user->{email});
+            }
+
+            $page->store({
+                content => $new_content,
+                comment => $comment,
+            });
+
+            $ctx->response->redirect(join '/', '/page/edit', $repo_name, $page->full_path, '?yukkitext_position='.$position);
+            return;
         }
 
-        $page->store({
-            content => $new_content,
-            comment => $comment,
-        });
+        else {
+            my @errors;
+            push @errors, "Comment is required."
+                if $err->{comment};
+            push @errors, "Please try again."
+                if $err->{yukkitext_position};
+            push @errors, "Wiki content is required."
+                if $err->{yukkitext};
 
-        $ctx->response->redirect(join '/', '/page/edit', $repo_name, $page->full_path, '?yukkitext_position='.$position);
-        return;
+            $ctx->add_errors(@errors);
+        }
     }
 
     my @attachments = grep { $_->filetype ne 'yukki' } $page->list_files;

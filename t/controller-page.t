@@ -57,6 +57,21 @@ test_psgi
         $jar->add_cookie_header($req);
         $res = $cb->($req);
         like $res->content, qr/<textarea\b/, 'got a wiki edit page';
+
+        $req = POST "$host/page/edit/main/home.yukki", [
+            yukkitext => 'I am a new creation.',
+            yukkitext_position  => '3',
+            comment   => 'new thing',
+        ];
+        $jar->add_cookie_header($req);
+        $res = $cb->($req);
+        is $res->code, 302, 'redirect indicates success';
+
+        $req = GET "$host/page/edit/main/home.yukki";
+        $jar->add_cookie_header($req);
+        $res = $cb->($req);
+        like $res->content, qr/<textarea\b/, 'got a wiki edit page';
+        like $res->content, qr/\bI am a new creation\./, 'found the new yukkitext';
     };
 
 done_testing;
