@@ -127,7 +127,7 @@ sub _build_links_template {
     $self->prepare_template(
         template   => 'links.html',
         directives => [
-            '.links' => {
+            '.links li' => {
                 'link<-links' => [
                     'a'      => 'link.label',
                     'a@href' => 'link.href',

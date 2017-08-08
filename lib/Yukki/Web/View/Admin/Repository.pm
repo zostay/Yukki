@@ -35,9 +35,10 @@ sub _build_list_template {
             '.repository' => {
                 'repo<-repositories' => [
                     '.name' => 'repo.name',
-                    '.title' => 'repo.repository_settings.name',
-                    '.branch' => 'repo.repository_settings.site_branch',
-                    '.default_page' => 'repo.repository_settings.default_page',
+                    '.title' => 'repo.name',
+                    '.branch' => 'repo.branch',
+                    '.default_page' => 'repo.default_page',
+                    '.action' => 'repo.action | encoded_string',
                 ],
             },
         ],
@@ -99,16 +100,41 @@ sub list {
     $ctx->response->page_title('List Repositories');
     $self->page_navigation($ctx->response, 'list');
 
+    my @repos = map {
+        my $repo = $_;
+        my $action = $self->render_links(
+            context => $ctx,
+            links   => [
+                {
+                    label => 'View',
+                    href  => '/page/view/' . $repo->name,
+                },
+                ($repo->repository_exists ? () :
+                {
+                    label => 'Initialize',
+                    href  => '/admin/user/initialize/' . $repo->name,
+                }),
+            ],
+        );
+
+        {
+            name => $repo->name,
+            title => $repo->repository_settings->name,
+            branch => $repo->repository_settings->site_branch,
+            default_page => $repo->repository_settings->default_page,
+            action => $action,
+        }
+    } sort {
+        $a->repository_settings->sort <=> $b->repository_settings->sort
+        || $a->repository_settings->name cmp $b->repository_settings->name
+    } @{ $vars->{repositories} || [] };
+
+
     return $self->render_page(
         template => $self->list_template,
         context  => $ctx,
         vars     => {
-            repositories => [
-                sort {
-                    $a->repository_settings->sort <=> $b->repository_settings->sort
-                    || $a->repository_settings->name cmp $b->repository_settings->name
-                } @{ $vars->{repositories} }
-            ],
+            repositories => \@repos
         },
     );
 }
@@ -132,6 +158,28 @@ sub edit {
             form_errors => $vars->{form_errors},
             default     => $vars->{default},
         },
+    );
+}
+
+=head2 initialize
+
+=cut
+
+sub initialize {
+    my ($self, $ctx, $vars) = @_;
+
+    $ctx->response->page_title($vars->{title});
+    $ctx->response->breadcrumb($vars->{breadcrumb});
+
+    $self->page_navigation($ctx->response, 'initialize');
+
+    my $repo_name = $vars->{repo}->title;
+    return $self->render_confirmation(
+        context    => $ctx,
+        title      => "Initialize $repo_name?",
+        question   => "Are you sure you want to create the git repository for storing the files for $repo_name?",
+        yes_label  => 'Initialize Now',
+        no_link    => $vars->{return_link},
     );
 }
 

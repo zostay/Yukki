@@ -8,7 +8,7 @@ extends 'Yukki::Model';
 
 use Type::Params qw( validate );
 use Type::Utils;
-use Types::Standard qw( Bool Maybe Str Dict slurpy );
+use Types::Standard qw( Bool Optional Str Dict slurpy );
 use Types::URI qw( Uri );
 
 use namespace::clean;
@@ -131,8 +131,8 @@ sub init_repository {
         = validate(\@_, class_type(__PACKAGE__),
             slurpy Dict[
                 key    => Str,
-                origin => Maybe[Uri],
-                init_from_settings => Bool,
+                origin => Optional[Uri],
+                init_from_settings => Optional[Bool],
             ],
         );
     my ($key, $origin, $init_from_settings) = @{$opt}{qw(
@@ -145,7 +145,7 @@ sub init_repository {
     }
 
     elsif (!$repo_config) {
-        my $repo_file = ''.$self->locate('repo_path', $key);
+        my $repo_file = $self->locate('repo_path', $key);
         $repo_config = Yukki::Settings::Repository->load_yaml(
             $repo_file->slurp_utf8
         );

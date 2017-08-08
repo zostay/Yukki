@@ -6,6 +6,7 @@ use Moo;
 
 use FormValidator::Tiny ':all';
 use Types::Standard qw( Int );
+use Yukki::Error qw( http_throw );
 
 with 'Yukki::Web::Controller';
 
@@ -30,6 +31,7 @@ sub fire {
 
     if ($action eq 'list') { $self->list_repositories($ctx) }
     elsif ($action eq 'add') { $self->add_repository($ctx) }
+    elsif ($action eq 'initialize') { $self->initialize_repository($ctx) }
     else {
         http_throw('No action found matching that URL.', {
             status => 'NotFound',
@@ -185,6 +187,50 @@ sub add_repository {
         form_errors => $form_errors,
         default     => \%default,
         breadcrumb  => \@breadcrumb,
+    });
+
+    $ctx->response->body($body);
+}
+
+=head2 initialize_repository
+
+Triggers repository initialization.
+
+=cut
+
+sub initialize_repository {
+    my ($self, $ctx) = @_;
+
+    my $repo_name = $ctx->request->path_parameters->{repository};
+    my $repo = $self->model('Root')->repository($repo_name);
+
+    http_throw("Repository named $repo_name does not exist.", {
+        status => 'NotFound',
+    }) unless $repo;
+
+    my $confirmed = $ctx->request->body_parameters->{confirmed};
+    if ($ctx->request->method eq 'POST' && $confirmed) {
+        $self->model('Root')->init_repository(
+            key => $repo_name,
+        );
+
+        $ctx->add_info("Initialized repository named ".$repo->title.".");
+        $ctx->response->redirect('/admin/repository/list');
+        return;
+    }
+
+    my @breadcrumb = (
+        {
+            label => 'List',
+            href  => 'admin/repository/list',
+        }
+    );
+
+    my $body = $self->view('Admin::Repository')->initialize($ctx, {
+        title => 'Initialize ' . $repo->title,
+        repo  => $repo,
+        breadcrumb => \@breadcrumb,
+        return_link => $ctx->rebase_url('admin/repository/list'),
     });
 
     $ctx->response->body($body);
