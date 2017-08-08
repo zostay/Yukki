@@ -8,7 +8,7 @@ extends 'Yukki::Model';
 
 use Type::Params qw( validate );
 use Type::Utils;
-use Types::Standard qw( Bool Optional Str Dict slurpy );
+use Types::Standard qw( Bool Optional Maybe Str Dict slurpy );
 use Types::URI qw( Uri );
 
 use namespace::clean;
@@ -131,8 +131,8 @@ sub init_repository {
         = validate(\@_, class_type(__PACKAGE__),
             slurpy Dict[
                 key    => Str,
-                origin => Optional[Uri],
-                init_from_settings => Optional[Bool],
+                origin => Optional[Maybe[Uri]],
+                init_from_settings => Optional[Maybe[Bool]],
             ],
         );
     my ($key, $origin, $init_from_settings) = @{$opt}{qw(
