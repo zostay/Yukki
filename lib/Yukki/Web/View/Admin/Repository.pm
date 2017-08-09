@@ -112,8 +112,14 @@ sub list {
                 ($repo->repository_exists ? () :
                 {
                     label => 'Initialize',
-                    href  => '/admin/user/initialize/' . $repo->name,
+                    href  => '/admin/repository/initialize/' . $repo->name,
                 }),
+                ($repo->repository_exists ?
+                {
+                    label => 'Kill',
+                    href  => '/admin/repository/kill/' . $repo->name,
+                    class => 'scary kill-action',
+                } : ())
             ],
         );
 
@@ -177,8 +183,31 @@ sub initialize {
     return $self->render_confirmation(
         context    => $ctx,
         title      => "Initialize $repo_name?",
-        question   => "Are you sure you want to create the git repository for storing the files for $repo_name?",
+        question   => "Are you sure you want to create the git repository for storing files in $repo_name?",
         yes_label  => 'Initialize Now',
+        no_link    => $vars->{return_link},
+    );
+}
+
+=head2 kill_it_with_fire
+
+=cut
+
+sub kill_it_with_fire {
+    my ($self, $ctx, $vars) = @_;
+
+    $ctx->response->page_title($vars->{title});
+    $ctx->response->breadcrumb($vars->{breadcrumb});
+
+    $self->page_navigation($ctx->response, 'kill');
+
+    my $repo_name = $vars->{repo}->title;
+    return $self->render_confirmation(
+        context    => $ctx,
+        title      => "Kill $repo_name?",
+        question   => qq[Are you sure you want to kill the git repository for storing files in $repo_name? <br><br> <strong class="scary">This operation will permanently destroy the data in your wiki. You should be very sure you want to do this before clicking KILL NOW.</strong>],
+        double_confirm => 1,
+        yes_label  => 'KILL NOW. CANNOT BE UNDONE.',
         no_link    => $vars->{return_link},
     );
 }

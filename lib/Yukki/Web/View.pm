@@ -11,7 +11,7 @@ use Template::Pure;
 use Text::MultiMarkdown;
 use Try::Tiny;
 use Type::Utils;
-use Types::Standard qw( Dict Str ArrayRef HashRef slurpy );
+use Types::Standard qw( Bool Dict Str ArrayRef HashRef Optional slurpy );
 use Types::URI qw( Uri );
 
 use namespace::clean;
@@ -129,8 +129,9 @@ sub _build_links_template {
         directives => [
             '.links li' => {
                 'link<-links' => [
-                    'a'      => 'link.label',
-                    'a@href' => 'link.href',
+                    'a'       => 'link.label',
+                    'a@href'  => 'link.href',
+                    'a@class' => 'link.class',
                 ],
             },
         ],
@@ -157,7 +158,8 @@ sub _build_confirm_template {
         template   => 'confirm.html',
         directives => [
             'h1.title'                  => 'title',
-            '.question'                 => 'question',
+            '.question'                 => 'question | encoded_string',
+            'form@class'                => 'double_confirm',
             '#submit'                   => 'yes_label',
             '#cancel_confirmation@href' => 'no_link',
         ],
@@ -279,11 +281,26 @@ sub render_confirmation {
                 question  => Str,
                 yes_label => Str,
                 no_link   => Str|Uri,
+                double_confirm => Optional[Bool],
             ]
         );
-    my ($ctx, $title, $question, $yes_label, $no_link) = @{$opt}{qw(
-        context title question yes_label no_link
+    my (
+        $ctx,
+        $title,
+        $question,
+        $yes_label,
+        $no_link,
+        $double_confirm,
+    ) = @{$opt}{qw(
+        context
+        title
+        question
+        yes_label
+        no_link
+        double_confirm
     )};
+
+    $double_confirm = $double_confirm ? 'double-confirm' : '';
 
     return $self->render_page(
         template => $self->confirm_template,
@@ -293,6 +310,7 @@ sub render_confirmation {
             question  => $question,
             yes_label => $yes_label,
             no_link   => $no_link,
+            double_confirm => $double_confirm,
         },
     );
 }
@@ -450,6 +468,7 @@ sub render_links {
                 +{
                     label => $_->{label},
                     href  => $ctx->rebase_url($_->{href}),
+                    class => $_->{class} // '',
                 }
             } @$links ],
         },

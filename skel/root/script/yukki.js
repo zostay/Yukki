@@ -77,6 +77,22 @@ $(document).ready(function() {
     $('every_10s', updatePosition);
     $('form.edit-page').submit(updatePosition);
 
+    $('.confirmation form').submit(function(evt) {
+        var yes = window.confirm("Are you really sure? This action cannot be undone.");
+        if (!yes) {
+            evt.preventDefault();
+        }
+    });
+
+    $('#show-kill').click(function (evt) {
+        if ($(this).is(':checked')) {
+            $('.kill-action').show();
+        }
+        else {
+            $('.kill-action').hide();
+        }
+    });
+
     if ($('#preview-yukkitext').length > 0) {
         $(window).bind('every_10s', function() {
             var url = String(window.location).replace(/\/edit\//, '/preview/');

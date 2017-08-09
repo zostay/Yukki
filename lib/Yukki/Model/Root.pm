@@ -10,6 +10,7 @@ use Type::Params qw( validate );
 use Type::Utils;
 use Types::Standard qw( Bool Optional Maybe Str Dict slurpy );
 use Types::URI qw( Uri );
+use Yukki::Error qw( http_throw );
 
 use namespace::clean;
 
@@ -91,16 +92,16 @@ The configuration to pass in is passed through to the constructor of L<Yukki::Se
 sub attach_repository {
     my ($self, %opt) = @_;
     my $key = delete $opt{key}
-        // die "missing key in attach_repository";
+        // http_throw "missing key in attach_repository";
 
     my $repo = Yukki::Settings::Repository->new(\%opt);
     my $repo_file = $self->locate('repo_path', $key);
 
     if ($self->app->settings->repositories->{$key}) {
-        die "repository with key '$key' is already defined in the master configuraiton file, cannot attach it again";
+        http_throw "repository with key '$key' is already defined in the master configuraiton file, cannot attach it again";
     }
     elsif (-e $self->locate('repo_path', $key)) {
-        die "repository with key '$key' is already configured, cannot attach it again";
+        http_throw "repository with key '$key' is already configured, cannot attach it again";
     }
 
     $repo_file->parent->mkpath;
@@ -141,7 +142,7 @@ sub init_repository {
 
     my $repo_config = $self->app->settings->repositories->{$key};
     if ($repo_config && !$init_from_settings) {
-        die "unable to initialize repository '$key' found in settings, please use the command-line tools";
+        http_throw "unable to initialize repository '$key' found in settings, please use the command-line tools";
     }
 
     elsif (!$repo_config) {
@@ -151,7 +152,7 @@ sub init_repository {
         );
     }
 
-    die "repository '$key' not yet attached" if !$repo_config;
+    http_throw "repository '$key' not yet attached" if !$repo_config;
 
     my $repository = $self->repository($key);
 
@@ -161,6 +162,46 @@ sub init_repository {
     else {
         $repository->initialize_repository;
     }
+}
+
+=head2 kill_repository
+
+Deletes the git repository associated with this configuration.
+
+=cut
+
+sub kill_repository {
+    my ($self, $opt)
+        = validate(\@_, class_type(__PACKAGE__),
+            slurpy Dict[
+                key    => Str,
+            ]
+        );
+    my $key = $opt->{key};
+
+    my $repo_config = $self->app->settings->repositories->{$key};
+    if ($repo_config) {
+        http_throw "unable to kill repository '$key' found in settings, please use the command-line";
+    }
+
+    elsif (!$repo_config) {
+        my $repo_file = $self->locate('repo_path', $key);
+        $repo_config = Yukki::Settings::Repository->load_yaml(
+            $repo_file->slurp_utf8
+        );
+    }
+
+    http_throw "repository '$key' not yet attached" if !$repo_config;
+
+    my $repository = $self->repository($key);
+
+    my $git_dir = $repository->repository_path;
+    http_throw "repository '$key' has no git repository"
+        unless $git_dir->is_dir;
+
+    $git_dir->remove_tree({ safe => 0 });
+
+    return;
 }
 
 1;

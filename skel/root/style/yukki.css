@@ -69,6 +69,12 @@ body ul.tag-editor .tag-editor-delete i:before { color: #339; }
 .tag { background-color: #eef; color: #339; padding-right: 5px; padding-left: 5px; white-space: nowrap; overflow: hidden; border-radius: 2px 0 0 2px; float: left; }
 li.tag { margin-left: 0 }
 
+table .action .scary { color: red; font-weight: bold; font-size: 0.8em; display: none }
+
+/*** Confirmation ***/
+
+.confirmation .scary { color: red; font-size: 1.1em }
+
 /*** Login ***/
 
 #login-page { width: 30em; margin: 8em auto }
