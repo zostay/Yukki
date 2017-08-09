@@ -111,6 +111,33 @@ sub attach_repository {
     return;
 }
 
+=head2 detach_repository
+
+    $root->detach_repository(key => $key);
+
+Given the key for a repository, this will remove the configuration. This does not work for configurations in the master file.
+
+=cut
+
+sub detach_repository {
+    my ($self, %opt) = @_;
+    my $key = delete $opt{key}
+        // http_throw "missing key in detach_repository";
+
+    my $repo = $self->repository($key);
+
+    http_throw "no repository named '$key' found"
+        unless $repo;
+
+    http_throw "cannot detach repository in master configuration"
+        if $repo->is_master_repository;
+
+    my $repo_config = $self->locate('repo_path', $key);
+    $repo_config->chmod(0600);
+    $repo_config->remove;
+    return;
+}
+
 =head2 init_repository
 
     $repository = $root->init_repository(

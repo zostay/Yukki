@@ -114,12 +114,17 @@ sub list {
                     label => 'Initialize',
                     href  => '/admin/repository/initialize/' . $repo->name,
                 }),
+                ($repo->repository_exists ? () :
+                {
+                    label => 'Remove',
+                    href  => '/admin/repository/remove/' . $repo->name,
+                }),
                 ($repo->repository_exists ?
                 {
                     label => 'Kill',
                     href  => '/admin/repository/kill/' . $repo->name,
                     class => 'scary kill-action',
-                } : ())
+                } : ()),
             ],
         );
 
@@ -208,6 +213,28 @@ sub kill_it_with_fire {
         question   => qq[Are you sure you want to kill the git repository for storing files in $repo_name? <br><br> <strong class="scary">This operation will permanently destroy the data in your wiki. You should be very sure you want to do this before clicking KILL NOW.</strong>],
         double_confirm => 1,
         yes_label  => 'KILL NOW. CANNOT BE UNDONE.',
+        no_link    => $vars->{return_link},
+    );
+}
+
+=head2 remove
+
+=cut
+
+sub remove {
+    my ($self, $ctx, $vars) = @_;
+
+    $ctx->response->page_title($vars->{title});
+    $ctx->response->breadcrumb($vars->{breadcrumb});
+
+    $self->page_navigation($ctx->response, 'remove');
+
+    my $repo_name = $vars->{repo}->title;
+    return $self->render_confirmation(
+        context    => $ctx,
+        title      => "Remove $repo_name?",
+        question   => qq[Are you sure you want to remove the configuration for $repo_name?],
+        yes_label  => 'Remove Now',
         no_link    => $vars->{return_link},
     );
 }

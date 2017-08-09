@@ -32,6 +32,7 @@ sub fire {
     if ($action eq 'list') { $self->list_repositories($ctx) }
     elsif ($action eq 'add') { $self->add_repository($ctx) }
     elsif ($action eq 'initialize') { $self->initialize_repository($ctx) }
+    elsif ($action eq 'remove') { $self->remove_repository($ctx) }
     elsif ($action eq 'kill') { $self->kill_repository($ctx) }
     else {
         http_throw('No action found matching that URL.', {
@@ -279,6 +280,56 @@ sub kill_repository {
 
     my $body = $self->view('Admin::Repository')->kill_it_with_fire($ctx, {
         title => 'Kill ' . $repo->title,
+        repo  => $repo,
+        breadcrumb => \@breadcrumb,
+        return_link => $ctx->rebase_url('admin/repository/list'),
+    });
+
+    $ctx->response->body($body);
+}
+
+=head2 remove_repository
+
+Removes a repository configuration.
+
+=cut
+
+sub remove_repository {
+    my ($self, $ctx) = @_;
+
+    my $repo_name = $ctx->request->path_parameters->{repository};
+    my $repo = $self->model('Root')->repository($repo_name);
+
+    http_throw("Repository named $repo_name does not exist.", {
+        status => 'NotFound',
+    }) unless $repo;
+
+    if ($repo->is_master_repository) {
+        $ctx->add_warnings('Repository '.$repo->title.' cannot be removed in app. Please use the command-line tools.');
+        $ctx->response->redirect('/admin/repository/list');
+        return;
+    }
+
+    my $confirmed = $ctx->request->body_parameters->{confirmed};
+    if ($ctx->request->method eq 'POST' && $confirmed) {
+        $self->model('Root')->detach_repository(
+            key => $repo_name,
+        );
+
+        $ctx->add_info('Removed repository configuration.');
+        $ctx->response->redirect('/admin/repository/list');
+        return;
+    }
+
+    my @breadcrumb = (
+        {
+            label => 'List',
+            href  => 'admin/repository/list',
+        },
+    );
+
+    my $body = $self->view('Admin::Repository')->remove($ctx, {
+        title => 'Remove ' . $repo->title,
         repo  => $repo,
         breadcrumb => \@breadcrumb,
         return_link => $ctx->rebase_url('admin/repository/list'),

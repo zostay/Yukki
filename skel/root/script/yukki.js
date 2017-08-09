@@ -77,7 +77,7 @@ $(document).ready(function() {
     $('every_10s', updatePosition);
     $('form.edit-page').submit(updatePosition);
 
-    $('.confirmation form').submit(function(evt) {
+    $('form.double-confirm').submit(function(evt) {
         var yes = window.confirm("Are you really sure? This action cannot be undone.");
         if (!yes) {
             evt.preventDefault();

@@ -203,10 +203,10 @@ sub BUILD {
             special => 'admin_repository',
         },
         validations => {
-            action => qr/^(?:initialize|kill)$/,
+            action => qr/^(?:initialize|remove|kill)$/,
         },
         acl => [
-            [ write => { action => [ qw( initialize kill ) ] } ],
+            [ write => { action => [ qw( initialize remove kill ) ] } ],
         ],
         target => $self->controller('Admin::Repository'),
     ));
