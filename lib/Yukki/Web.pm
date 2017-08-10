@@ -236,11 +236,11 @@ sub dispatch {
             }
 
             if ($admin) {
-                $ctx->response->add_navigation_item(user => {
-                    label => "Admin \x{25BE}",
+                $ctx->response->add_navigation_item(repository => {
+                    label => "\x{2630}",
                     href  => '/',
-                    sort  => 300,
-                    class => 'popup',
+                    sort  => 0,
+                    class => 'admin-nav popup',
                     id    => 'admin-popup',
                 });
             }

@@ -71,6 +71,8 @@ li.tag { margin-left: 0 }
 
 table .action .scary { color: red; font-weight: bold; font-size: 0.8em; display: none }
 
+a.admin-nav { text-decoration: none }
+
 .popup-menu { display: none }
 .popup-menu { position: absolute }
 .popup-menu { border: 1px solid #339; padding: 5px; background: white }
