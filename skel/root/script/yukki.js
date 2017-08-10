@@ -33,7 +33,6 @@ function updatePosition() {
 }
 
 function handleAnyAndNoneTagPlaceholders(field, editor, tags) {
-    console.log(editor);
     $('li', editor).each(function() {
         var $li = $(this);
         if ($li.find('.tag-editor-tag').html() == 'NONE') {
@@ -80,11 +79,23 @@ $(document).ready(function() {
     $('.popup-menu').each(function () {
         var $menu = $(this);
         var toggle = '#' + $menu.attr('data-toggle');
-        console.log('making ' + toggle + ' toggle something');
+
+        // Open popup menu on toggle click
         $(toggle).click(function(evt) {
             evt.preventDefault();
             $menu.toggle();
             $menu.position({ of: toggle, my: 'left top', at: 'left bottom' });
+        });
+    });
+
+    // Close any open popup menu on click outside of any popup
+    $('body').click(function(evt) {
+        var $target = $(evt.target);
+        $('.popup-menu').each(function () {
+            var $popup = $(this);
+            var inPopup = $target.closest($popup).length != 0;
+            var inToggle = $target.closest('#' + $popup.attr('data-toggle')).length != 0;
+            if (!inPopup && !inToggle) $popup.hide();
         });
     });
 
