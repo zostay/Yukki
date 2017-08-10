@@ -254,7 +254,7 @@ sub prepare_template {
     my ($template, $directives) = @{$opt}{qw( template directives )};
 
     my $template_content =
-        $self->app->locate_dir('template_path', $template)->slurp;
+        $self->app->locate_dir('template_path', $template)->slurp_utf8;
 
     return Template::Pure->new(
         template   => $template_content,
