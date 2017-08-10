@@ -207,8 +207,46 @@ sub dispatch {
             );
 
         if ($ctx->session->{user}) {
+            my $admin = 0;
+            my $user = $ctx->session->{user};
+            if ($self->check_access(
+                user    => $user,
+                special => 'admin_user',
+                needs   => 'read',
+            )) {
+                $admin++;
+                $ctx->response->add_navigation_item(admin => {
+                    label => 'Users',
+                    href  => 'admin/user/list',
+                    sort  => 50,
+                });
+            }
+
+            if ($self->check_access(
+                user    => $user,
+                special => 'admin_repository',
+                needs   => 'read',
+            )) {
+                $admin++;
+                $ctx->response->add_navigation_item(admin => {
+                    label => 'Repositories',
+                    href  => 'admin/repository/list',
+                    sort  => 50,
+                });
+            }
+
+            if ($admin) {
+                $ctx->response->add_navigation_item(user => {
+                    label => "Admin \x{25BE}",
+                    href  => '/',
+                    sort  => 300,
+                    class => 'popup',
+                    id    => 'admin-popup',
+                });
+            }
+
             $ctx->response->add_navigation_item(user => {
-                label => $ctx->session->{user}{name},
+                label => $user->name,
                 href  => 'profile',
                 sort  => 200,
             });

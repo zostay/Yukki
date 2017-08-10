@@ -140,6 +140,7 @@ In case your templates have custom menus on them, you may need to set this. The 
       - user
       - page
       - page_bottom
+      - admin
 
 This will insure that those menus are empty when they should be empty.
 
@@ -154,6 +155,7 @@ has menu_names => (
         user
         page
         page_bottom
+        admin
     ) ] },
 );
 

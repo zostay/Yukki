@@ -71,6 +71,11 @@ li.tag { margin-left: 0 }
 
 table .action .scary { color: red; font-weight: bold; font-size: 0.8em; display: none }
 
+.popup-menu { display: none }
+.popup-menu { position: absolute }
+.popup-menu { border: 1px solid #339; padding: 5px; background: white }
+.popup-menu li { list-style: none; margin: 0 }
+
 /*** Confirmation ***/
 
 .confirmation .scary { color: red; font-size: 1.1em }

@@ -4,6 +4,7 @@ use v5.24;
 use utf8;
 use Moo;
 
+use Encode qw( encode );
 use Type::Params qw( validate );
 use Scalar::Util qw( blessed reftype );
 use Spreadsheet::Engine;
@@ -191,8 +192,10 @@ sub page_template {
         my $menu_name = $_;
         "#nav-$menu_name .navigation" => {
             "menu_item<-$menu_name" => [
-                'a'      => 'menu_item.label',
-                'a@href' => 'menu_item.href',
+                'a'       => 'menu_item.label',
+                'a@href'  => 'menu_item.href',
+                'a@class' => 'menu_item.class',
+                'a@id'    => 'menu_item.id',
             ],
         },
     } @{ $self->app->settings->menu_names };
@@ -363,7 +366,7 @@ sub render_page {
     }
 
     my %menu_vars = map {
-        $_ => $self->available_menu_items($ctx, $_)
+        $_ => ($self->available_menu_items($ctx, $_) || [])
     } @{ $self->app->settings->menu_names };
 
     my @scripts = $self->app->settings->all_scripts;
@@ -424,7 +427,9 @@ sub available_menu_items {
     my @items = map {
         +{
             %$_,
-            href => $ctx->rebase_url($_->{href}),
+            id    => $_->{id},
+            class => $_->{class},
+            href  => $ctx->rebase_url($_->{href}),
         },
     } grep {
         my $url = $_->{href}; $url =~ s{\?.*$}{};
@@ -504,7 +509,7 @@ sub render {
         view => $self,
     );
 
-    return $template->render($vars);
+    return encode('UTF-8', $template->render($vars));
 }
 
 1;

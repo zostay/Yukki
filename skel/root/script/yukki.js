@@ -77,6 +77,17 @@ $(document).ready(function() {
     $('every_10s', updatePosition);
     $('form.edit-page').submit(updatePosition);
 
+    $('.popup-menu').each(function () {
+        var $menu = $(this);
+        var toggle = '#' + $menu.attr('data-toggle');
+        console.log('making ' + toggle + ' toggle something');
+        $(toggle).click(function(evt) {
+            evt.preventDefault();
+            $menu.toggle();
+            $menu.position({ of: toggle, my: 'left top', at: 'left bottom' });
+        });
+    });
+
     $('form.double-confirm').submit(function(evt) {
         var yes = window.confirm("Are you really sure? This action cannot be undone.");
         if (!yes) {
