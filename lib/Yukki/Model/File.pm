@@ -4,8 +4,6 @@ use v5.24;
 use utf8;
 use Moo;
 
-extends 'Yukki::Model';
-
 use Class::Load;
 use Digest::SHA1 qw( sha1_hex );
 use Number::Bytes::Human qw( format_bytes );
@@ -15,6 +13,8 @@ use Types::Standard qw( Maybe Str );
 use Yukki::Error qw( http_throw );
 
 use namespace::clean;
+
+extends 'Yukki::Model';
 
 # ABSTRACT: the model for loading and saving files in the wiki
 

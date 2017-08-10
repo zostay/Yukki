@@ -791,4 +791,86 @@ sub clone_repository {
     return;
 }
 
+=head2 remote_config
+
+    my $remotes = $self->remote_config;
+    say "Origin URL: $remotes->{origin}";
+
+Returns a hash contianing all the configured remotes for the repository.
+
+=cut
+
+sub remote_config {
+    my $self = shift;
+    return +{
+        map { split /\s+/ } $self->git->run('config', '--get-regex', 'remote\..*\.url')
+    };
+}
+
+=head2 remote
+
+    my $remote = $repository->remote($origin);
+
+This is a safer shortcut for:
+
+    my $remote = $app->model('Remote', { repository => $repository, name => $origin });
+
+It returns a L<Yukki::Model::Remote> or C<undef> if it does not exists.
+
+=cut
+
+sub remote {
+    my ($self, $name) = @_;
+
+    my $config = $self->remote_config;
+    return $self->app->model('Remote', {
+        repository => $self,
+        name       => $name,
+    }) if defined $config->{ $name };
+
+    return;
+}
+
+=head2 add_remote_config
+
+    $repository->add_remote_config($origin => $url);
+
+Configures a new remote repository.
+
+=cut
+
+sub add_remote_config {
+    my ($self, $name, $url) = @_;
+    $self->git->run('remote', $name, $url);
+    return;
+}
+
+=head2 remove_remote_config
+
+    $respository->remove_remote_config($origin);
+
+Deletes a remote repository from the configuration.
+
+=cut
+
+sub remove_remote_config {
+    my ($self, $name) = @_;
+    $self->git->run('remote', 'remote', $name);
+    return;
+}
+
+=head2 update_remote_config
+
+    $repository->update_remote_config($origin, $url);
+
+Updates the URL associated with a remote configuration.
+
+=cut
+
+sub update_remote_config {
+    my ($self, $name, $url) = @_;
+    $self->git->run('remote', 'set-url', $name, $url);
+    return;
+}
+
 1;
