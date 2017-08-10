@@ -237,7 +237,7 @@ sub dispatch {
 
             if ($admin) {
                 $ctx->response->add_navigation_item(repository => {
-                    label => "\x{2630}",
+                    label => "\N{TRIGRAM FOR HEAVEN}",
                     href  => '/',
                     sort  => 0,
                     class => 'admin-nav popup',
