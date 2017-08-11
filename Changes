@@ -1,5 +1,20 @@
 {{$NEXT}}
 
+    * Major: Exposed the management pages as a menu on the upper left if the
+      user has at least the special read permissions required now. This is still
+      an alpha feature and I have not yet provided any documentation on how to
+      set this up.
+    * Major: The app now has the ability to managing repository configuration.
+    * Major: The app now has the ability to initialize empty git repositories.
+    * Major: The app now has the ability to destroy the wiki git repositories
+      (PERMANENTLY DELETING WIKI DATA). As this is very dangerous, taking this
+      action requires four clicks to perform once you reach the repository admin
+      screen.
+    * Minor: More unit tests. More integration tests.
+    * Bugfix: The old 0.14* releases had added support for UTF-8. Recent trial
+      releases using Template::Pure had broken this support. This should now be
+      fixed again.
+
 0.991_002 2017-08-03 23:07:46-05:00 America/Chicago (TRIAL RELEASE)
 
     * Minor: Added a new set of management screens for managing users in the
