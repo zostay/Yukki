@@ -77,7 +77,8 @@ Given a repository name and page, returns a L<Yukki::Model::File> for it.
 =cut
 
 sub lookup_page {
-    my ($self, $repo_name, $page) = @_;
+    my ($self, $repo_name, $page, $r) = @_;
+    $r ||= 'HEAD';
 
     my $repository = $self->model('Repository', { name => $repo_name });
 
@@ -88,7 +89,7 @@ sub lookup_page {
     }
 
     my $path = join '/', @$page, $final_part;
-    return $repository->file({ path => $path, filetype => $filetype });
+    return $repository->file({ path => $path, filetype => $filetype, revision => $r });
 }
 
 =head2 view_page
@@ -103,7 +104,8 @@ sub view_page {
 
     my ($repo_name, $path) = $self->repo_name_and_path($ctx);
 
-    my $page    = $self->lookup_page($repo_name, $path);
+    my $r    = $ctx->request->query_parameters->{r};
+    my $page = $self->lookup_page($repo_name, $path, $r);
 
     my $breadcrumb = $self->breadcrumb($page->repository, $path);
 
@@ -331,13 +333,22 @@ sub view_history {
 
     my $breadcrumb = $self->breadcrumb($page->repository, $path);
 
+    my $page_url = $ctx->rebase_url(
+        join('/', 'page/view', $repo_name, $page->full_path),
+    );
+
     $ctx->response->body(
         $self->view('Page')->history($ctx, {
             title      => $page->title,
             breadcrumb => $breadcrumb,
             repository => $repo_name,
             page       => $page->full_path,
-            revisions  => [ $page->history ],
+            revisions  => [ map {
+                +{
+                    page_url => "$page_url?r=".$_->{object_id},
+                    file     => $_,
+                }
+            } $page->history ],
         })
     );
 }

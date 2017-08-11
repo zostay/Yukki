@@ -78,6 +78,8 @@ a.admin-nav { text-decoration: none }
 .popup-menu { border: 1px solid #339; padding: 5px; background: white }
 .popup-menu li { list-style: none; margin: 0 }
 
+.page-meta { margin-top: 1em }
+
 /*** Confirmation ***/
 
 .confirmation .scary { color: red; font-size: 1.1em }

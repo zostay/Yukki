@@ -50,6 +50,8 @@ sub _build_view_template {
         template   => 'page/view.html',
         directives => [
             '#yukkitext' => 'html | encoded_string',
+            '#revision'  => 'revision',
+            '#file_date' => 'file_date',
         ],
     );
 }
@@ -68,23 +70,19 @@ sub _build_history_template {
             'form@action' => 'form_action',
             '.revision'   => {
                 'rev<-revisions' => [
-                    '.first-revision input@value'  => 'rev.object_id',
-                    '.second-revision input@value' => 'rev.object_id',
-                    '.date'                        => 'rev.time_ago',
-                    '.author'                      => 'rev.author_name',
-                    '.diffstat'                    => '+={rev.lines_added}/-={rev.lines_removed}',
-                    '.comment'                     => 'rev.comment | default("(no comment)")',
-                    '.first-revision input'        => sub {
-                        my ($t, $input, $vars) = @_;
-                        $input->attr(checked => 'checked')
-                            if $vars->{index} == 2;
-                    },
-                    '.second-revision input'       => sub {
-                        my ($t, $input, $vars) = @_;
-                        $input->attr(checked => 'checked')
-                            if $vars->{index} == 1;
-                    },
+                    '.first-revision input@value'  => 'rev.file.object_id',
+                    '.second-revision input@value' => 'rev.file.object_id',
+                    '.date a'                        => 'rev.file.time_ago',
+                    '.date a@href'                 => '={rev.page_url}',
+                    '.author'                      => 'rev.file.author_name',
+                    '.diffstat'                    => '+={rev.file.lines_added}/-={rev.file.lines_removed}',
+                    '.comment'                     => 'rev.file.comment | default("(no comment)")',
                 ],
+            },
+            sub {
+                my ($t, $dom, $data) = @_;
+                $dom->at('.revision:nth-child(2) .first-revision input')->attr(checked => 1);
+                $dom->at('.revision:nth-child(1) .second-revision input')->attr(checked => 1);
             },
         ],
     );
@@ -269,11 +267,21 @@ sub view {
 
     $self->page_navigation($ctx->response, 'view', $vars);
 
+    $ctx->add_info("This is a historical version of this page")
+        if $file->revision ne 'HEAD'
+           and $file->find_path($file->full_path)
+                ne $file->object_id;
+
+    my $rev8 = $file->revision;
+    $rev8 = substr $rev8, 0, 8 if $file->revision ne 'HEAD';
+
     return $self->render_page(
         template => $self->view_template,
         context  => $ctx,
         vars     => {
-            'html' => $html,
+            'html'      => $html,
+            'revision'  => $rev8,
+            'file_date' => $file->file_date('relative'),
         },
     );
 }

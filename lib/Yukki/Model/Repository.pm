@@ -145,6 +145,21 @@ sub _build_git {
 
 =head1 METHODS
 
+=head2 resolve_ref
+
+    my $r = $self->resolve_ref($ref);
+
+Returns the reference to use for looking up information based on C<$r>. If C<$r> is undefined or set to "HEAD", this will default to using the current C<branch>. Otherwise, C<$ref> is used as-is.
+
+=cut
+
+sub resolve_ref {
+    my ($self, $ref) = @_;
+    return $self->branch unless defined $ref;
+    return $self->branch if $ref eq 'HEAD';
+    return $ref;
+}
+
 =head2 repository_exists
 
 Checks to see if the git repository is present at all.
@@ -455,19 +470,20 @@ blob at that path for the L</branch>.
 =cut
 
 sub find_path {
-    my ($self, $path) = @_;
+    my ($self, $path, $r) = @_;
+    $r = $self->resolve_ref($r);
 
     my $object_id;
     my @files;
     try {
-        @files = $self->git->run('ls-tree', $self->branch, $path);
+        @files = $self->git->run('ls-tree', $r, $path);
     }
     catch {
 
         # Looks like an empty repo, try initializing it
         if ($_ =~ /Not a valid object name/) {
             $self->initialize_repository;
-            @files = $self->git->run('ls-tree', $self->branch, $path);
+            @files = $self->git->run('ls-tree', $r, $path);
         }
 
         # I don't know what this is, die die die!
@@ -501,18 +517,36 @@ sub show {
     return $self->git->run('show', $object_id);
 }
 
+=head2 fetch_date
+
+    my $date = $repository->fetch_date($path, $r);
+
+Returns the modification date for the file as of the given revision (or use the
+latest revision if no revision is named).
+
+=cut
+
+sub fetch_date {
+    my ($self, $path, $r, $format) = @_;
+    $r = $self->resolve_ref($r);
+    $format //= 'format:%s';
+
+    return $self->git->run('log', "--date=$format", '-1', '--format=%ad', $r, '--', $path);
+}
+
 =head2 fetch_size
 
   my $bytes = $repository->fetch_size($path);
 
-Returns the size, in bites, of the blob at the given path.
+Returns the size, in bytes, of the blob at the given path.
 
 =cut
 
 sub fetch_size {
-    my ($self, $path) = @_;
+    my ($self, $path, $r) = @_;
+    $r = $self->resolve_ref($r);
 
-    my @files = $self->git->run('ls-tree', '-l', $self->branch, $path);
+    my @files = $self->git->run('ls-tree', '-l', $r, $path);
     FILE: for my $line (@files) {
         my ($mode, $type, $id, $size, $name) = split /\s+/, $line, 5;
         return $size if $name eq $path;
@@ -531,10 +565,11 @@ C<$path> in the repository.
 =cut
 
 sub list_files {
-    my ($self, $path) = @_;
+    my ($self, $path, $r) = @_;
+    $r = $self->resolve_ref($r);
     my @files;
 
-    my @tree_files = $self->git->run('ls-tree', $self->branch, $path . '/');
+    my @tree_files = $self->git->run('ls-tree', $r, $path . '/');
     FILE: for my $line (@tree_files) {
         my ($mode, $type, $id, $name) = split /\s+/, $line, 4;
 
@@ -628,10 +663,11 @@ Number of lines removed.
 =cut
 
 sub log {
-    my ($self, $full_path) = @_;
+    my ($self, $full_path, $r) = @_;
+    $r = $self->resolve_ref($r);
 
     my @lines = $self->git->run(
-        'log', $self->branch, '--pretty=format:%H~%an~%aD~%ar~%s', '--numstat',
+        'log', $r, '--pretty=format:%H~%an~%aD~%ar~%s', '--numstat',
         '--', $full_path
     );
 

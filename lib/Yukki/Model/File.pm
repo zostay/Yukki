@@ -82,6 +82,7 @@ has repository => (
         'commit_tree'         => 'commit_tree',
         'update_root'         => 'update_root',
         'find_path'           => 'find_path',
+        'fetch_date'          => 'fetch_date',
         'fetch_size'          => 'fetch_size',
         'repository_name'     => 'name',
         'author_name'         => 'author_name',
@@ -90,6 +91,22 @@ has repository => (
         'diff_blobs'          => 'diff_blobs',
     },
 );
+
+=head2 revision
+
+Defaults to C<HEAD>, which is a synthetic version meaning "whatever is the latest revision." If not set to "HEAD", it is assumed to be a reference to a particular revision.
+
+Setting this to a revision allows historical versions of the file to be fetched.
+
+=cut
+
+has revision => (
+    is          => 'ro',
+    isa         => Str,
+    required    => 1,
+    default     => 'HEAD',
+);
+
 
 =head1 METHODS
 
@@ -171,7 +188,7 @@ This is the git object ID of the file blob.
 
 sub object_id {
     my $self = shift;
-    return $self->find_path($self->full_path);
+    return $self->find_path($self->full_path, $self->revision);
 }
 
 =head2 title
@@ -203,6 +220,17 @@ sub title {
     return $title;
 }
 
+=head2 file_date
+
+This is the date the file was lasted modified in seconds since the epoch.
+
+=cut
+
+sub file_date {
+    my ($self, $format) = @_;
+    return $self->fetch_date($self->full_path, $self->revision, $format);
+}
+
 =head2 file_size
 
 This is the size of the file in bytes.
@@ -211,7 +239,7 @@ This is the size of the file in bytes.
 
 sub file_size {
     my $self = shift;
-    return $self->fetch_size($self->full_path);
+    return $self->fetch_size($self->full_path, $self->revision);
 }
 
 =head2 formatted_file_size
@@ -368,7 +396,7 @@ sub exists {
     my $self = shift;
 
     my $path = $self->full_path;
-    return $self->find_path($path);
+    return $self->find_path($path, $self->revision);
 }
 
 =head2 fetch
@@ -384,7 +412,7 @@ sub fetch {
     my $self = shift;
 
     my $path = $self->full_path;
-    my $object_id = $self->find_path($path);
+    my $object_id = $self->find_path($path, $self->revision);
 
     return unless defined $object_id;
 
@@ -532,7 +560,7 @@ List the files attached to/under this file path.
 
 sub list_files {
     my ($self) = @_;
-    return $self->repository->list_files($self->path);
+    return $self->repository->list_files($self->path, $self->revision);
 }
 
 =head2 parent
