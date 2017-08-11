@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+0.991_003 2017-08-10 19:21:44-05:00 America/Chicago (TRIAL RELEASE)
+
     * Major: Exposed the management pages as a menu on the upper left if the
       user has at least the special read permissions required now. This is still
       an alpha feature and I have not yet provided any documentation on how to
