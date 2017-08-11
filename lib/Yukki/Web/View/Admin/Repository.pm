@@ -127,10 +127,10 @@ sub list {
         my $action = $self->render_links(
             context => $ctx,
             links   => [
-                {
+                ($repo->repository_exists ? {
                     label => 'View',
                     href  => '/page/view/' . $repo->name,
-                },
+                } : ()),
                 ($repo->repository_exists ? () :
                 {
                     label => 'Initialize',
