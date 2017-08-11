@@ -150,7 +150,7 @@ validation_spec edit_page => [
         into => '+',
     ],
     comment => [
-        required => 1,
+        optional => 1,
     ],
 ];
 

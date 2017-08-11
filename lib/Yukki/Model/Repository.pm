@@ -877,4 +877,18 @@ sub update_remote_config {
     return;
 }
 
+=head2 fetch_remote
+
+    $repository->fetch_remote($origin);
+
+Fetches the refs for the remote repository named C<$origin>.
+
+=cut
+
+sub fetch_remote {
+    my ($self, $name) = @_;
+    $self->git->run('fetch', $name);
+    return;
+}
+
 1;
