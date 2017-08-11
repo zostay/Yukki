@@ -5,11 +5,11 @@
 
 # NAME
 
-Yukki::Manual::Installation - installaction instructions
+Yukki::Manual::Installation - installation instructions
 
 # VERSION
 
-version 0.991\_003
+version 0.991\_004
 
 # SYNOPSIS
 
