@@ -803,7 +803,11 @@ Returns a hash contianing all the configured remotes for the repository.
 sub remote_config {
     my $self = shift;
     return +{
-        map { split /\s+/ } $self->git->run('config', '--get-regex', 'remote\..*\.url')
+        map {
+            my ($k, $v) = split /\s+/;
+            my ($r, $n, $u) = split /[.]/, $k, 3;
+            ($n, $v);
+        } $self->git->run('config', '--get-regex', 'remote\..*\.url')
     };
 }
 

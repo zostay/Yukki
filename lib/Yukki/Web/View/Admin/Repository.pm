@@ -38,6 +38,7 @@ sub _build_list_template {
                     '.title' => 'repo.name',
                     '.branch' => 'repo.branch',
                     '.default_page' => 'repo.default_page',
+                    '.remotes' => 'repo.remotes | encoded_string',
                     '.action' => 'repo.action | encoded_string',
                 ],
             },
@@ -69,6 +70,27 @@ sub _build_edit_template {
                 'form.anonymous_access_level',
                 'default.anonymous_access_level',
             ),
+        ],
+    );
+}
+
+has remotes_template => (
+    is          => 'ro',
+    isa         => class_type('Template::Pure'),
+    lazy        => 1,
+    builder     => '_build_remotes_template',
+);
+
+sub _build_remotes_template {
+    shift->prepare_template(
+        template   => 'admin/repository/remotes.html',
+        directives => [
+            '.remote' => {
+                'remote<-remotes' => [
+                    '.@title' => 'remote',
+                    '.'       => 'i.index',
+                ],
+            },
         ],
     );
 }
@@ -133,6 +155,13 @@ sub list {
             title => $repo->repository_settings->name,
             branch => $repo->repository_settings->site_branch,
             default_page => $repo->repository_settings->default_page,
+            remotes => $self->render(
+                template => $self->remotes_template,
+                context  => $ctx,
+                vars     => {
+                    remotes => $repo->remote_config,
+                },
+            ),
             action => $action,
         }
     } sort {
