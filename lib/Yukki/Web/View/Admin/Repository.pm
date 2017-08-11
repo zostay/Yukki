@@ -150,18 +150,21 @@ sub list {
             ],
         );
 
+        my $remotes = '';
+        $remotes = $self->render(
+            template => $self->remotes_template,
+            context  => $ctx,
+            vars     => {
+                remotes => $repo->remote_config,
+            },
+        ) if $repo->repository_exists;
+
         {
             name => $repo->name,
             title => $repo->repository_settings->name,
             branch => $repo->repository_settings->site_branch,
             default_page => $repo->repository_settings->default_page,
-            remotes => $self->render(
-                template => $self->remotes_template,
-                context  => $ctx,
-                vars     => {
-                    remotes => $repo->remote_config,
-                },
-            ),
+            remotes => $remotes,
             action => $action,
         }
     } sort {

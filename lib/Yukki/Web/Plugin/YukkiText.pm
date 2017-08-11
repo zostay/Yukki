@@ -205,7 +205,7 @@ sub yukkitext {
     my $file       = $params->{file};
     my $position   = 0 + ($params->{position} // -1);
     my $repository = $file->repository_name;
-    my $yukkitext  = $file->fetch;
+    my $yukkitext  = $file->fetch // '';
 
     $yukkitext =~ s[(.{$position}.*?)$][$1<span id="yukkitext-caret"></span>]sm
         if $position >= 0;

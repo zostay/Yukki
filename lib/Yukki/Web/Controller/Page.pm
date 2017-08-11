@@ -190,11 +190,11 @@ sub edit_page {
 
         else {
             my @errors;
-            push @errors, "Comment is required."
+            push @errors, "comment is required"
                 if $err->{comment};
-            push @errors, "Please try again."
+            push @errors, "please try again"
                 if $err->{yukkitext_position};
-            push @errors, "Wiki content is required."
+            push @errors, "wiki content is required"
                 if $err->{yukkitext};
 
             $ctx->add_errors(@errors);
