@@ -2,7 +2,7 @@ package Yukki::TemplateUtil;
 
 use v5.24;
 use utf8;
-
+use warnings;
 use Mojo::DOM58::Entities qw( html_escape );
 use Try::Tiny;
 

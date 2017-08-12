@@ -2,7 +2,7 @@ package Yukki::TextUtil;
 
 use v5.24;
 use utf8;
-
+use warnings;
 use Encode ();
 use IO::Prompter ();
 use Path::Tiny;
