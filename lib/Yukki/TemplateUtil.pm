@@ -84,7 +84,7 @@ errors are set.
 sub form_error {
     my ($data_path, $id) = @_;
     my $path = "form_errors.$data_path";
-    my $id //= "#$data_path";
+    $id //= "#$data_path";
 
     sub {
         my ($template, $dom, $data) = @_;
