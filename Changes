@@ -3,6 +3,8 @@
     * Major: You can now view historical versions of documents, not just diffs.
     * Minor: The default template shows the revision being shown and the last
       modified date of the file at the bottom.
+    * Bugfix: Correct hang on edit when comment is undefined.
+    * Bugfix: Correct some menu bugs in the repository admin page.
 
 0.991_003 2017-08-10 19:21:44-05:00 America/Chicago (TRIAL RELEASE)
 

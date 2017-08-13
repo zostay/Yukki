@@ -436,7 +436,7 @@ sub commit_tree {
 
     return $self->git->run(
         'commit-tree', $new_tree_id, '-p', $old_tree_id, {
-            input => $comment,
+            input => $comment // '',
             env   => {
                 GIT_AUTHOR_NAME  => $self->author_name,
                 GIT_AUTHOR_EMAIL => $self->author_email,
