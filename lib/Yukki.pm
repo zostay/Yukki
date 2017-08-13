@@ -22,7 +22,7 @@ use Try::Tiny;
 
 use namespace::clean;
 
-# ABSTRACT: Yet Uh-nother wiki - a git-based wiki
+# ABSTRACT: Yet Uh-nother wiki - a git-based wiki with workgroups
 
 =head1 DESCRIPTION
 

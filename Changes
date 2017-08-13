@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+0.991_004 2017-08-12 21:53:13-05:00 America/Chicago (TRIAL RELEASE)
+
     * Major: You can now view historical versions of documents, not just diffs.
     * Minor: The default template shows the revision being shown and the last
       modified date of the file at the bottom.
