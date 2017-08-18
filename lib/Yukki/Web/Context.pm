@@ -8,6 +8,7 @@ use Sub::Name qw( subname );
 use Type::Utils;
 use Types::Standard qw( ArrayRef HashRef Str );
 use Types::URI qw( Uri );
+use URI;
 use Yukki::Web::Request;
 use Yukki::Web::Response;
 
@@ -157,7 +158,7 @@ sub _build_base_url {
     }
 
     else {
-        return $_;
+        return URI->new($base_url);
     }
 }
 

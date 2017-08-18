@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+    * Bugfix: Using an absolute URI as the base_url was not working.
+
 0.991_004 2017-08-12 21:53:13-05:00 America/Chicago (TRIAL RELEASE)
 
     * Major: You can now view historical versions of documents, not just diffs.
