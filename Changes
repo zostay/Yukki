@@ -1,5 +1,8 @@
 {{$NEXT}}
 
+    * Bugfix: Fixed alternate views (like plain) that did not define
+      placeholders for all the features that are part of the standard template.
+
 0.991_005 2017-08-18 13:43:42-05:00 America/Chicago (TRIAL RELEASE)
 
     * Bugfix: Using an absolute URI as the base_url was not working.

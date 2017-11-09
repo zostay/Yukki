@@ -200,32 +200,48 @@ sub page_template {
         },
     } @{ $self->app->settings->menu_names };
 
+    # Page styles may omit bits they don't care about. Check to see if the
+    # template will support them and leave them off if not. Template::Pure dies
+    # if a directive asks for an element that isn't part of the page. :(
+    my @optional_directives = (
+        $view_args->{directives}->@*,
+        'head script.local' => {
+            'script<-scripts' => [
+                '@src' => 'script',
+            ],
+        },
+        'head link.local'   => {
+            'link<-links' => [
+                '@href' => 'link',
+            ],
+        },
+        '#messages'   => 'messages | encoded_string',
+        'title'       => 'main_title',
+        '.masthead-title' => 'title',
+        %menu_vars,
+        '#breadcrumb li' => {
+            'crumb<-breadcrumb' => [
+                'a'      => 'crumb.label',
+                'a@href' => 'crumb.href',
+            ],
+        },
+        '#content'    => 'content | encoded_string',
+    );
+
+    my $template_content =
+        $self->app->locate_dir('template_path', $view_args->{template})->slurp_utf8;
+    my $template_dom = Mojo::DOM58->new($template_content);
+
+    my @directives;
+    while (my ($css, $lookup) = splice(@optional_directives, 0, 2)) {
+        if (defined $template_dom->at($css)) {
+            push @directives, $css, $lookup;
+        }
+    }
+
     return $self->_page_templates->{ $which } = $self->prepare_template(
         template   => $view_args->{template},
-        directives => [
-            $view_args->{directives}->@*,
-            'head script.local' => {
-                'script<-scripts' => [
-                    '@src' => 'script',
-                ],
-            },
-            'head link.local'   => {
-                'link<-links' => [
-                    '@href' => 'link',
-                ],
-            },
-            '#messages'   => 'messages | encoded_string',
-            'title'       => 'main_title',
-            '.masthead-title' => 'title',
-            %menu_vars,
-            '#breadcrumb li' => {
-                'crumb<-breadcrumb' => [
-                    'a'      => 'crumb.label',
-                    'a@href' => 'crumb.href',
-                ],
-            },
-            '#content'    => 'content | encoded_string',
-        ],
+        directives => \@directives,
     );
 }
 
