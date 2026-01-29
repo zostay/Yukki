@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/zostay/Yukki.svg?branch=master)](https://travis-ci.org/zostay/Yukki)
 [![Coverage Status](https://coveralls.io/repos/zostay/Yukki/badge.svg?branch=master)](https://coveralls.io/r/zostay/Yukki?branch=master)
 [![GitHub issues](https://img.shields.io/github/issues/zostay/Yukki.svg)](https://github.com/zostay/Yukki/issues)
-[![Kwalitee status](http://cpants.cpanauthors.org/dist/Yukki.png)](http://cpants.charsbar.org/dist/overview/Yukki)
+[![Kwalitee status](https://cpants.cpanauthors.org/dist/Yukki.png)](https://cpants.cpanauthors.org/dist/Yukki)
 
 # NAME
 
@@ -9,7 +9,7 @@ Yukki::Manual::Installation - installation instructions
 
 # VERSION
 
-version 0.991\_006
+version 0.991\_007
 
 # SYNOPSIS
 
@@ -39,7 +39,7 @@ The ["SYNOPSIS"](#synopsis) pretty well sums up the highlights of installation. 
 
 # INSTALLATION
 
-The code can be installed like any other CPAN module. By using [App::cpanminus](https://metacpan.org/pod/App::cpanminus) or [CPAN](https://metacpan.org/pod/CPAN), you will get all the dependencies downloaded and installed automatically for you.
+The code can be installed like any other CPAN module. By using [App::cpanminus](https://metacpan.org/pod/App%3A%3Acpanminus) or [CPAN](https://metacpan.org/pod/CPAN), you will get all the dependencies downloaded and installed automatically for you.
 
 # SITE SETUP
 
@@ -64,7 +64,7 @@ Most of these commands (all except `yukki-setup`) look for a file named `etc/yuk
 
 If no file is found, the script will stop and complain of an error.
 
-See [Yukki::Settings](https://metacpan.org/pod/Yukki::Settings) and [Yukki::Web::Settings](https://metacpan.org/pod/Yukki::Web::Settings) for a complete list of configuration directives.
+See [Yukki::Settings](https://metacpan.org/pod/Yukki%3A%3ASettings) and [Yukki::Web::Settings](https://metacpan.org/pod/Yukki%3A%3AWeb%3A%3ASettings) for a complete list of configuration directives.
 
 # REPOSITORY INITIALIZATION
 
@@ -100,7 +100,7 @@ Andrew Sterling Hanenkamp <hanenkamp@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Qubling Software LLC.
+This software is copyright (c) 2026 by Qubling Software LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
