@@ -1,0 +1,44 @@
+name: Test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        perl-version:
+          - '5.24'
+          - '5.26'
+          - '5.32'
+          - '5.38'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Perl ${{ matrix.perl-version }}
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl-version }}
+
+      - name: Configure git
+        run: |
+          git config --global user.email 'test@example.com'
+          git config --global user.name 'Test User'
+
+      - name: Install Dist::Zilla
+        run: cpanm --notest --quiet Dist::Zilla
+
+      - name: Install author dependencies
+        run: dzil authordeps --missing | cpanm --notest --quiet
+
+      - name: Install dependencies
+        run: dzil listdeps --missing | cpanm --notest --quiet
+
+      - name: Run tests
+        run: dzil test --release --verbose
