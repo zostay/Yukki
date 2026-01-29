@@ -32,7 +32,7 @@ jobs:
         run: dzil listdeps --missing | cpanm --notest --quiet
 
       - name: Install test dependencies
-        run: cpanm --notest --quiet Test::Pod::Coverage Test::Pod
+        run: cpanm --notest --quiet Test::Pod::Coverage Test::Pod Pod::Coverage::TrustPod
 
       - name: Run tests
         run: dzil test --release --verbose
