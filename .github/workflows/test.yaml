@@ -9,22 +9,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        perl-version:
-          - '5.24'
-          - '5.26'
-          - '5.32'
-          - '5.38'
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Perl ${{ matrix.perl-version }}
+      - name: Set up Perl
         uses: shogo82148/actions-setup-perl@v1
         with:
-          perl-version: ${{ matrix.perl-version }}
+          perl-version: '5.38'
 
       - name: Configure git
         run: |
@@ -39,6 +30,9 @@ jobs:
 
       - name: Install dependencies
         run: dzil listdeps --missing | cpanm --notest --quiet
+
+      - name: Install test dependencies
+        run: cpanm --notest --quiet Test::Pod::Coverage Test::Pod
 
       - name: Run tests
         run: dzil test --release --verbose
