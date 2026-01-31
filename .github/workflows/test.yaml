@@ -9,13 +9,16 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        perl-version: ['5.24', '5.38']
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Perl
         uses: shogo82148/actions-setup-perl@v1
         with:
-          perl-version: '5.38'
+          perl-version: ${{ matrix.perl-version }}
 
       - name: Configure git
         run: |
