@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+0.991_007 2026-01-31 12:53:24-06:00 America/Chicago (TRIAL RELEASE)
+
     * Bugfix: Fixed alternate views (like plain) that did not define
       placeholders for all the features that are part of the standard template.
 
