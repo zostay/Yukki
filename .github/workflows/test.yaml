@@ -29,10 +29,16 @@ jobs:
         run: cpanm --notest --quiet Dist::Zilla
 
       - name: Install author dependencies
-        run: dzil authordeps --missing | cpanm --notest --quiet
+        shell: bash
+        run: |
+          set -euo pipefail
+          dzil authordeps --missing | cpanm --notest --quiet
 
       - name: Install dependencies
-        run: dzil listdeps --missing | cpanm --notest --quiet
+        shell: bash
+        run: |
+          set -euo pipefail
+          dzil listdeps --missing | cpanm --notest --quiet
 
       - name: Install test dependencies
         run: cpanm --notest --quiet Test::Pod::Coverage Test::Pod Pod::Coverage::TrustPod
