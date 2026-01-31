@@ -1,4 +1,5 @@
-[![Test](https://github.com/zostay/Yukki/actions/workflows/test.yaml/badge.svg)](https://github.com/zostay/Yukki/actions/workflows/test.yaml)
+[![Build Status](https://travis-ci.org/zostay/Yukki.svg?branch=master)](https://travis-ci.org/zostay/Yukki)
+[![Coverage Status](https://coveralls.io/repos/zostay/Yukki/badge.svg?branch=master)](https://coveralls.io/r/zostay/Yukki?branch=master)
 [![GitHub issues](https://img.shields.io/github/issues/zostay/Yukki.svg)](https://github.com/zostay/Yukki/issues)
 [![Kwalitee status](https://cpants.cpanauthors.org/dist/Yukki.png)](https://cpants.cpanauthors.org/dist/Yukki)
 
